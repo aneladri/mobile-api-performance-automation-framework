@@ -6,17 +6,16 @@ import java.util.Properties;
 
 public class PropertyLoader {
 
-    public static Properties load(String filePath) {
+    private PropertyLoader() {
+    }
 
+    public static Properties load(String filePath) {
         Properties properties = new Properties();
 
-        try (FileInputStream fis = new FileInputStream(filePath)) {
-            properties.load(fis);
+        try (FileInputStream input = new FileInputStream(filePath)) {
+            properties.load(input);
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Unable to load properties file: " + filePath,
-                    e
-            );
+            throw new RuntimeException("Unable to load properties file: " + filePath, e);
         }
 
         return properties;
