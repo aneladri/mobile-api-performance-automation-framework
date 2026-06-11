@@ -1,0 +1,11 @@
+.gradle/
+build/
+.DS_Store
+.vscode/
+.idea/
+*.iml
+logs/
+*.log
+node_modules/
+allure-results/
+allure-report/
