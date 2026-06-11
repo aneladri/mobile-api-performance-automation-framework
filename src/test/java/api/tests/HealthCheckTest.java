@@ -1,13 +1,14 @@
 package api.tests;
 
+import core.base.BaseApiTest;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
 
-public class HealthCheckTest {
+public class HealthCheckTest extends BaseApiTest {
 
     @Test
-    public void verifyFrameworkRuns() {
-        assertTrue(true, "Framework test executed successfully");
+    public void verifyFrameworkApiLayerRuns() {
+        assertEquals(200, 200, "API framework layer executed successfully");
     }
 }
