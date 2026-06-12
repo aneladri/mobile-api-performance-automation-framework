@@ -4,6 +4,7 @@ import core.driver.DriverManager;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import mobile.utils.WaitUtils;
 
 public class BaseScreen {
 
@@ -14,7 +15,7 @@ public class BaseScreen {
     }
 
     protected WebElement find(By locator) {
-        return driver.findElement(locator);
+        return WaitUtils.waitForVisible(locator);
     }
 
     protected void tap(By locator) {
