@@ -8,8 +8,10 @@ repositories {
 
 dependencies {
 
+    // Test Framework
     testImplementation 'org.testng:testng:7.10.2'
 
+    // Appium
     testImplementation 'io.appium:java-client:9.4.0'
 
     // Logging
@@ -17,7 +19,11 @@ dependencies {
     testImplementation 'org.apache.logging.log4j:log4j-core:2.24.3'
     testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3'
 
+    // API Automation
     testImplementation 'io.rest-assured:rest-assured:5.5.0'
+
+    // Allure Reporting
+    //testImplementation 'io.qameta.allure:allure-testng:2.29.1'
 }
 
 test {
