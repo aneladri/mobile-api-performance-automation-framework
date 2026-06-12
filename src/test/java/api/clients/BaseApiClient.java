@@ -1,9 +1,8 @@
 package api.clients;
 
+import api.builders.RequestBuilder;
 import core.config.ConfigManager;
 import io.restassured.specification.RequestSpecification;
-
-import static io.restassured.RestAssured.given;
 
 public class BaseApiClient {
 
@@ -11,9 +10,10 @@ public class BaseApiClient {
     }
 
     public static RequestSpecification request() {
-        return given()
-                .baseUri(ConfigManager.getRequired("baseUrl"))
-                .header("Content-Type", "application/json")
-                .log().all();
+
+        return RequestBuilder.defaultRequest()
+                .baseUri(
+                        ConfigManager.getRequired("baseUrl")
+                );
     }
 }

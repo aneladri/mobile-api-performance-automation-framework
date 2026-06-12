@@ -9,7 +9,7 @@ public class RequestBuilder {
     private RequestBuilder() {
     }
 
-    public static RequestSpecification getDefaultRequest() {
+    public static RequestSpecification defaultRequest() {
 
         return given()
                 .header("Content-Type", "application/json")
