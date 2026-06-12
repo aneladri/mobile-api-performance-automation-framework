@@ -24,6 +24,9 @@ dependencies {
 
     // Allure Reporting
     testImplementation 'io.qameta.allure:allure-testng:2.29.1'
+
+    // JSON Schema Validation
+    testImplementation 'io.rest-assured:json-schema-validator:5.5.0'
 }
 
 test {
