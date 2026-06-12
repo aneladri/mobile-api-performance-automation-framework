@@ -23,7 +23,7 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:5.5.0'
 
     // Allure Reporting
-    //testImplementation 'io.qameta.allure:allure-testng:2.29.1'
+    testImplementation 'io.qameta.allure:allure-testng:2.29.1'
 }
 
 test {

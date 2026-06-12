@@ -1,14 +1,21 @@
 package api.tests;
 
+import api.clients.BaseApiClient;
+import api.endpoints.ApiEndpoints;
+import api.validators.ResponseValidator;
 import core.base.BaseApiTest;
+import io.restassured.response.Response;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 public class HealthCheckTest extends BaseApiTest {
 
     @Test
     public void verifyFrameworkApiLayerRuns() {
-        assertEquals(200, 200, "API framework layer executed successfully");
+        Response response = BaseApiClient.request()
+                .when()
+                .get(ApiEndpoints.STATUS_200);
+
+        ResponseValidator.validateStatusCode(response, 200);
+        ResponseValidator.validateResponseTime(response, 3000);
     }
 }
