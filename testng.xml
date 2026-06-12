@@ -9,6 +9,7 @@
     <test name="API Smoke Tests">
         <classes>
             <class name="api.tests.HealthCheckTest"/>
+            <class name="api.tests.PayloadManagerTest"/>
         </classes>
     </test>
 </suite>
