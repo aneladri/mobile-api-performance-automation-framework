@@ -10,6 +10,7 @@
         <classes>
             <class name="api.tests.HealthCheckTest"/>
             <class name="api.tests.PayloadManagerTest"/>
+            <class name="mobile.tests.ApiDemosLaunchTest"/>
         </classes>
     </test>
 </suite>

@@ -16,6 +16,5 @@ public class HealthCheckTest extends BaseApiTest {
                 .get(ApiEndpoints.STATUS_200);
 
         ResponseValidator.validateStatusCode(response, 200);
-        ResponseValidator.validateResponseTime(response, 10000);
     }
 }

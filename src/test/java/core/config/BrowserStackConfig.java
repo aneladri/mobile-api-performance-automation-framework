@@ -6,15 +6,10 @@ public final class BrowserStackConfig {
     }
 
     public static String getHubUrl() {
-
         return String.format(
                 "https://%s:%s@hub-cloud.browserstack.com/wd/hub",
-                ConfigManager.getRequired(
-                        "browserstackUserName"
-                ),
-                ConfigManager.getRequired(
-                        "browserstackAccessKey"
-                )
+                ConfigManager.getRequired("browserstackUserName"),
+                ConfigManager.getRequired("browserstackAccessKey")
         );
     }
 }
