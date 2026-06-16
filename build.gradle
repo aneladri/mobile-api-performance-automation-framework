@@ -34,3 +34,21 @@ test {
         suites 'testng.xml'
     }
 }
+
+tasks.register('apiTest', Test) {
+    useTestNG() {
+        suites 'testng-api.xml'
+    }
+}
+
+tasks.register('mobileTest', Test) {
+    useTestNG() {
+        suites 'testng-mobile.xml'
+    }
+}
+
+tasks.register('regressionTest', Test) {
+    useTestNG() {
+        suites 'testng-regression.xml'
+    }
+}
