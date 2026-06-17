@@ -1,12 +1,15 @@
 package core.driver;
 
+import core.config.BrowserStackConfig;
 import core.config.ConfigManager;
+import core.config.ExecutionConfig;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import mobile.capabilities.AndroidCapabilities;
+import mobile.capabilities.BrowserStackCapabilities;
 import mobile.capabilities.IosCapabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
 import java.time.Duration;
@@ -17,51 +20,40 @@ public class DriverFactory {
     }
 
     public static void createDriver(String platform) {
+        try {
+            AppiumDriver driver;
 
-    try {
+            if (platform.equalsIgnoreCase("android")) {
+                DesiredCapabilities capabilities;
+                String serverUrl;
 
-        AppiumDriver driver;
+                if (ExecutionConfig.isBrowserStack()) {
+                    capabilities = BrowserStackCapabilities.buildAndroid();
+                    serverUrl = BrowserStackConfig.getHubUrl();
+                } else {
+                    capabilities = AndroidCapabilities.build();
+                    serverUrl = ConfigManager.getRequired("appiumServerUrl");
+                }
 
-        if (platform.equalsIgnoreCase("android")) {
+                driver = new AndroidDriver(new URL(serverUrl), capabilities);
 
-            DesiredCapabilities capabilities =
-                    AndroidCapabilities.build();
+            } else if (platform.equalsIgnoreCase("ios")) {
+                DesiredCapabilities capabilities = IosCapabilities.build();
 
-            driver = new AndroidDriver(
-                    new URL(ConfigManager.getRequired("appiumServerUrl")),
-                    capabilities
-            );
+                driver = new IOSDriver(
+                        new URL(ConfigManager.getRequired("appiumServerUrl")),
+                        capabilities
+                );
 
-        } else if (platform.equalsIgnoreCase("ios")) {
+            } else {
+                throw new RuntimeException("Unsupported mobile platform: " + platform);
+            }
 
-            DesiredCapabilities capabilities =
-                    IosCapabilities.build();
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+            DriverManager.setDriver(driver);
 
-            driver = new IOSDriver(
-                    new URL(ConfigManager.getRequired("appiumServerUrl")),
-                    capabilities
-            );
-
-        } else {
-
-            throw new RuntimeException(
-                    "Unsupported mobile platform: " + platform
-            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create Appium driver for platform: " + platform, e);
         }
-
-        driver.manage()
-                .timeouts()
-                .implicitlyWait(Duration.ofSeconds(10));
-
-        DriverManager.setDriver(driver);
-
-    } catch (Exception e) {
-
-        throw new RuntimeException(
-                "Failed to create Appium driver for platform: "
-                        + platform,
-                e
-        );
     }
-}
 }
