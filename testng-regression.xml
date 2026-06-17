@@ -4,6 +4,7 @@
 
     <listeners>
         <listener class-name="core.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
 
     <test name="API Regression Tests">
