@@ -52,3 +52,7 @@ tasks.register('regressionTest', Test) {
         suites 'testng-regression.xml'
     }
 }
+
+tasks.withType(Test).configureEach {
+    systemProperty "allure.results.directory", "$buildDir/allure-results"
+}
