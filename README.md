@@ -7,7 +7,7 @@
 | Framework Name  | Unified Test Automation Framework (UTAF)       |
 | Version         | 1.0.0                                          |
 | Framework Type  | Mobile, API & Performance Automation           |
-| Created By      | YOUR NAME                                      |
+| Created By      | Aneesh Neladri                                      |
 | Role            | Senior QA Automation Engineer / Test Architect |
 | Initial Release | June 2026                                      |
 | Status          | Active Development                             |
