@@ -16,41 +16,19 @@ public final class BrowserStackCapabilities {
         DesiredCapabilities capabilities =
                 new DesiredCapabilities();
 
-        capabilities.setCapability(
-                "platformName",
-                "Android"
-        );
+        capabilities.setCapability("platformName", "Android");
 
         Map<String, Object> browserstackOptions =
                 new HashMap<>();
 
         browserstackOptions.put(
                 "deviceName",
-                ConfigManager.getRequired(
-                        "browserstackDeviceName"
-                )
+                ConfigManager.getRequired("browserstackDeviceName")
         );
 
         browserstackOptions.put(
                 "osVersion",
-                ConfigManager.getRequired(
-                        "browserstackOsVersion"
-                )
-        );
-
-        browserstackOptions.put(
-                "projectName",
-                "MAPAF"
-        );
-
-        browserstackOptions.put(
-                "buildName",
-                "Regression Build"
-        );
-
-        browserstackOptions.put(
-                "sessionName",
-                "Android Test"
+                ConfigManager.getRequired("browserstackOsVersion")
         );
 
         capabilities.setCapability(
@@ -60,9 +38,7 @@ public final class BrowserStackCapabilities {
 
         capabilities.setCapability(
                 "appium:app",
-                ConfigManager.getRequired(
-                        "browserstackAppId"
-                )
+                ConfigManager.getRequired("browserstackAppId")
         );
 
         return capabilities;
