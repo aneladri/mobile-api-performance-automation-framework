@@ -1,6 +1,8 @@
-name: API Test
+name: API Tests
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - develop
@@ -32,9 +34,23 @@ jobs:
       - name: Run API tests
         run: ./gradlew clean apiTest
 
-      - name: Upload test report
+      - name: Upload Gradle HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: api-test-report
+          name: api-gradle-html-report
           path: build/reports/tests/apiTest
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-allure-results
+          path: build/allure-results
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-logs
+          path: logs
