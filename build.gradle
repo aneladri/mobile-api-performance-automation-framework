@@ -69,3 +69,9 @@ tasks.register('regressionTest', Test) {
         listeners.add("io.qameta.allure.testng.AllureTestNg")
     }
 }
+
+tasks.register('iosTest', Test) {
+    useTestNG() {
+        suites 'testng-ios.xml'
+    }
+}

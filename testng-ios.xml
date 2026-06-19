@@ -1,0 +1,16 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="iOS Automation Suite">
+
+    <listeners>
+        <listener class-name="core.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <test name="iOS Tests">
+        <packages>
+            <package name="mobile.tests.ios"/>
+        </packages>
+    </test>
+
+</suite>
