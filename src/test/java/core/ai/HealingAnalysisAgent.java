@@ -12,6 +12,16 @@ public class HealingAnalysisAgent implements Agent {
 
     @Override
     public String analyze(String input) {
+
+        UnifiedHealingRecommendation recommendation =
+                advisor.analyze(input);
+
+        AgentMetricsCollector.record(
+                getName(),
+                recommendation.getConfidence(),
+                recommendation.getConfidence() < 50
+        );
+
         return advisor.generateSummary(input);
     }
 }

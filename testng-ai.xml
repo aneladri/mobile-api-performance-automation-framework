@@ -25,6 +25,7 @@
             <class name="ai.tests.HealingDashboardGeneratorTest"/>
             <class name="ai.tests.HealingAnalysisAgentTest"/>
             <class name="ai.tests.HealingAgentConfigurationTest"/>
+            <class name="ai.tests.HealingAgentMetricsTest"/>
         </classes>
     </test>
 </suite>
