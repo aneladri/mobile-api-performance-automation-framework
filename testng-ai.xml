@@ -13,6 +13,7 @@
             <class name="ai.tests.SuggestionEngineTest"/>
             <class name="ai.tests.AgentMetricsCollectorTest"/>
             <class name="ai.tests.MetricsReportGeneratorTest"/>
+            <class name="ai.tests.AgentExecutionHistoryTest"/>
         </classes>
     </test>
 </suite>
