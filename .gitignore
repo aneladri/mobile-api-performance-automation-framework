@@ -9,3 +9,6 @@ logs/
 node_modules/
 allure-results/
 allure-report/
+
+# Performance execution artifacts
+performance/results/
