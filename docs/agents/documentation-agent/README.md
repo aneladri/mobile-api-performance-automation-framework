@@ -2,44 +2,52 @@
 
 ## Purpose
 
-The Documentation Agent is responsible for maintaining framework documentation and ensuring that project documentation remains synchronized with framework implementation.
-
----
+The Claude Documentation Agent maintains MAPAF documentation and ensures that documentation stays synchronized with framework implementation.
 
 ## Responsibilities
 
-* README Maintenance
-* START_HERE Guide Maintenance
-* Framework Architecture Updates
-* Roadmap Updates
-* Changelog Updates
-* Agent Documentation Updates
+- Review framework changes
+- Identify impacted documents
+- Recommend README updates
+- Recommend START_HERE updates
+- Recommend architecture documentation updates
+- Recommend roadmap updates
+- Recommend changelog entries
+- Identify stale or inconsistent documentation
 
----
+## Monitored Documents
+
+- README.md
+- docs/START_HERE.md
+- docs/FRAMEWORK_ARCHITECTURE.md
+- docs/ROADMAP.md
+- docs/CHANGELOG.md
+- docs/DECISIONS/
+- docs/agents/
 
 ## Inputs
 
-* Git Commits
-* Pull Requests
-* Framework Structure
-* Roadmap Changes
-* Architecture Changes
-
----
+- Git commit messages
+- Pull request descriptions
+- Changed files
+- Package structure
+- New framework features
+- Removed or renamed components
+- Updated configuration properties
+- CI/CD workflow changes
 
 ## Outputs
 
-* Updated Documentation
-* Changelog Entries
-* Roadmap Updates
-* Architecture Recommendations
-
----
+- Documentation update recommendations
+- Changelog entries
+- Roadmap adjustments
+- Architecture documentation changes
+- Setup guide updates
 
 ## Success Criteria
 
-* Documentation reflects actual framework implementation
-* Roadmap remains current
-* Architecture documentation remains synchronized
-* New team members can onboard successfully
-
+- Documentation reflects the actual framework state
+- New joiners can follow setup steps successfully
+- Roadmap matches current priorities
+- Changelog captures meaningful framework changes
+- Architecture documentation remains accurate
