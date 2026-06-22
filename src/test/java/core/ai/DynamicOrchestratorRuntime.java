@@ -29,7 +29,7 @@ public class DynamicOrchestratorRuntime {
         if (config.isHealingAnalysisEnabled()) {
             registry.register(new HealingAnalysisAgent());
         }
-        registry.register(new HealingAnalysisAgent());
+      
     }
 
     public String analyze(String input) {
