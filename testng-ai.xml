@@ -15,6 +15,7 @@
             <class name="ai.tests.MetricsReportGeneratorTest"/>
             <class name="ai.tests.AgentExecutionHistoryTest"/>
             <class name="ai.tests.AgentHistoryReportGeneratorTest"/>
+            <class name="ai.tests.AgentTrendAnalyzerTest"/>
         </classes>
     </test>
 </suite>
