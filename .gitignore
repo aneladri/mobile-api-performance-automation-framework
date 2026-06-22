@@ -12,3 +12,6 @@ allure-report/
 
 # Performance execution artifacts
 performance/results/
+
+# AI generated reports
+reports/ai/generated/*.md
