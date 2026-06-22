@@ -74,4 +74,11 @@ tasks.register('iosTest', Test) {
     useTestNG() {
         suites 'testng-ios.xml'
     }
+
+}
+
+tasks.register('aiTest', Test) {
+    useTestNG() {
+        suites 'testng-ai.xml'
+    }
 }
