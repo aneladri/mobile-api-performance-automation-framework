@@ -14,6 +14,12 @@ public class FailureAnalysisAgent implements Agent {
     public String analyze(String input) {
         AgentResponse response = runtime.analyze(input);
 
+        AgentMetricsCollector.record(
+        getName(),
+        response.getConfidence(),
+        "Unknown Failure".equals(response.getClassification())
+        );
+
         return """
                 Failure Analysis:
                 %s
