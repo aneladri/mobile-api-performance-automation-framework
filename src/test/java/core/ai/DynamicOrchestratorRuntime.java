@@ -6,10 +6,25 @@ public class DynamicOrchestratorRuntime {
             new AgentRegistry();
 
     public DynamicOrchestratorRuntime() {
-        registry.register(new FailureAnalysisAgent());
-        registry.register(new DocumentationAnalysisAgent());
+
+        AgentConfiguration config =
+            new AgentConfiguration();
+
+        if (config.isFailureAnalysisEnabled()) {
+            registry.register(new FailureAnalysisAgent());
+        }
+
+        if (config.isDocumentationAnalysisEnabled()) {
+            registry.register(new DocumentationAnalysisAgent());
+        }
+
+        if (config.isArchitectureAnalysisEnabled()) {
         registry.register(new ArchitectAnalysisAgent());
-        registry.register(new PerformanceAnalysisAgent());
+        }
+
+        if (config.isPerformanceAnalysisEnabled()) {
+            registry.register(new PerformanceAnalysisAgent());
+        }
     }
 
     public String analyze(String input) {
