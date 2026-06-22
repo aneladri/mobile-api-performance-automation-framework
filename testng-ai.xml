@@ -11,6 +11,8 @@
             <class name="ai.tests.AgentRegistryTest"/>
             <class name="ai.tests.DynamicOrchestratorRuntimeTest"/>
             <class name="ai.tests.SuggestionEngineTest"/>
+            <class name="ai.tests.AgentMetricsCollectorTest"/>
+            <class name="ai.tests.MetricsReportGeneratorTest"/>
         </classes>
     </test>
 </suite>
