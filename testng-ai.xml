@@ -2,8 +2,14 @@
 
 <suite name="AI Runtime Suite">
     <test name="AI Runtime Tests">
-        <packages>
-            <package name="ai.tests"/>
-        </packages>
+        <classes>
+            <class name="ai.tests.FailureAnalysisRuntimeTest"/>
+            <class name="ai.tests.FailureReportGeneratorTest"/>
+            <class name="ai.tests.ReportWriterTest"/>
+            <class name="ai.tests.OrchestratorRuntimeTest"/>
+            <class name="ai.tests.OrchestratorReportWriterTest"/>
+            <class name="ai.tests.AgentRegistryTest"/>
+            <class name="ai.tests.DynamicOrchestratorRuntimeTest"/>
+        </classes>
     </test>
 </suite>
