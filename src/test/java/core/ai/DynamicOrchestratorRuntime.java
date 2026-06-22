@@ -25,6 +25,7 @@ public class DynamicOrchestratorRuntime {
         if (config.isPerformanceAnalysisEnabled()) {
             registry.register(new PerformanceAnalysisAgent());
         }
+        registry.register(new HealingAnalysisAgent());
     }
 
     public String analyze(String input) {

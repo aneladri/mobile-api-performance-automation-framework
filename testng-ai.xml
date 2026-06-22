@@ -23,6 +23,7 @@
             <class name="ai.tests.UnifiedHealingAdvisorTest"/>
             <class name="ai.tests.UnifiedHealingReportWriterTest"/>
             <class name="ai.tests.HealingDashboardGeneratorTest"/>
+            <class name="ai.tests.HealingAnalysisAgentTest"/>
         </classes>
     </test>
 </suite>
