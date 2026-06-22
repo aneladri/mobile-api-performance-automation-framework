@@ -25,6 +25,10 @@ public class DynamicOrchestratorRuntime {
         if (config.isPerformanceAnalysisEnabled()) {
             registry.register(new PerformanceAnalysisAgent());
         }
+
+        if (config.isHealingAnalysisEnabled()) {
+            registry.register(new HealingAnalysisAgent());
+        }
         registry.register(new HealingAnalysisAgent());
     }
 

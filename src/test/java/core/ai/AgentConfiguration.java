@@ -25,4 +25,10 @@ public class AgentConfiguration {
                 System.getProperty("ai.performance.enabled", "true")
         );
     }
+
+    public boolean isHealingAnalysisEnabled() {
+        return Boolean.parseBoolean(
+            System.getProperty("ai.healing.enabled", "true")
+        );
+    }
 }
