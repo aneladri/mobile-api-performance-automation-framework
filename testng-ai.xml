@@ -19,6 +19,7 @@
             <class name="ai.tests.SelfHealingRuntimeTest"/>
             <class name="ai.tests.LocatorRecommendationEngineTest"/>
             <class name="ai.tests.WaitStrategyEngineTest"/>
+            <class name="ai.tests.ConfigurationRecommendationEngineTest"/>
         </classes>
     </test>
 </suite>
