@@ -16,20 +16,9 @@ public class DynamicOrchestratorRuntimeTest {
                         "SSLHandshakeException"
                 );
 
-        Assert.assertTrue(
-                report.contains("Failure Analysis")
-        );
-
-        Assert.assertTrue(
-                report.contains("Documentation Impact")
-        );
-
-        Assert.assertTrue(
-                report.contains("Architecture Impact")
-        );
-
-        Assert.assertTrue(
-                report.contains("Performance Impact")
-        );
+        Assert.assertTrue(report.contains("Failure Analysis"));
+        Assert.assertTrue(report.contains("Documentation Impact"));
+        Assert.assertTrue(report.contains("Architecture Impact"));
+        Assert.assertTrue(report.contains("Performance Impact"));
     }
 }
