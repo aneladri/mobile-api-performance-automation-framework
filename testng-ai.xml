@@ -10,6 +10,7 @@
             <class name="ai.tests.OrchestratorReportWriterTest"/>
             <class name="ai.tests.AgentRegistryTest"/>
             <class name="ai.tests.DynamicOrchestratorRuntimeTest"/>
+            <class name="ai.tests.SuggestionEngineTest"/>
         </classes>
     </test>
 </suite>
