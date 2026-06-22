@@ -1,6 +1,9 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
 <suite name="AI Runtime Suite">
+    <listeners>
+        <listener class-name="core.listeners.TestListener"/>
+    </listeners>
     <test name="AI Runtime Tests">
         <classes>
             <class name="ai.tests.FailureAnalysisRuntimeTest"/>
