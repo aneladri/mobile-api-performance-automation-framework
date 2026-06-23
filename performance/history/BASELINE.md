@@ -1,42 +1,31 @@
-# Performance Baseline
-
-## Smoke Test
+## Stress Test
 
 Baseline Date:
 2026-06-23
 
-Environment:
-QA
-
-Iterations:
-5
-
 Virtual Users:
-1
+25
+
+Duration:
+90s
 
 Checks:
-5 passed / 0 failed
+657 passed / 0 failed
 
 Response Time p95:
-40.46ms
+37.99ms
 
 Average Response Time:
-33.88ms
-
-Median Response Time:
-33.36ms
+31.05ms
 
 Max Response Time:
-43.22ms
+288.56ms
 
 Error Rate:
 0%
 
 Throughput:
-2.98 req/s
-
-Iteration Rate:
-1.49 iterations/s
+14.55 req/s
 
 Status:
 PASS
