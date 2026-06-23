@@ -30,6 +30,8 @@ public class LocatorHealingEngine {
             String screenClass,
             String testName
     ) {
+        HealingMetricsCollector.recordHealingAttempt();
+
         String locatorKey =
                 brokenLocator.toString();
 
@@ -42,6 +44,8 @@ public class LocatorHealingEngine {
                 tryCachedLocator(locatorKey);
 
         if (cached != null) {
+            HealingMetricsCollector.recordCacheHit();
+
             logger.info(
                     "[Healing] Tier 1 HIT - cache"
             );
@@ -62,6 +66,8 @@ public class LocatorHealingEngine {
                     tryCandidate(candidate);
 
             if (element != null) {
+                HealingMetricsCollector.recordRuleHit();
+
                 logger.info(
                         "[Healing] Tier 2 HIT - local rule: {}",
                         candidate
@@ -83,12 +89,16 @@ public class LocatorHealingEngine {
         );
 
         if (!HealingBudgetGuard.allowApiCall(locatorKey)) {
+            HealingMetricsCollector.recordBudgetBlock();
+
             logger.warn(
                     "[Healing] Budget gate blocked API call for: {}",
                     locatorKey
             );
             return null;
         }
+
+        HealingMetricsCollector.recordClaudeCall();
 
         String platform =
                 ConfigManager.get("platform") != null
