@@ -35,6 +35,7 @@
             <class name="ai.tests.PerformanceReportGeneratorTest"/>
             <class name="ai.tests.PerformanceAgentMetricsTest"/>
             <class name="ai.tests.HealingMetricsCollectorTest"/>
+            <class name="ai.tests.HealingMetricsReportGeneratorTest"/>
         </classes>
     </test>
 </suite>
