@@ -34,6 +34,7 @@
             <class name="ai.tests.K6SummaryParserTest"/>
             <class name="ai.tests.PerformanceReportGeneratorTest"/>
             <class name="ai.tests.PerformanceAgentMetricsTest"/>
+            <class name="ai.tests.HealingMetricsCollectorTest"/>
         </classes>
     </test>
 </suite>
