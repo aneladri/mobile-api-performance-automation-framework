@@ -1,0 +1,113 @@
+# MAPAF Grafana Integration
+
+## Overview
+
+MAPAF integrates with Grafana through InfluxDB to provide real-time visualization of k6 performance metrics.
+
+Architecture:
+
+```text
+k6
+↓
+InfluxDB
+↓
+Grafana
+↓
+MAPAF Performance Dashboard
+```
+
+## Components
+
+### k6
+
+Responsible for:
+
+* Smoke Tests
+* Load Tests
+* Stress Tests
+* Soak Tests
+
+### InfluxDB
+
+Stores:
+
+* Request Metrics
+* Latency Metrics
+* Error Metrics
+* Virtual User Metrics
+
+### Grafana
+
+Visualizes:
+
+* Response Time
+* Error Rate
+* Request Rate
+* Throughput
+* Virtual Users
+
+## Local Setup
+
+Start InfluxDB:
+
+```bash
+docker run -d \
+  --name influxdb \
+  -p 8086:8086 \
+  influxdb:1.8
+```
+
+Start Grafana:
+
+```bash
+docker run -d \
+  --name grafana \
+  -p 3000:3000 \
+  grafana/grafana
+```
+
+Grafana URL:
+
+```text
+http://localhost:3000
+```
+
+Default Login:
+
+```text
+admin
+admin
+```
+
+## Datasource Configuration
+
+Type:
+
+```text
+InfluxDB
+```
+
+URL:
+
+```text
+http://host.docker.internal:8086
+```
+
+Database:
+
+```text
+k6
+```
+
+## Dashboard
+
+Dashboard Name:
+
+```text
+MAPAF Performance Dashboard
+```
+
+Purpose:
+
+Provide visibility into application performance during test execution.
+
