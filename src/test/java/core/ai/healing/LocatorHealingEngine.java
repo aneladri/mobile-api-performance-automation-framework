@@ -1,0 +1,180 @@
+package core.ai.healing;
+
+import core.config.ConfigManager;
+import core.driver.DriverManager;
+import core.utils.LoggerUtil;
+import mobile.locators.LocatorBuilder;
+import mobile.locators.LocatorType;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.List;
+
+public class LocatorHealingEngine {
+
+    private static final Logger logger =
+            LoggerUtil.getLogger(LocatorHealingEngine.class);
+
+    private static final int RETRY_TIMEOUT_SECONDS = 10;
+    private static final int MIN_CONFIDENCE = 60;
+
+    private final LocalHealingRuleEngine ruleEngine =
+            new LocalHealingRuleEngine();
+
+    public WebElement heal(
+            By brokenLocator,
+            String screenClass,
+            String testName
+    ) {
+        String locatorKey =
+                brokenLocator.toString();
+
+        logger.info(
+                "[Healing] Starting tiered healing for: {}",
+                locatorKey
+        );
+
+        WebElement cached =
+                tryCachedLocator(locatorKey);
+
+        if (cached != null) {
+            logger.info(
+                    "[Healing] Tier 1 HIT - cache"
+            );
+            return cached;
+        }
+
+        String rawPageSource =
+                capturePageSource();
+
+        List<HealedLocatorCandidate> ruleCandidates =
+                ruleEngine.attempt(
+                        brokenLocator,
+                        rawPageSource
+                );
+
+        for (HealedLocatorCandidate candidate : ruleCandidates) {
+            WebElement element =
+                    tryCandidate(candidate);
+
+            if (element != null) {
+                logger.info(
+                        "[Healing] Tier 2 HIT - local rule: {}",
+                        candidate
+                );
+
+                HealedLocatorStore.store(
+                        locatorKey,
+                        candidate,
+                        screenClass,
+                        testName
+                );
+
+                return element;
+            }
+        }
+
+        logger.info(
+                "[Healing] Tier 2 MISS - checking API budget"
+        );
+
+        if (!HealingBudgetGuard.allowApiCall(locatorKey)) {
+            logger.warn(
+                    "[Healing] Budget gate blocked API call for: {}",
+                    locatorKey
+            );
+            return null;
+        }
+
+        String platform =
+                ConfigManager.get("platform") != null
+                        ? ConfigManager.get("platform")
+                        : "android";
+
+        String compressedSource =
+                PageSourceCompressor.compress(rawPageSource);
+
+        logger.warn(
+                "[Healing] Tier 3 Claude API not wired yet. Platform: {}, source chars: {}",
+                platform,
+                compressedSource.length()
+        );
+
+        return null;
+    }
+
+    private WebElement tryCachedLocator(String locatorKey) {
+        HealedLocatorCandidate cached =
+                HealedLocatorStore.getCached(locatorKey);
+
+        if (cached == null) {
+            return null;
+        }
+
+        WebElement element =
+                tryCandidate(cached);
+
+        if (element != null) {
+            return element;
+        }
+
+        logger.warn(
+                "[Healing] Cached locator no longer works: {}",
+                cached
+        );
+
+        return null;
+    }
+
+    private WebElement tryCandidate(
+            HealedLocatorCandidate candidate
+    ) {
+        try {
+            LocatorType type =
+                    LocatorType.valueOf(
+                            candidate.getLocatorType()
+                    );
+
+            By locator =
+                    LocatorBuilder.build(
+                            type,
+                            candidate.getLocatorValue()
+                    );
+
+            WebDriverWait wait =
+                    new WebDriverWait(
+                            DriverManager.getDriver(),
+                            Duration.ofSeconds(RETRY_TIMEOUT_SECONDS)
+                    );
+
+            return wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(locator)
+            );
+
+        } catch (Exception e) {
+            logger.debug(
+                    "[Healing] Candidate failed: {} - {}",
+                    candidate,
+                    e.getClass().getSimpleName()
+            );
+
+            return null;
+        }
+    }
+
+    private String capturePageSource() {
+        try {
+            return DriverManager.getDriver().getPageSource();
+        } catch (Exception e) {
+            logger.warn(
+                    "[Healing] Could not capture page source: {}",
+                    e.getMessage()
+            );
+            return "";
+        }
+    }
+}
