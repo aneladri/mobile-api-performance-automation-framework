@@ -1,15 +1,13 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-const BASE_URL = __ENV.BASE_URL || 'https://httpbin.org';
+import { BASE_URL } from '../config/environments.js';
+import { THRESHOLDS } from '../config/thresholds.js';
 
 export const options = {
-  vus: 1,
-  iterations: 5,
-  thresholds: {
-    http_req_duration: ['p(95)<3000'],
-    http_req_failed: ['rate<0.05'],
-  },
+    vus: 1,
+    iterations: 5,
+    thresholds: THRESHOLDS.smoke
 };
 
 export default function () {
