@@ -1,27 +1,46 @@
 import http from 'k6/http';
-import { check } from 'k6';
+import { check, sleep } from 'k6';
 
-import { BASE_URL } from '../config/environments.js';
-import { THRESHOLDS } from '../config/thresholds.js';
 import { MOBILE_HEADERS } from '../config/headers.js';
+import { getAuthToken } from '../auth/auth.js';
+
+const BASE_URL =
+    __ENV.BASE_URL || 'https://httpbin.org';
 
 export const options = {
     vus: 1,
     iterations: 5,
-    thresholds: THRESHOLDS.smoke
+
+    thresholds: {
+        http_req_duration: ['p(95)<3000'],
+        http_req_failed: ['rate<0.05']
+    }
 };
 
-export default function () {
-  const response = http.get(
-    `${BASE_URL}/status/200`,
-    {
-        headers: MOBILE_HEADERS
-    }
-  );
+export function setup() {
 
-  console.log(`STATUS=${response.status}`);
-  console.log(`BODY=${response.body}`);
-  check(response, {
-    'status is 200': (r) => r.status === 200,
-  });
+    return {
+        token: getAuthToken()
+    };
+}
+
+export default function (data) {
+
+    const response =
+        http.get(
+            `${BASE_URL}/status/200`,
+            {
+                headers: {
+                    ...MOBILE_HEADERS,
+                    Authorization:
+                        `Bearer ${data.token}`
+                }
+            }
+        );
+
+    check(response, {
+        'status is 200': (r) => r.status === 200
+    });
+
+    sleep(1);
 }
