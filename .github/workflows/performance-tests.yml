@@ -8,6 +8,9 @@ on:
       - develop
       - main
 
+  schedule:
+    - cron: "0 2 * * *"
+
 jobs:
   performance-tests:
     name: Run K6 Performance Tests
@@ -19,7 +22,6 @@ jobs:
 
       - name: Install k6
         run: |
-          sudo gpg -k
           sudo apt-get update
           sudo apt-get install -y gnupg software-properties-common
           curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
@@ -27,13 +29,41 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y k6
 
+      - name: Prepare performance results directory
+        run: mkdir -p performance/results
+
       - name: Run Smoke Performance Test
+        env:
+          BASE_URL: ${{ secrets.API_BASE_URL }}
         run: |
-          k6 run performance/k6/smoke/api-health-smoke.js
+          k6 run \
+            -e BASE_URL=$BASE_URL \
+            --summary-export=performance/results/smoke-summary.json \
+            performance/k6/smoke/api-health-smoke.js
+
+      - name: Run Load Performance Test
+        if: github.event_name == 'schedule'
+        env:
+          BASE_URL: ${{ secrets.API_BASE_URL }}
+        run: |
+          k6 run \
+            -e BASE_URL=$BASE_URL \
+            --summary-export=performance/results/load-summary.json \
+            performance/k6/load/api-health-load.js
+
+      - name: Run Stress Performance Test
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          BASE_URL: ${{ secrets.API_BASE_URL }}
+        run: |
+          k6 run \
+            -e BASE_URL=$BASE_URL \
+            --summary-export=performance/results/stress-summary.json \
+            performance/k6/stress/api-health-stress.js
 
       - name: Upload Performance Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: performance-test-results
-          path: performance
+          path: performance/results
