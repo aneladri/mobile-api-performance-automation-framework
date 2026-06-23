@@ -1,5 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import { MOBILE_HEADERS } from '../config/headers.js';
 
 const BASE_URL = __ENV.BASE_URL || 'https://httpbin.org';
 
@@ -16,7 +17,12 @@ export const options = {
 };
 
 export default function () {
-  const response = http.get(`${BASE_URL}/status/200`);
+  const response = http.get(
+    `${BASE_URL}/status/200`,
+    {
+        headers: MOBILE_HEADERS
+    }
+  );
 
   check(response, {
     'status is 200': (r) => r.status === 200,
