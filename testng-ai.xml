@@ -32,6 +32,7 @@
             <class name="ai.tests.PerformanceRegressionAnalyzerTest"/>
             <class name="ai.tests.PerformanceAnalysisAgentTest"/>
             <class name="ai.tests.K6SummaryParserTest"/>
+            <class name="ai.tests.PerformanceReportGeneratorTest"/>
         </classes>
     </test>
 </suite>
