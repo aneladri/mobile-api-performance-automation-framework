@@ -11,7 +11,13 @@ import java.time.Duration;
 
 public final class WaitUtils {
 
-    private static final int DEFAULT_TIMEOUT = 15;
+    private static final int DEFAULT_TIMEOUT =
+            Integer.parseInt(
+                    System.getProperty(
+                            "waitTimeoutSeconds",
+                            "15"
+                    )
+            );
 
     private WaitUtils() {
     }
@@ -20,32 +26,59 @@ public final class WaitUtils {
         return DriverManager.getDriver();
     }
 
-    private static WebDriverWait wait(int timeout) {
+    private static WebDriverWait wait(int timeoutSeconds) {
         return new WebDriverWait(
                 getDriver(),
-                Duration.ofSeconds(timeout)
+                Duration.ofSeconds(timeoutSeconds)
         );
     }
 
     public static WebElement waitForVisible(By locator) {
+        return waitForVisible(
+                locator,
+                DEFAULT_TIMEOUT
+        );
+    }
 
-        return wait(DEFAULT_TIMEOUT)
+    public static WebElement waitForVisible(
+            By locator,
+            int timeoutSeconds
+    ) {
+        return wait(timeoutSeconds)
                 .until(
                         ExpectedConditions.visibilityOfElementLocated(locator)
                 );
     }
 
     public static WebElement waitForClickable(By locator) {
+        return waitForClickable(
+                locator,
+                DEFAULT_TIMEOUT
+        );
+    }
 
-        return wait(DEFAULT_TIMEOUT)
+    public static WebElement waitForClickable(
+            By locator,
+            int timeoutSeconds
+    ) {
+        return wait(timeoutSeconds)
                 .until(
                         ExpectedConditions.elementToBeClickable(locator)
                 );
     }
 
     public static boolean waitForInvisibility(By locator) {
+        return waitForInvisibility(
+                locator,
+                DEFAULT_TIMEOUT
+        );
+    }
 
-        return wait(DEFAULT_TIMEOUT)
+    public static boolean waitForInvisibility(
+            By locator,
+            int timeoutSeconds
+    ) {
+        return wait(timeoutSeconds)
                 .until(
                         ExpectedConditions.invisibilityOfElementLocated(locator)
                 );
@@ -53,11 +86,26 @@ public final class WaitUtils {
 
     public static boolean waitForText(
             By locator,
-            String expectedText) {
+            String expectedText
+    ) {
+        return waitForText(
+                locator,
+                expectedText,
+                DEFAULT_TIMEOUT
+        );
+    }
 
-        return wait(DEFAULT_TIMEOUT)
+    public static boolean waitForText(
+            By locator,
+            String expectedText,
+            int timeoutSeconds
+    ) {
+        return wait(timeoutSeconds)
                 .until(
-                        ExpectedConditions.textToBe(locator, expectedText)
+                        ExpectedConditions.textToBe(
+                                locator,
+                                expectedText
+                        )
                 );
     }
 }
