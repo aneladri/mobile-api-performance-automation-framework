@@ -1,4 +1,4 @@
-package mobile.tests;
+package training.mobile;
 
 import core.base.BaseMobileTest;
 import org.testng.Assert;
