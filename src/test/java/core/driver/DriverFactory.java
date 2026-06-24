@@ -12,7 +12,6 @@ import mobile.capabilities.IosCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
-import java.time.Duration;
 
 public class DriverFactory {
 
@@ -38,21 +37,32 @@ public class DriverFactory {
                 driver = new AndroidDriver(new URL(serverUrl), capabilities);
 
             } else if (platform.equalsIgnoreCase("ios")) {
-                DesiredCapabilities capabilities = IosCapabilities.build();
+                DesiredCapabilities capabilities;
+                String serverUrl;
 
-                driver = new IOSDriver(
-                        new URL(ConfigManager.getRequired("appiumServerUrl")),
-                        capabilities
-                );
+                if (ExecutionConfig.isBrowserStack()) {
+                    capabilities = BrowserStackCapabilities.buildIos();
+                    serverUrl = BrowserStackConfig.getHubUrl();
+                } else {
+                    capabilities = IosCapabilities.build();
+                    serverUrl = ConfigManager.getRequired("appiumServerUrl");
+                }
+
+                driver = new IOSDriver(new URL(serverUrl), capabilities);
 
             } else {
-                throw new RuntimeException("Unsupported mobile platform: " + platform);
+                throw new RuntimeException(
+                        "Unsupported mobile platform: " + platform
+                );
             }
 
             DriverManager.setDriver(driver);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create Appium driver for platform: " + platform, e);
+            throw new RuntimeException(
+                    "Failed to create Appium driver for platform: " + platform,
+                    e
+            );
         }
     }
 }
