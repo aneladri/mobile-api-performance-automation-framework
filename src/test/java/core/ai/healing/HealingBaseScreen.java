@@ -1,14 +1,31 @@
 package core.ai.healing;
 
-import io.appium.java_client.AppiumDriver;
+import mobile.screens.base.BaseScreen;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
-public abstract class HealingBaseScreen {
+public abstract class HealingBaseScreen extends BaseScreen {
 
-    protected final AppiumDriver driver;
+    private final LocatorHealingEngine healingEngine =
+            new LocatorHealingEngine();
 
-    protected HealingBaseScreen(
-            AppiumDriver driver
-    ) {
-        this.driver = driver;
+    @Override
+    protected WebElement find(By locator) {
+        try {
+            return super.find(locator);
+        } catch (Exception e) {
+            WebElement healed =
+                    healingEngine.heal(
+                            locator,
+                            getClass().getSimpleName(),
+                            Thread.currentThread().getStackTrace()[2].getMethodName()
+                    );
+
+            if (healed != null) {
+                return healed;
+            }
+
+            throw e;
+        }
     }
 }

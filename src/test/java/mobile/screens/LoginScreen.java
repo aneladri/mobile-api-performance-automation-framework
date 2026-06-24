@@ -1,9 +1,9 @@
 package mobile.screens;
 
-import mobile.screens.base.BaseScreen;
+import core.ai.healing.HealingBaseScreen;
 import org.openqa.selenium.By;
 
-public class LoginScreen extends BaseScreen {
+public class LoginScreen extends HealingBaseScreen {
 
     private final By usernameField = By.id("username");
     private final By passwordField = By.id("password");

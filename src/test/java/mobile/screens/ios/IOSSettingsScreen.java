@@ -4,8 +4,9 @@ import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import core.ai.healing.HealingBaseScreen;
 
-public class IOSSettingsScreen {
+public class IOSSettingsScreen extends HealingBaseScreen {
 
     private final AppiumDriver driver;
 

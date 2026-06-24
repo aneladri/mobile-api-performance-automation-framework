@@ -3,8 +3,9 @@ package mobile.screens.ios;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
+import core.ai.healing.HealingBaseScreen;
 
-public class IOSGeneralScreen {
+public class IOSGeneralScreen extends HealingBaseScreen {
 
     private final AppiumDriver driver;
 

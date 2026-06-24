@@ -1,8 +1,9 @@
 package mobile.screens.ios;
 
 import io.appium.java_client.AppiumDriver;
+import core.ai.healing.HealingBaseScreen;
 
-public class IOSHomeScreen {
+public class IOSHomeScreen extends HealingBaseScreen{
 
     private final AppiumDriver driver;
 
