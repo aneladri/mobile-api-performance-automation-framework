@@ -1,16 +1,41 @@
 # MAPAF - Mobile API Performance Automation Framework
 
+## Framework Owner
+
+**Aneesh Neladri**
+Automation Manager | Test Architect | Quality Engineering Leader
+
+---
+
 ## Overview
 
-MAPAF (Mobile API Performance Automation Framework) is an enterprise-grade automation platform supporting:
+MAPAF (Mobile API Performance Automation Framework) is an enterprise-grade Quality Engineering platform that combines:
 
-* Mobile Automation (Android & iOS)
 * API Automation
+* Android Automation
+* iOS Automation
 * Performance Testing
-* Cloud Execution
-* CI/CD Integration
-* Reporting & Observability
-* AI-Assisted Engineering
+* AI-Assisted Analysis
+* Locator Healing
+* Grafana Observability
+* CI/CD Automation
+* Training & Enablement
+
+## Overview
+
+MAPAF (Mobile API Performance Automation Framework) is an enterprise-grade Quality Engineering platform that combines:
+
+* API Automation
+* Android Automation
+* iOS Automation
+* Performance Testing
+* AI-Assisted Analysis
+* Locator Healing
+* Grafana Observability
+* CI/CD Automation
+* Training & Enablement
+
+MAPAF provides a single platform for test execution, reporting, AI-driven analysis, performance observability, and engineer onboarding.
 
 ---
 
@@ -27,58 +52,77 @@ MAPAF (Mobile API Performance Automation Framework) is an enterprise-grade autom
 
 ### Mobile Automation
 
-* Appium 2
+* Appium 2.x
 * Android Automation
 * iOS Automation
-* Page Object Model
+* Screen Object Pattern
 * Business Flow Layer
-* Screenshot Capture
+* Screenshot Management
 * BrowserStack Execution
+* Self-Healing Locator Framework
 
 ### Performance Testing
 
-* K6 Smoke Testing
+* Smoke Testing
 * Load Testing
 * Stress Testing
+* Soak Testing
 * Threshold Validation
+* Regression Detection
 
-### Reporting
+### AI Engineering Layer
+
+* Failure Analysis Agent
+* Performance Analysis Agent
+* Healing Analysis Agent
+* Unified Healing Advisor
+* AI Report Generation
+* Agent Metrics & History
+
+### Locator Healing
+
+* Healed Locator Store
+* Local Healing Rule Engine
+* Healing Budget Guard
+* Page Source Compression
+* Healing Metrics
+* Healing Reports
+
+### Reporting & Observability
 
 * Allure Reports
-* Screenshots
-* Logs
-* CI/CD Artifacts
+* AI Reports
+* Healing Reports
+* Performance Reports
+* Grafana Dashboards
+* InfluxDB Metrics Storage
 
-### CI/CD
+### Training Platform
 
-* GitHub Actions
-* API Pipeline
-* Mobile Pipeline
-* Performance Pipeline
-* BrowserStack Pipeline
-
-### AI Architecture
-
-* Claude Failure Analysis Agent
-* Claude Documentation Agent
-* Claude Architect Agent
+* 10 Guided Labs
+* Trainer Guide
+* Training Plan
+* Capstone Project
+* AI Healing Exercises
 
 ---
 
 ## Technology Stack
 
-| Layer          | Technology     |
-| -------------- | -------------- |
-| Language       | Java 17        |
-| Build Tool     | Gradle         |
-| Test Framework | TestNG         |
-| Mobile         | Appium 2       |
-| API            | REST Assured   |
-| Performance    | K6             |
-| Reporting      | Allure         |
-| CI/CD          | GitHub Actions |
-| Cloud          | BrowserStack   |
-| Source Control | Git            |
+| Layer           | Technology     |
+| --------------- | -------------- |
+| Language        | Java 17        |
+| Build Tool      | Gradle         |
+| Test Framework  | TestNG         |
+| Mobile          | Appium 2       |
+| API             | REST Assured   |
+| Performance     | k6             |
+| Reporting       | Allure         |
+| Observability   | Grafana        |
+| Metrics Storage | InfluxDB       |
+| CI/CD           | GitHub Actions |
+| Cloud Execution | BrowserStack   |
+| Source Control  | Git            |
 
 ---
 
@@ -91,15 +135,42 @@ MAPAF
 ├── API Layer
 ├── Mobile Layer
 ├── Performance Layer
+├── AI Layer
+├── Healing Layer
 ├── Reporting Layer
+├── Observability Layer
 ├── CI/CD Layer
-└── AI Agent Layer
+└── Training Platform
 ```
 
-For detailed architecture:
+---
+
+## Project Structure
 
 ```text
-docs/FRAMEWORK_ARCHITECTURE.md
+src/test/java
+│
+├── api
+├── mobile
+├── core
+├── ai
+└── performance
+
+performance/
+│
+├── smoke
+├── load
+├── stress
+├── soak
+├── auth
+└── config
+
+docs/
+│
+├── training
+├── performance
+├── agents
+└── decisions
 ```
 
 ---
@@ -113,19 +184,37 @@ git clone <repository-url>
 cd automation-framework
 ```
 
+Compile:
+
+```bash
+./gradlew clean compileTestJava
+```
+
 Run API Tests:
 
 ```bash
-gradle clean apiTest
+./gradlew apiTest
 ```
 
 Run Mobile Tests:
 
 ```bash
-gradle clean mobileTest
+./gradlew mobileTest
 ```
 
-Run Performance Tests:
+Run iOS Tests:
+
+```bash
+./gradlew iosTest
+```
+
+Run AI Tests:
+
+```bash
+./gradlew aiTest
+```
+
+Run Smoke Performance Test:
 
 ```bash
 k6 run performance/k6/smoke/api-health-smoke.js
@@ -139,41 +228,92 @@ allure serve build/allure-results
 
 ---
 
+## AI Locator Healing
+
+MAPAF includes a tiered locator healing architecture:
+
+```text
+Broken Locator
+↓
+Cache
+↓
+Local Rule Engine
+↓
+Budget Guard
+↓
+AI Recommendation
+```
+
+Healing metrics are automatically tracked and reported.
+
+---
+
+## Grafana Observability
+
+MAPAF supports:
+
+```text
+k6
+↓
+InfluxDB
+↓
+Grafana
+↓
+Performance Dashboard
+```
+
+Dashboard Metrics:
+
+* Response Time
+* Request Rate
+* Error Rate
+* Virtual Users
+* Iterations
+
+---
+
+## Training Programme
+
+Training Path:
+
+```text
+Lab 00 – Introduction
+Lab 01 – Setup
+Lab 02 – Architecture
+Lab 03 – API Testing
+Lab 04 – Android Testing
+Lab 05 – iOS Testing
+Lab 06 – Performance Testing
+Lab 07 – AI Analysis
+Lab 07b – AI Healing Exercise
+Lab 08 – Debugging
+Lab 09 – Git Workflow
+Lab 10 – Capstone Project
+```
+
+---
+
 ## Documentation
 
-### New Joiners
-
-Start here:
+Training:
 
 ```text
-docs/START_HERE.md
+docs/training/framework-labs/
 ```
 
-### Architecture
+Performance:
 
 ```text
-docs/FRAMEWORK_ARCHITECTURE.md
+docs/performance/
 ```
 
-### Roadmap
-
-```text
-docs/ROADMAP.md
-```
-
-### Changelog
-
-```text
-docs/CHANGELOG.md
-```
-
-### Architecture Decisions
+Architecture Decisions:
 
 ```text
 docs/DECISIONS/
 ```
 
-### AI Agents
+AI Documentation:
 
 ```text
 docs/agents/
@@ -181,22 +321,33 @@ docs/agents/
 
 ---
 
+## Ownership
+
+### Framework Owner
+
+**Aneesh Neladri**
+Automation Manager | Test Architect | Quality Engineering Leader
+
+### Responsibilities
+
+* Framework Architecture
+* Automation Standards
+* AI Platform
+* Performance Platform
+* Training Programme
+* CI/CD Governance
+* Release Management
+
+---
+
 ## Current Version
 
 ```text
-MAPAF v2.4
+MAPAF v3.0
 ```
 
 ### Status
 
 ```text
+Production Ready
 Active Development
-```
-
----
-
-## Maintained By
-
-**Aneesh Neladri**
-
-Automation Manager | Test Architect | Quality Engineering Leader
