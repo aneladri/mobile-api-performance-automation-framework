@@ -1,5 +1,6 @@
 package mobile.locators;
 
+import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.By;
 
 public final class LocatorBuilder {
@@ -9,18 +10,22 @@ public final class LocatorBuilder {
 
     public static By build(
             LocatorType type,
-            String value) {
+            String value
+    ) {
 
         return switch (type) {
 
-            case ID -> By.id(value);
+            case ID ->
+                    By.id(value);
 
-            case XPATH -> By.xpath(value);
+            case XPATH ->
+                    By.xpath(value);
 
-            case CLASS_NAME -> By.className(value);
+            case CLASS_NAME ->
+                    By.className(value);
 
             case ACCESSIBILITY_ID ->
-                    By.xpath("//*[@content-desc='" + value + "']");
+                    AppiumBy.accessibilityId(value);
         };
     }
 }
