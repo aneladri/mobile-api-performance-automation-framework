@@ -49,7 +49,6 @@ public class DriverFactory {
                 throw new RuntimeException("Unsupported mobile platform: " + platform);
             }
 
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             DriverManager.setDriver(driver);
 
         } catch (Exception e) {
