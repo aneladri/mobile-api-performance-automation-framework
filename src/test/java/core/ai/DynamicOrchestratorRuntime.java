@@ -1,5 +1,8 @@
 package core.ai;
 
+/**
+ * Preferred runtime for dynamic AI agent routing.
+ */
 public class DynamicOrchestratorRuntime {
 
     private final AgentRegistry registry =

@@ -1,5 +1,10 @@
 package core.ai;
 
+/**
+ * @deprecated Use {@link DynamicOrchestratorRuntime}.
+ * This legacy runtime is kept only for backward compatibility with existing tests.
+ */
+@Deprecated
 public class OrchestratorRuntime {
 
     public String analyze(String log) {
