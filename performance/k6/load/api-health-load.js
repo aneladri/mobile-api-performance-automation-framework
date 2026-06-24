@@ -4,6 +4,7 @@ import { check, sleep } from 'k6';
 import { BASE_URL } from '../config/environments.js';
 import { THRESHOLDS } from '../config/thresholds.js';
 import { MOBILE_HEADERS } from '../config/headers.js';
+import { getAuthToken } from '../auth/auth.js';
 
 export const options = {
     vus: 10,
@@ -11,13 +12,22 @@ export const options = {
     thresholds: THRESHOLDS.load
 };
 
-export default function () {
+export function setup() {
+    return {
+        token: getAuthToken()
+    };
+}
+
+export default function (data) {
 
     const response =
         http.get(
             `${BASE_URL}/status/200`,
             {
-                headers: MOBILE_HEADERS
+                headers: {
+                    ...MOBILE_HEADERS,
+                    Authorization: `Bearer ${data.token}`
+                }
             }
         );
 
