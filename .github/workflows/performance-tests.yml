@@ -16,6 +16,12 @@ jobs:
     name: Run K6 Performance Tests
     runs-on: ubuntu-latest
 
+    env:
+      BASE_URL: ${{ secrets.API_BASE_URL }}
+      PLATFORM: android
+      DEVICE_TYPE: mobile
+      APP_VERSION: ci
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,31 +41,34 @@ jobs:
           mkdir -p reports/performance
 
       - name: Run Smoke Performance Test
-        env:
-          BASE_URL: ${{ secrets.API_BASE_URL }}
         run: |
           k6 run \
             -e BASE_URL=$BASE_URL \
+            -e PLATFORM=$PLATFORM \
+            -e DEVICE_TYPE=$DEVICE_TYPE \
+            -e APP_VERSION=$APP_VERSION \
             --summary-export=performance/results/smoke-summary.json \
             performance/k6/smoke/api-health-smoke.js
 
       - name: Run Load Performance Test
         if: github.event_name == 'schedule'
-        env:
-          BASE_URL: ${{ secrets.API_BASE_URL }}
         run: |
           k6 run \
             -e BASE_URL=$BASE_URL \
+            -e PLATFORM=$PLATFORM \
+            -e DEVICE_TYPE=$DEVICE_TYPE \
+            -e APP_VERSION=$APP_VERSION \
             --summary-export=performance/results/load-summary.json \
             performance/k6/load/api-health-load.js
 
       - name: Run Stress Performance Test
         if: github.event_name == 'workflow_dispatch'
-        env:
-          BASE_URL: ${{ secrets.API_BASE_URL }}
         run: |
           k6 run \
             -e BASE_URL=$BASE_URL \
+            -e PLATFORM=$PLATFORM \
+            -e DEVICE_TYPE=$DEVICE_TYPE \
+            -e APP_VERSION=$APP_VERSION \
             --summary-export=performance/results/stress-summary.json \
             performance/k6/stress/api-health-stress.js
 
