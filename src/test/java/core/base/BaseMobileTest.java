@@ -21,15 +21,27 @@ public class BaseMobileTest extends BaseTest {
         DriverFactory.createDriver(platform);
     }
 
-    @AfterMethod(alwaysRun = true)
+  @AfterMethod(alwaysRun = true)
     public void captureScreenshotAndTearDown(ITestResult result) {
+
         try {
             if (DriverManager.getDriver() != null) {
-                ScreenshotUtils.attachScreenshotToAllure();
-                logger.info("Screenshot captured for test: " + result.getName());
+
+                boolean shouldCapture =
+                    result.getStatus() == ITestResult.FAILURE
+                            || result.getStatus() == ITestResult.SKIP;
+
+                if (shouldCapture) {
+                    ScreenshotUtils.attachScreenshotToAllure();
+                }
             }
+
         } catch (Exception e) {
-            logger.warn("Screenshot capture skipped: " + e.getMessage());
+            logger.warn(
+                "Screenshot capture skipped: {}",
+                    e.getMessage()
+            );
+
         } finally {
             DriverManager.quitDriver();
         }
