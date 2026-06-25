@@ -1,55 +1,132 @@
-# MAPAF Roadmap
-
-## Completed
-
-### v1.x
-
-* Framework Foundation
-* API Automation Foundation
-* Schema Validation
-* API Test Data Management
-* Mobile Foundation
-* Locator Strategy
-* Gesture Support
-* BrowserStack Foundation
-* Android End-to-End Execution
-
-### v2.x
-
-* GitHub Actions
-* Allure Reporting
-* Screenshot Attachments
-* BrowserStack CI Foundation
-* Claude Agent Architecture
-* K6 Performance Foundation
+# MAPAF Release Notes
 
 ---
 
-## Planned
+# v1.4.0 – AI Platform Foundation
 
-### v2.5
+Release Date: June 2026
 
-* BrowserStack Real Execution
-* BrowserStack Reporting
+## Overview
 
-### v2.6
+This release introduces the foundation of the MAPAF AI Platform.
 
-* Claude Failure Analysis Agent
+The framework now includes a provider abstraction layer, enabling future integration with multiple Large Language Models (LLMs) without changing framework components.
 
-### v2.7
+---
 
-* Claude Documentation Agent Automation
+## New Features
 
-### v2.8
+### AI Provider Architecture
 
-* Claude Architect Reviews
+Added:
 
-### v2.9
+* AIProvider
+* AIProviderFactory
+* AIRequest
+* AIResponse
+* ClaudeAIProvider
+* HealingAIService
 
-* K6 CI/CD Integration
+Documentation:
 
-### v3.0
+```
+docs/agents/AI_PROVIDER_ARCHITECTURE.md
+```
 
-* Autonomous Self-Healing Agent
-* AI-Assisted Locator Recovery
-* AI Release Governance
+---
+
+### Mobile Framework Improvements
+
+Implemented:
+
+* HealingBaseScreen integration
+* Native Appium accessibility locator strategy
+* BrowserStack iOS capability support
+* Screenshot capture only on failures
+
+---
+
+### Performance Framework
+
+Added:
+
+* Shared k6 configuration
+* Shared threshold configuration
+* Authentication setup for performance tests
+* Grafana integration
+* InfluxDB metrics
+* Soak testing
+* Performance observability
+
+---
+
+### Training Platform
+
+Added:
+
+* Trainer Guide
+* Training Plan
+* AI Healing Exercise (Lab 07b)
+* Beginner curriculum improvements
+
+---
+
+### CI/CD
+
+Improved:
+
+* Mobile workflow
+* Performance workflow
+* Removed duplicate workflow
+* BrowserStack improvements
+
+---
+
+### Architecture
+
+Added:
+
+* AI Provider Layer
+* HealingAIService
+* Provider abstraction
+* Legacy OrchestratorRuntime deprecation
+
+---
+
+## Improvements
+
+* Cleaner mobile architecture
+* Better AI extensibility
+* Faster locator strategy
+* Reduced screenshot storage
+* Improved BrowserStack support
+* Simplified workflow structure
+
+---
+
+## Known Limitations
+
+Current AI Platform provides the foundation only.
+
+Future releases will include:
+
+* Claude locator healing integration
+* Additional AI providers
+* AI dashboard
+* Performance baseline management
+
+---
+
+# Previous Releases
+
+## v1.3.0
+
+Feedback remediation release.
+
+## v1.2.0
+
+Performance observability.
+
+## v1.1.0
+
+Locator healing foundation.
