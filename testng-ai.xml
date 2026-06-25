@@ -40,6 +40,7 @@
             <class name="ai.tests.PromptLoaderTest"/>
             <class name="ai.tests.FailureAnalysisServiceTest"/>
             <class name="ai.tests.DocumentationAIServiceTest"/>
+            <class name="ai.tests.ArchitectureAIServiceTest"/>
         </classes>
     </test>
 </suite>
