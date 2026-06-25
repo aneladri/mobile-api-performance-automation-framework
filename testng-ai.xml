@@ -41,6 +41,7 @@
             <class name="ai.tests.FailureAnalysisServiceTest"/>
             <class name="ai.tests.DocumentationAIServiceTest"/>
             <class name="ai.tests.ArchitectureAIServiceTest"/>
+            <class name="ai.tests.PerformanceAIServiceTest"/>
         </classes>
     </test>
 </suite>
