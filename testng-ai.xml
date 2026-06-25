@@ -42,6 +42,7 @@
             <class name="ai.tests.DocumentationAIServiceTest"/>
             <class name="ai.tests.ArchitectureAIServiceTest"/>
             <class name="ai.tests.PerformanceAIServiceTest"/>
+            <class name="ai.platform.AIPlatformValidationTest"/>
         </classes>
     </test>
 </suite>

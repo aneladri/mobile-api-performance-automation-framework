@@ -1,6 +1,6 @@
 package ai.tests;
 
-import core.ai.healing.HealingAIService;
+import core.ai.services.HealingAIService;
 import core.ai.providers.AIProvider;
 import core.ai.providers.AIProviderFactory;
 import org.testng.Assert;

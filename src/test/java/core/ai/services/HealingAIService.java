@@ -1,5 +1,6 @@
-package core.ai.healing;
+package core.ai.services;
 
+import core.ai.healing.HealedLocatorCandidate;
 import core.ai.providers.AIProvider;
 import core.ai.providers.AIProviderFactory;
 import core.ai.providers.AIRequest;
