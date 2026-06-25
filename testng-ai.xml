@@ -39,6 +39,7 @@
             <class name="ai.tests.HealingAIServiceTest"/>
             <class name="ai.tests.PromptLoaderTest"/>
             <class name="ai.tests.FailureAnalysisServiceTest"/>
+            <class name="ai.tests.DocumentationAIServiceTest"/>
         </classes>
     </test>
 </suite>
