@@ -10,10 +10,10 @@ public class AutomationGenerationEngine {
     private final AutomationEngineerService service =
             new AutomationEngineerService();
 
-    private final SourceCodeWriter writer =
-            new JavaSourceWriter();
+    private final FeaturePackageWriter writer =
+            new FeaturePackageWriter();
 
-    public AutomationProject generate(
+    public AutomationFeaturePackage generate(
             AutomationGenerationRequest request,
             String outputDirectory
     ) {
@@ -36,11 +36,17 @@ public class AutomationGenerationEngine {
                         parsed.getTodoItems()
                 );
 
+        AutomationFeaturePackage featurePackage =
+                new AutomationFeaturePackage(
+                        request.getScreenName(),
+                        project
+                );
+
         writer.write(
-                project,
+                featurePackage,
                 outputDirectory
         );
 
-        return project;
+        return featurePackage;
     }
 }
