@@ -82,3 +82,35 @@ tasks.register('aiTest', Test) {
         suites 'testng-ai.xml'
     }
 }
+
+tasks.register('generateAutomation', JavaExec) {
+    group = 'MAPAF AI'
+    description = 'Generate MAPAF automation assets from a user story'
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'core.ai.cli.GenerateAutomationTask'
+
+    systemProperty 'story',
+            project.findProperty('story') ?: ''
+
+    systemProperty 'platform',
+            project.findProperty('platform') ?: 'android'
+
+    systemProperty 'screenName',
+            project.findProperty('screenName') ?: 'GeneratedScreen'
+
+    systemProperty 'acceptanceCriteria',
+            project.findProperty('acceptanceCriteria')
+                    ?: 'TODO_ACCEPTANCE_CRITERIA'
+
+    systemProperty 'targetPackage',
+            project.findProperty('targetPackage')
+                    ?: 'mobile.generated'
+
+    systemProperty 'outputDirectory',
+            project.findProperty('outputDirectory')
+                    ?: 'generated/ai/automation'
+
+    systemProperty 'dryRun',
+        project.findProperty('dryRun') ?: 'false'                
+}

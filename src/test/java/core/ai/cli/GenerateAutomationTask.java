@@ -10,6 +10,11 @@ public final class GenerateAutomationTask {
 
     public static void main(String[] args) {
 
+        boolean dryRun =
+                Boolean.parseBoolean(
+                        System.getProperty("dryRun", "false")
+                );
+
         String story =
                 System.getProperty("story");
 
@@ -48,6 +53,16 @@ public final class GenerateAutomationTask {
                         acceptanceCriteria,
                         targetPackage
                 );
+
+        if (dryRun) {
+            System.out.println(
+                    "Dry run enabled. Automation generation task is wired correctly."
+            );
+            System.out.println(
+                    "Story: " + story
+            );
+            return;
+        }
 
         AutomationGenerationEngine engine =
                 new AutomationGenerationEngine();
