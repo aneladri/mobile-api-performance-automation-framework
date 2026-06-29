@@ -45,6 +45,7 @@
             <class name="ai.platform.AIPlatformValidationTest"/>
             <class name="ai.platform.AIPlatformEndToEndTest"/>
             <class name="ai.tests.AutomationGenerationParserTest"/>
+            <class name="ai.tests.JavaSourceWriterTest"/>
         </classes>
     </test>
 </suite>
