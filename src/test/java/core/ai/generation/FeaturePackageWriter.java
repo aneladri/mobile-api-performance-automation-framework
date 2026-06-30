@@ -7,6 +7,9 @@ public class FeaturePackageWriter {
     private final SourceCodeWriter sourceCodeWriter =
             new JavaSourceWriter();
 
+    private final FeatureDocumentationWriter documentationWriter =
+            new FeatureDocumentationWriter();
+
     public void write(
             AutomationFeaturePackage featurePackage,
             String outputDirectory
@@ -23,6 +26,11 @@ public class FeaturePackageWriter {
 
         sourceCodeWriter.write(
                 featurePackage.getProject(),
+                featureDirectory.toString()
+        );
+
+        documentationWriter.write(
+                featurePackage,
                 featureDirectory.toString()
         );
     }
