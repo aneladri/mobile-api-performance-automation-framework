@@ -73,7 +73,7 @@ public final class GenerateAutomationTask {
         );
 
         System.out.println(
-                "Automation assets generated at: " + outputDirectory
+                "Automation feature package generated at: " + outputDirectory
         );
     }
 }
