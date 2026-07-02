@@ -7,6 +7,11 @@ import roomscan.locators.RoomScanLocators;
 
 public class RoomScanHomeScreen extends HealingBaseScreen {
 
+    private final By homeScreenTitle =
+            AppiumBy.accessibilityId(
+                    RoomScanLocators.HOME_SCREEN_TITLE
+            );
+
     private final By startScanButton =
             AppiumBy.accessibilityId(
                     RoomScanLocators.START_SCAN_BUTTON
@@ -22,28 +27,48 @@ public class RoomScanHomeScreen extends HealingBaseScreen {
                     RoomScanLocators.SETTINGS_BUTTON
             );
 
-    private final By homeScreenTitle =
-            AppiumBy.accessibilityId(
-                    RoomScanLocators.HOME_SCREEN_TITLE
-            );
-
+    /**
+     * Verifies the Room Scan home screen is displayed.
+     */
     public boolean isLoaded() {
-        return isDisplayed(homeScreenTitle);
+        return isDisplayed(
+                homeScreenTitle
+        );
     }
 
+    /**
+     * Verifies the Start Scan button is available.
+     */
     public boolean isReadyToScan() {
-        return isDisplayed(startScanButton);
+        return isDisplayed(
+                startScanButton
+        );
     }
 
+    /**
+     * Starts a new room scan.
+     */
     public void startScan() {
-        click(startScanButton);
+        tap(
+                startScanButton
+        );
     }
 
+    /**
+     * Opens Scan History.
+     */
     public void openScanHistory() {
-        click(scanHistoryButton);
+        tap(
+                scanHistoryButton
+        );
     }
 
+    /**
+     * Opens Settings.
+     */
     public void openSettings() {
-        click(settingsButton);
+        tap(
+                settingsButton
+        );
     }
 }
