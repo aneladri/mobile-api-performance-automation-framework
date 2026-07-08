@@ -47,6 +47,8 @@
             <class name="ai.tests.AutomationGenerationParserTest"/>
             <class name="ai.tests.JavaSourceWriterTest"/>
             <class name="ai.tests.AutomationGenerationEngineTest"/>
+            <class name="ai.tests.FeaturePackageWriterTest"/>
+            <class name="roomscan.tests.RoomScanMockWorkflowTest"/>
         </classes>
     </test>
 </suite>
