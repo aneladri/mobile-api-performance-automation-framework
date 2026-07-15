@@ -32,6 +32,10 @@ public final class HealingMetricsCollector {
         metrics.incrementClaudeCalls();
     }
 
+    public static void recordClaudeHit() {
+        metrics.incrementClaudeHits();
+    }
+
     public static void reset() {
         metrics = new HealingMetrics();
     }

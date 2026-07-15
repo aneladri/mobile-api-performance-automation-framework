@@ -1,5 +1,6 @@
 package core.ai.healing;
 
+import core.ai.services.HealingAIService;
 import core.config.ConfigManager;
 import core.driver.DriverManager;
 import core.utils.LoggerUtil;
@@ -24,6 +25,9 @@ public class LocatorHealingEngine {
 
     private final LocalHealingRuleEngine ruleEngine =
             new LocalHealingRuleEngine();
+
+    private final HealingAIService aiService =
+            new HealingAIService();
 
     public WebElement heal(
             By brokenLocator,
@@ -108,10 +112,62 @@ public class LocatorHealingEngine {
         String compressedSource =
                 PageSourceCompressor.compress(rawPageSource);
 
-        logger.warn(
-                "[Healing] Tier 3 Claude API not wired yet. Platform: {}, source chars: {}",
+        logger.info(
+                "[Healing] Tier 3 - calling Claude AI. Platform: {}, source chars: {}",
                 platform,
                 compressedSource.length()
+        );
+
+        HealedLocatorCandidate aiCandidate =
+                aiService.recommendLocator(
+                        brokenLocator,
+                        screenClass,
+                        testName,
+                        platform,
+                        compressedSource
+                );
+
+        if (aiCandidate == null) {
+            logger.warn(
+                    "[Healing] Tier 3 MISS - Claude AI returned no usable recommendation"
+            );
+            return null;
+        }
+
+        if (aiCandidate.getConfidence() < MIN_CONFIDENCE) {
+            logger.warn(
+                    "[Healing] Tier 3 MISS - confidence {} below threshold {} for {}",
+                    aiCandidate.getConfidence(),
+                    MIN_CONFIDENCE,
+                    aiCandidate
+            );
+            return null;
+        }
+
+        WebElement healedElement =
+                tryCandidate(aiCandidate);
+
+        if (healedElement != null) {
+            HealingMetricsCollector.recordClaudeHit();
+
+            logger.info(
+                    "[Healing] Tier 3 HIT - Claude AI: {}",
+                    aiCandidate
+            );
+
+            HealedLocatorStore.store(
+                    locatorKey,
+                    aiCandidate,
+                    screenClass,
+                    testName
+            );
+
+            return healedElement;
+        }
+
+        logger.warn(
+                "[Healing] Tier 3 candidate did not resolve on page: {}",
+                aiCandidate
         );
 
         return null;

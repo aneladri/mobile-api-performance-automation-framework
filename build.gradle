@@ -19,6 +19,7 @@ dependencies {
     testImplementation 'io.rest-assured:json-schema-validator:5.5.0'
 
     testImplementation 'io.qameta.allure:allure-testng:2.29.1'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 }
 
 tasks.withType(Test).configureEach {
@@ -80,6 +81,54 @@ tasks.register('iosTest', Test) {
 tasks.register('aiTest', Test) {
     useTestNG() {
         suites 'testng-ai.xml'
+    }
+}
+
+tasks.register('flowDemoTest', Test) {
+    description = 'Runs the multi-step Appium navigation flow demo'
+    group = 'MAPAF Demo'
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-flow-demo.xml'
+        listeners.add("io.qameta.allure.testng.AllureTestNg")
+    }
+}
+
+tasks.register('failureDemoTest', Test) {
+    description = 'Runs a deliberate, deterministic failure for showing a real failure report'
+    group = 'MAPAF Demo'
+    ignoreFailures = true
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-failure-demo.xml'
+        listeners.add("io.qameta.allure.testng.AllureTestNg")
+    }
+}
+
+tasks.register('healingDemoTest', Test) {
+    description = 'Runs the Tier 3 AI self-healing demo test'
+    group = 'MAPAF Demo'
+
+    systemProperty "waitTimeoutSeconds", project.findProperty("waitTimeoutSeconds") ?: "15"
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-healing-demo.xml'
+        listeners.add("io.qameta.allure.testng.AllureTestNg")
     }
 }
 

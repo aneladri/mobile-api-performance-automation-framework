@@ -15,8 +15,8 @@ public class ClaudeAIProvider implements AIProvider {
     private static final Logger logger =
             LoggerUtil.getLogger(ClaudeAIProvider.class);
 
-    private static final String API_URL =
-            "https://api.anthropic.com/v1/messages";
+    private static final String DEFAULT_BASE_URL =
+            "https://api.anthropic.com";
 
     private static final String ANTHROPIC_VERSION =
             "2023-06-01";
@@ -46,6 +46,9 @@ public class ClaudeAIProvider implements AIProvider {
                         ? ConfigManager.get("claudeMaxTokens")
                         : "1024";
 
+        String apiUrl =
+                resolveBaseUrl() + "/v1/messages";
+
         String body =
                 buildRequestBody(
                         request,
@@ -55,7 +58,7 @@ public class ClaudeAIProvider implements AIProvider {
 
         HttpRequest httpRequest =
                 HttpRequest.newBuilder()
-                        .uri(URI.create(API_URL))
+                        .uri(URI.create(apiUrl))
                         .header("Content-Type", "application/json")
                         .header("x-api-key", apiKey)
                         .header("anthropic-version", ANTHROPIC_VERSION)
@@ -115,6 +118,32 @@ public class ClaudeAIProvider implements AIProvider {
         return System.getenv("CLAUDE_API_KEY");
     }
 
+    private String resolveBaseUrl() {
+
+        String fromConfig =
+                ConfigManager.get("claudeBaseUrl");
+
+        if (fromConfig != null && !fromConfig.isBlank()
+                && !fromConfig.startsWith("${")) {
+            return stripTrailingSlash(fromConfig);
+        }
+
+        String fromEnv =
+                System.getenv("CLAUDE_BASE_URL");
+
+        if (fromEnv != null && !fromEnv.isBlank()) {
+            return stripTrailingSlash(fromEnv);
+        }
+
+        return DEFAULT_BASE_URL;
+    }
+
+    private String stripTrailingSlash(String url) {
+        return url.endsWith("/")
+                ? url.substring(0, url.length() - 1)
+                : url;
+    }
+
     private String buildRequestBody(
             AIRequest request,
             String model,
@@ -155,17 +184,49 @@ public class ClaudeAIProvider implements AIProvider {
 
         start += marker.length();
 
-        int end =
-                responseBody.indexOf("\"", start);
+        StringBuilder result = new StringBuilder();
+        int i = start;
 
-        if (end < 0) {
-            return responseBody;
+        while (i < responseBody.length()) {
+            char c = responseBody.charAt(i);
+
+            if (c == '\\' && i + 1 < responseBody.length()) {
+                char next = responseBody.charAt(i + 1);
+
+                switch (next) {
+                    case 'n' -> result.append('\n');
+                    case 'r' -> result.append('\r');
+                    case 't' -> result.append('\t');
+                    case '"' -> result.append('"');
+                    case '\\' -> result.append('\\');
+                    case '/' -> result.append('/');
+                    case 'u' -> {
+                        if (i + 5 < responseBody.length()) {
+                            String hex =
+                                    responseBody.substring(i + 2, i + 6);
+                            result.append(
+                                    (char) Integer.parseInt(hex, 16)
+                            );
+                            i += 4;
+                        }
+                    }
+                    default -> result.append(next);
+                }
+
+                i += 2;
+                continue;
+            }
+
+            if (c == '"') {
+                // Unescaped quote: this is the real end of the JSON string.
+                break;
+            }
+
+            result.append(c);
+            i++;
         }
 
-        return responseBody
-                .substring(start, end)
-                .replace("\\n", "\n")
-                .replace("\\\"", "\"");
+        return result.toString();
     }
 
     private String escape(String value) {
