@@ -354,3 +354,17 @@ tasks.register('performanceDashboardLoad') {
     dependsOn 'performanceDemoLoad'
     finalizedBy 'performanceReport'
 }
+
+tasks.register('reportingTest', Test) {
+    description = 'Runs common reporting framework tests'
+    group = 'verification'
+
+    useTestNG {
+        suites 'testng-reporting.xml'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
