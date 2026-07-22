@@ -4,6 +4,7 @@
     <test name="Common Reporting">
         <classes>
             <class name="common.reporting.tests.SummaryReaderWriterTest"/>
+            <class name="common.reporting.tests.DashboardModelTest"/>
         </classes>
     </test>
 </suite>
