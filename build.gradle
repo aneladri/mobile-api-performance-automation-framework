@@ -368,3 +368,25 @@ tasks.register('reportingTest', Test) {
         exceptionFormat = 'full'
     }
 }
+
+tasks.register('generatePerformanceSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common performance execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'performance.reporting.PerformanceSummaryCli'
+
+    systemProperty 'mapaf.environment',
+            project.findProperty('environment') ?: 'LOCAL'
+
+    systemProperty 'mapaf.build',
+            System.getenv('BUILD_NUMBER') ?: 'local'
+
+    systemProperty 'mapaf.branch',
+            System.getenv('GIT_BRANCH') ?: 'local'
+
+    systemProperty 'mapaf.commit',
+            System.getenv('GIT_COMMIT') ?: 'local'
+}
