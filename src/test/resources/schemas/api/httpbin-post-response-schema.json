@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["args", "data", "files", "form", "headers", "json", "origin", "url"],
+  "properties": {
+    "args": { "type": "object" },
+    "data": { "type": "string" },
+    "files": { "type": "object" },
+    "form": { "type": "object" },
+    "headers": { "type": "object" },
+    "json": {
+      "type": "object",
+      "required": ["firstName", "lastName", "email", "role"],
+      "properties": {
+        "firstName": { "type": "string", "minLength": 1 },
+        "lastName": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "origin": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}

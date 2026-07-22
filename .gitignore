@@ -1,0 +1,33 @@
+.gradle/
+build/
+.DS_Store
+.vscode/
+.idea/
+*.iml
+logs/
+*.log
+node_modules/
+allure-results/
+allure-report/
+
+# Performance execution artifacts
+performance/results/
+
+# AI generated reports
+reports/ai/generated/*.md
+
+# AI-generated source and locator artifacts
+generated/
+
+# Performance demo generated output
+performance/results/k6/*.json
+performance/jmeter/results/*.jtl
+performance/jmeter/reports/*
+!performance/jmeter/reports/.gitkeep
+performance/reports/mock-api/*
+!performance/reports/mock-api/.gitkeep
+
+# Generated performance reports
+performance/k6/reports/*
+!performance/k6/reports/.gitkeep
+performance/reports/index.html
