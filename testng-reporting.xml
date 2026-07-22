@@ -5,6 +5,7 @@
         <classes>
             <class name="common.reporting.tests.SummaryReaderWriterTest"/>
             <class name="common.reporting.tests.DashboardModelTest"/>
+            <class name="common.reporting.tests.DashboardAggregatorTest"/>
         </classes>
     </test>
 </suite>
