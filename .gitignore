@@ -31,3 +31,4 @@ performance/reports/mock-api/*
 performance/k6/reports/*
 !performance/k6/reports/.gitkeep
 performance/reports/index.html
+performance/reports/summary.json
