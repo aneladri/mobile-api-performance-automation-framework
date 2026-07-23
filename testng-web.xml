@@ -9,6 +9,7 @@
             <class name="web.tests.PlaywrightManagerTest"/>
             <class name="web.tests.BaseWebTestLifecycleTest"/>
             <class name="web.tests.BaseWebTestIsolationTest"/>
+            <class name="web.tests.BasePageTest"/>
         </classes>
 
     </test>
