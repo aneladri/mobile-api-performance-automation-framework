@@ -15,6 +15,7 @@
             <class name="common.reporting.tests.DashboardSectionFrameworkTest"/>
             <class name="common.reporting.tests.OverviewSectionBuilderTest"/>
             <class name="common.reporting.tests.DashboardWidgetFactoryTest"/>
+            <class name="common.reporting.tests.ApiSectionBuilderTest"/>
         </classes>
     </test>
 </suite>
