@@ -17,6 +17,9 @@
             <class name="common.reporting.tests.DashboardWidgetFactoryTest"/>
             <class name="common.reporting.tests.ApiSectionBuilderTest"/>
             <class name="common.reporting.tests.PerformanceSectionBuilderTest"/>
+            <class name="common.reporting.tests.EnvironmentSectionBuilderTest"/>
+            <class name="common.reporting.tests.DownloadsSectionBuilderTest"/>
+            <class name="common.reporting.tests.DashboardGeneratorTest"/>
         </classes>
     </test>
 </suite>
