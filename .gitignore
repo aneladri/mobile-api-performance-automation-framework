@@ -36,3 +36,4 @@ api/reports/summary.json
 dashboard/reports/
 published/
 web/artifacts/
+web/reports/summary.json

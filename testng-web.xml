@@ -13,6 +13,7 @@
             <class name="web.tests.WebLocatorTest"/>
             <class name="web.tests.LocatorRepositoryTest"/>
             <class name="web.tests.ExecutionArtifactManagerTest"/>
+            <class name="web.tests.WebSummaryGeneratorTest"/>
         </classes>
 
     </test>

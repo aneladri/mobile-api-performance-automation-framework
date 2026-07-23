@@ -444,3 +444,28 @@ tasks.register('playwrightInstall', JavaExec) {
 
     args 'install', 'chromium'
 }
+
+tasks.register('generateWebSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common web execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'web.reporting.WebSummaryCli'
+
+    systemProperty 'mapaf.environment',
+            project.findProperty('environment') ?: 'LOCAL'
+
+    systemProperty 'mapaf.build',
+            System.getenv('BUILD_NUMBER') ?: 'local'
+
+    systemProperty 'mapaf.branch',
+            System.getenv('GIT_BRANCH') ?: 'local'
+
+    systemProperty 'mapaf.commit',
+            System.getenv('GIT_COMMIT') ?: 'local'
+
+    systemProperty 'web.browser',
+            project.findProperty('browser') ?: 'CHROMIUM'
+}
