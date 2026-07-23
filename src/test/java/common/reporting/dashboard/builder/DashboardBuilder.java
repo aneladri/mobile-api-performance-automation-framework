@@ -7,6 +7,8 @@ import common.reporting.dashboard.section.DashboardSectionBuilder;
 import common.reporting.dashboard.section.OverviewSectionBuilder;
 import common.reporting.dashboard.section.ApiSectionBuilder;
 import common.reporting.dashboard.section.PerformanceSectionBuilder;
+import common.reporting.dashboard.section.EnvironmentSectionBuilder;
+import common.reporting.dashboard.section.DownloadsSectionBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ public class DashboardBuilder {
                 register(new OverviewSectionBuilder());
                 register(new ApiSectionBuilder());
 		register(new PerformanceSectionBuilder());
+                register(new EnvironmentSectionBuilder());
+                register(new DownloadsSectionBuilder());
         }
 
         public DashboardBuilder register(

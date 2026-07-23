@@ -20,6 +20,8 @@
             <class name="common.reporting.tests.EnvironmentSectionBuilderTest"/>
             <class name="common.reporting.tests.DownloadsSectionBuilderTest"/>
             <class name="common.reporting.tests.DashboardGeneratorTest"/>
+            <class name="common.reporting.tests.DashboardGeneratorCliTest"/>
+            <class name="common.reporting.tests.DashboardGenerationConfigurationTest"/>
         </classes>
     </test>
 </suite>

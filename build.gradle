@@ -412,3 +412,12 @@ tasks.register('generateApiSummary', JavaExec) {
     systemProperty 'mapaf.commit',
             System.getenv('GIT_COMMIT') ?: 'local'
 }
+
+tasks.register('generateDashboard', JavaExec) {
+    group = 'reporting'
+    description = 'Generates the MAPAF unified quality dashboard'
+
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'common.reporting.dashboard.generator.DashboardGeneratorCli'
+}
