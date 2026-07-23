@@ -10,6 +10,7 @@
             <class name="common.reporting.tests.ApiSummaryGeneratorTest"/>
             <class name="common.reporting.tests.DashboardConfigurationTest"/>
             <class name="common.reporting.tests.DashboardWidgetModelTest"/>
+            <class name="common.reporting.tests.DashboardBuilderTest"/>
         </classes>
     </test>
 </suite>
