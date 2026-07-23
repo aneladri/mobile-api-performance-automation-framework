@@ -3,11 +3,29 @@ package common.reporting.dashboard.section;
 import common.reporting.dashboard.DashboardSummary;
 import common.reporting.dashboard.widget.DashboardSection;
 import common.reporting.dashboard.widget.DashboardWidget;
+import common.reporting.dashboard.widget.DashboardWidgetFactory;
 import common.reporting.dashboard.widget.WidgetStatus;
-import common.reporting.dashboard.widget.WidgetType;
 
 public class OverviewSectionBuilder
         extends AbstractDashboardSectionBuilder {
+
+    private final DashboardWidgetFactory widgetFactory;
+
+    public OverviewSectionBuilder() {
+        this(new DashboardWidgetFactory());
+    }
+
+    OverviewSectionBuilder(
+            DashboardWidgetFactory widgetFactory
+    ) {
+        if (widgetFactory == null) {
+            throw new IllegalArgumentException(
+                    "Dashboard widget factory must not be null"
+            );
+        }
+
+        this.widgetFactory = widgetFactory;
+    }
 
     @Override
     public String getSectionId() {
@@ -20,7 +38,9 @@ public class OverviewSectionBuilder
     }
 
     @Override
-    public DashboardSection build(DashboardSummary summary) {
+    public DashboardSection build(
+            DashboardSummary summary
+    ) {
         if (summary == null) {
             throw new IllegalArgumentException(
                     "Dashboard summary must not be null"
@@ -33,117 +53,107 @@ public class OverviewSectionBuilder
                 getDisplayOrder()
         );
 
-        section.addWidget(buildOverallStatusWidget(summary));
-        section.addWidget(createKpiWidget(
-                "total-tests",
-                "Total Tests",
-                summary.getMetrics().getTotalTests(),
-                2
-        ));
-
-        DashboardWidget passRate = createKpiWidget(
-                "pass-rate",
-                "Pass Rate",
-                summary.getMetrics().getPassRate(),
-                3
+        section.addWidget(
+                widgetFactory.createStatusWidget(
+                        "overall-status",
+                        "Overall Status",
+                        summary.getOverallStatus(),
+                        1
+                )
         );
-        passRate.addData("unit", "%");
-        section.addWidget(passRate);
 
-        DashboardWidget duration = createKpiWidget(
-                "duration",
-                "Duration",
-                summary.getMetrics().getDurationSeconds(),
-                4
+        section.addWidget(
+                widgetFactory.createKpiWidget(
+                        "total-tests",
+                        "Total Tests",
+                        summary.getMetrics().getTotalTests(),
+                        2
+                )
         );
-        duration.addData("unit", "seconds");
-        section.addWidget(duration);
 
-        section.addWidget(createKpiWidget(
-                "module-count",
-                "Modules",
-                summary.getModules().size(),
-                5
-        ));
+        section.addWidget(
+                widgetFactory.createKpiWidget(
+                        "pass-rate",
+                        "Pass Rate",
+                        summary.getMetrics().getPassRate(),
+                        "%",
+                        3
+                )
+        );
 
-        section.addWidget(createKpiWidget(
-                "passed-tests",
-                "Passed",
-                summary.getMetrics().getPassed(),
-                6
-        ));
+        section.addWidget(
+                widgetFactory.createKpiWidget(
+                        "duration",
+                        "Duration",
+                        summary.getMetrics().getDurationSeconds(),
+                        "seconds",
+                        4
+                )
+        );
 
-        section.addWidget(createKpiWidget(
-                "failed-tests",
-                "Failed",
-                summary.getMetrics().getFailed(),
-                7
-        ));
+        section.addWidget(
+                widgetFactory.createKpiWidget(
+                        "module-count",
+                        "Modules",
+                        summary.getModules().size(),
+                        5
+                )
+        );
 
-        section.addWidget(createKpiWidget(
-                "skipped-tests",
-                "Skipped",
-                summary.getMetrics().getSkipped(),
-                8
-        ));
+        section.addWidget(
+                widgetFactory.createKpiWidget(
+                        "passed-tests",
+                        "Passed",
+                        summary.getMetrics().getPassed(),
+                        WidgetStatus.SUCCESS,
+                        6
+                )
+        );
+
+        section.addWidget(
+                createFailedTestsWidget(summary)
+        );
+
+        section.addWidget(
+                createSkippedTestsWidget(summary)
+        );
 
         return section;
     }
 
-    private DashboardWidget buildOverallStatusWidget(
+    private DashboardWidget createFailedTestsWidget(
             DashboardSummary summary
     ) {
-        DashboardWidget widget = new DashboardWidget(
-                "overall-status",
-                "Overall Status",
-                WidgetType.STATUS
-        );
+        int failed = summary.getMetrics().getFailed();
 
-        widget.setDisplayOrder(1);
-        widget.setStatus(mapStatus(summary.getOverallStatus()));
-        widget.addData(
-                "value",
-                summary.getOverallStatus().name()
-        );
+        WidgetStatus status = failed > 0
+                ? WidgetStatus.FAILURE
+                : WidgetStatus.SUCCESS;
 
-        return widget;
+        return widgetFactory.createKpiWidget(
+                "failed-tests",
+                "Failed",
+                failed,
+                status,
+                7
+        );
     }
 
-    private DashboardWidget createKpiWidget(
-            String id,
-            String title,
-            Object value,
-            int displayOrder
+    private DashboardWidget createSkippedTestsWidget(
+            DashboardSummary summary
     ) {
-        DashboardWidget widget = new DashboardWidget(
-                id,
-                title,
-                WidgetType.KPI
+        int skipped = summary.getMetrics().getSkipped();
+
+        WidgetStatus status = skipped > 0
+                ? WidgetStatus.WARNING
+                : WidgetStatus.SUCCESS;
+
+        return widgetFactory.createKpiWidget(
+                "skipped-tests",
+                "Skipped",
+                skipped,
+                status,
+                8
         );
-
-        widget.setDisplayOrder(displayOrder);
-        widget.setStatus(resolveKpiStatus(id, value));
-        widget.addData("value", value);
-
-        return widget;
-    }
-
-    private WidgetStatus resolveKpiStatus(
-            String widgetId,
-            Object value
-    ) {
-        if ("failed-tests".equals(widgetId)
-                && value instanceof Number number
-                && number.intValue() > 0) {
-            return WidgetStatus.FAILURE;
-        }
-
-        if ("skipped-tests".equals(widgetId)
-                && value instanceof Number number
-                && number.intValue() > 0) {
-            return WidgetStatus.WARNING;
-        }
-
-        return WidgetStatus.INFORMATION;
     }
 }
