@@ -23,6 +23,7 @@
             <class name="common.reporting.tests.DashboardGeneratorCliTest"/>
             <class name="common.reporting.tests.DashboardGenerationConfigurationTest"/>
             <class name="common.reporting.tests.DashboardPublisherTest"/>
+            <class name="common.reporting.tests.DashboardGenerationPipelineTest"/>
         </classes>
     </test>
 </suite>
