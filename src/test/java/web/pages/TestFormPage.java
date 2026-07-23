@@ -1,35 +1,44 @@
 package web.pages;
 
 import com.microsoft.playwright.Page;
+import web.locators.WebLocator;
 
 import java.nio.file.Path;
 import java.util.List;
 
 public class TestFormPage extends BasePage {
 
-    private static final String NAME_INPUT =
-            "#name";
+    private static final WebLocator NAME_INPUT = WebLocator.id(
+            "Name Input",
+            "name");
 
-    private static final String EMAIL_INPUT =
-            "#email";
+    private static final WebLocator EMAIL_INPUT = WebLocator.name(
+            "Email Input",
+            "email");
 
-    private static final String ACTIVE_CHECKBOX =
-            "#active";
+    private static final WebLocator ACTIVE_CHECKBOX = WebLocator.id(
+            "Active Checkbox",
+            "active");
 
-    private static final String COUNTRY_SELECT =
-            "#country";
+    private static final WebLocator COUNTRY_SELECT = WebLocator.css(
+            "Country Select",
+            "#country");
 
-    private static final String SUBMIT_BUTTON =
-            "#submit";
+    private static final WebLocator SUBMIT_BUTTON = WebLocator.text(
+            "Submit Button",
+            "Submit");
 
-    private static final String RESULT =
-            "#result";
+    private static final WebLocator RESULT = WebLocator.id(
+            "Result",
+            "result");
 
-    private static final String FILE_INPUT =
-            "#file";
+    private static final WebLocator FILE_INPUT = WebLocator.id(
+            "File Input",
+            "file");
 
-    private static final String ITEM =
-            ".item";
+    private static final WebLocator ITEM = WebLocator.css(
+            "Automation Items",
+            ".item");
 
     public TestFormPage(Page page) {
         super(page);
@@ -64,15 +73,17 @@ public class TestFormPage extends BasePage {
     }
 
     public void selectCountryByValue(
-            String value
-    ) {
-        selectByValue(COUNTRY_SELECT, value);
+            String value) {
+        selectByValue(
+                COUNTRY_SELECT,
+                value);
     }
 
     public void selectCountryByLabel(
-            String label
-    ) {
-        selectByLabel(COUNTRY_SELECT, label);
+            String label) {
+        selectByLabel(
+                COUNTRY_SELECT,
+                label);
     }
 
     public void submit() {
@@ -102,7 +113,6 @@ public class TestFormPage extends BasePage {
     public String getEmailPlaceholder() {
         return attribute(
                 EMAIL_INPUT,
-                "placeholder"
-        );
+                "placeholder");
     }
 }

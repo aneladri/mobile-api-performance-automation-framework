@@ -10,6 +10,8 @@
             <class name="web.tests.BaseWebTestLifecycleTest"/>
             <class name="web.tests.BaseWebTestIsolationTest"/>
             <class name="web.tests.BasePageTest"/>
+            <class name="web.tests.WebLocatorTest"/>
+            <class name="web.tests.LocatorRepositoryTest"/>
         </classes>
 
     </test>

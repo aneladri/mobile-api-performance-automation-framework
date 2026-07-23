@@ -3,6 +3,7 @@ package web.pages;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.SelectOption;
+import web.locators.WebLocator;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -14,8 +15,7 @@ public abstract class BasePage {
     protected BasePage(Page page) {
         if (page == null) {
             throw new IllegalArgumentException(
-                    "Playwright page must not be null"
-            );
+                    "Playwright page must not be null");
         }
 
         this.page = page;
@@ -31,11 +31,21 @@ public abstract class BasePage {
         return page.locator(selector);
     }
 
+    protected Locator locator(
+            WebLocator webLocator) {
+        if (webLocator == null) {
+            throw new IllegalArgumentException(
+                    "Web locator must not be null");
+        }
+
+        return page.locator(
+                webLocator.toSelector());
+    }
+
     public void navigate(String url) {
         if (url == null || url.isBlank()) {
             throw new IllegalArgumentException(
-                    "Navigation URL must not be blank"
-            );
+                    "Navigation URL must not be blank");
         }
 
         page.navigate(url);
@@ -59,12 +69,10 @@ public abstract class BasePage {
 
     protected void fill(
             String selector,
-            String value
-    ) {
+            String value) {
         if (value == null) {
             throw new IllegalArgumentException(
-                    "Input value must not be null"
-            );
+                    "Input value must not be null");
         }
 
         locator(selector).fill(value);
@@ -76,12 +84,10 @@ public abstract class BasePage {
 
     protected void press(
             String selector,
-            String key
-    ) {
+            String key) {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException(
-                    "Keyboard key must not be blank"
-            );
+                    "Keyboard key must not be blank");
         }
 
         locator(selector).press(key);
@@ -125,19 +131,16 @@ public abstract class BasePage {
 
     protected String attribute(
             String selector,
-            String attributeName
-    ) {
+            String attributeName) {
         if (attributeName == null
                 || attributeName.isBlank()) {
 
             throw new IllegalArgumentException(
-                    "Attribute name must not be blank"
-            );
+                    "Attribute name must not be blank");
         }
 
         return locator(selector).getAttribute(
-                attributeName
-        );
+                attributeName);
     }
 
     protected int count(String selector) {
@@ -145,19 +148,16 @@ public abstract class BasePage {
     }
 
     protected List<String> allTextContents(
-            String selector
-    ) {
+            String selector) {
         return locator(selector).allTextContents();
     }
 
     protected void selectByValue(
             String selector,
-            String value
-    ) {
+            String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(
-                    "Select option value must not be blank"
-            );
+                    "Select option value must not be blank");
         }
 
         locator(selector).selectOption(value);
@@ -165,42 +165,34 @@ public abstract class BasePage {
 
     protected void selectByLabel(
             String selector,
-            String label
-    ) {
+            String label) {
         if (label == null || label.isBlank()) {
             throw new IllegalArgumentException(
-                    "Select option label must not be blank"
-            );
+                    "Select option label must not be blank");
         }
 
         locator(selector).selectOption(
-                new SelectOption().setLabel(label)
-        );
+                new SelectOption().setLabel(label));
     }
 
     protected void selectByIndex(
             String selector,
-            int index
-    ) {
+            int index) {
         if (index < 0) {
             throw new IllegalArgumentException(
-                    "Select option index must not be negative"
-            );
+                    "Select option index must not be negative");
         }
 
         locator(selector).selectOption(
-                new SelectOption().setIndex(index)
-        );
+                new SelectOption().setIndex(index));
     }
 
     protected void uploadFile(
             String selector,
-            Path file
-    ) {
+            Path file) {
         if (file == null) {
             throw new IllegalArgumentException(
-                    "Upload file must not be null"
-            );
+                    "Upload file must not be null");
         }
 
         locator(selector).setInputFiles(file);
@@ -211,15 +203,13 @@ public abstract class BasePage {
     }
 
     protected void scrollIntoView(
-            String selector
-    ) {
+            String selector) {
         locator(selector).scrollIntoViewIfNeeded();
     }
 
     protected void dragAndDrop(
             String sourceSelector,
-            String targetSelector
-    ) {
+            String targetSelector) {
         Locator source = locator(sourceSelector);
         Locator target = locator(targetSelector);
 
@@ -231,24 +221,133 @@ public abstract class BasePage {
     }
 
     protected void waitForVisible(
-            String selector
-    ) {
+            String selector) {
         locator(selector).waitFor(
                 new Locator.WaitForOptions()
                         .setState(
-                                com.microsoft.playwright.options
-                                        .WaitForSelectorState.VISIBLE
-                        )
-        );
+                                com.microsoft.playwright.options.WaitForSelectorState.VISIBLE));
     }
 
     private void validateSelector(
-            String selector
-    ) {
+            String selector) {
         if (selector == null || selector.isBlank()) {
             throw new IllegalArgumentException(
-                    "Locator selector must not be blank"
-            );
+                    "Locator selector must not be blank");
         }
+    }
+
+    protected void click(
+            WebLocator webLocator) {
+        locator(webLocator).click();
+    }
+
+    protected void fill(
+            WebLocator webLocator,
+            String value) {
+        if (value == null) {
+            throw new IllegalArgumentException(
+                    "Input value must not be null");
+        }
+
+        locator(webLocator).fill(value);
+    }
+
+    protected void clear(
+            WebLocator webLocator) {
+        locator(webLocator).clear();
+    }
+
+    protected void check(
+            WebLocator webLocator) {
+        locator(webLocator).check();
+    }
+
+    protected void uncheck(
+            WebLocator webLocator) {
+        locator(webLocator).uncheck();
+    }
+
+    protected boolean isChecked(
+            WebLocator webLocator) {
+        return locator(webLocator).isChecked();
+    }
+
+    protected boolean isVisible(
+            WebLocator webLocator) {
+        return locator(webLocator).isVisible();
+    }
+
+    protected boolean isEnabled(
+            WebLocator webLocator) {
+        return locator(webLocator).isEnabled();
+    }
+
+    protected String innerText(
+            WebLocator webLocator) {
+        return locator(webLocator).innerText();
+    }
+
+    protected String inputValue(
+            WebLocator webLocator) {
+        return locator(webLocator).inputValue();
+    }
+
+    protected String attribute(
+            WebLocator webLocator,
+            String attributeName) {
+        if (attributeName == null
+                || attributeName.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Attribute name must not be blank");
+        }
+
+        return locator(webLocator)
+                .getAttribute(attributeName);
+    }
+
+    protected int count(
+            WebLocator webLocator) {
+        return locator(webLocator).count();
+    }
+
+    protected List<String> allTextContents(
+            WebLocator webLocator) {
+        return locator(webLocator)
+                .allTextContents();
+    }
+
+    protected void selectByValue(
+            WebLocator webLocator,
+            String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Select option value must not be blank");
+        }
+
+        locator(webLocator).selectOption(value);
+    }
+
+    protected void uploadFile(
+            WebLocator webLocator,
+            Path file) {
+        if (file == null) {
+            throw new IllegalArgumentException(
+                    "Upload file must not be null");
+        }
+
+        locator(webLocator).setInputFiles(file);
+    }
+
+    protected void selectByLabel(
+            WebLocator webLocator,
+            String label) {
+        if (label == null || label.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Select option label must not be blank");
+        }
+
+        locator(webLocator).selectOption(
+                new SelectOption().setLabel(label));
     }
 }

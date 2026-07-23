@@ -29,6 +29,7 @@ public class BasePageTest extends BaseWebTest {
 
                     <input
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="name@example.com">
 
