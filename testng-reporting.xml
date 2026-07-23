@@ -7,6 +7,7 @@
             <class name="common.reporting.tests.DashboardModelTest"/>
             <class name="common.reporting.tests.DashboardAggregatorTest"/>
             <class name="common.reporting.tests.PerformanceSummaryGeneratorTest"/>
+            <class name="common.reporting.tests.ApiSummaryGeneratorTest"/>
         </classes>
     </test>
 </suite>

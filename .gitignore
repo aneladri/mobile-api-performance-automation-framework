@@ -32,3 +32,4 @@ performance/k6/reports/*
 !performance/k6/reports/.gitkeep
 performance/reports/index.html
 performance/reports/summary.json
+api/reports/summary.json
