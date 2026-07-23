@@ -11,6 +11,7 @@
             <class name="common.reporting.tests.DashboardConfigurationTest"/>
             <class name="common.reporting.tests.DashboardWidgetModelTest"/>
             <class name="common.reporting.tests.DashboardBuilderTest"/>
+            <class name="common.reporting.tests.DashboardHtmlRendererTest"/>
         </classes>
     </test>
 </suite>
