@@ -21,6 +21,7 @@ dependencies {
     testImplementation 'io.qameta.allure:allure-testng:2.29.1'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     testImplementation 'org.wiremock:wiremock-standalone:3.13.1'
+    testImplementation 'com.microsoft.playwright:playwright:1.55.0'
 }
 
 tasks.withType(Test).configureEach {
@@ -420,4 +421,26 @@ tasks.register('generateDashboard', JavaExec) {
     dependsOn testClasses
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'common.reporting.dashboard.generator.DashboardGeneratorCli'
+}
+
+tasks.register('webTest', Test) {
+    description = 'Runs Web TestNG suite'
+    group = 'verification'
+
+    useTestNG {
+        suites 'testng-web.xml'
+    }
+}
+
+tasks.register('playwrightInstall', JavaExec) {
+    group = 'MAPAF Web'
+    description = 'Installs Playwright browser binaries'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+
+    mainClass = 'com.microsoft.playwright.CLI'
+
+    args 'install', 'chromium'
 }
