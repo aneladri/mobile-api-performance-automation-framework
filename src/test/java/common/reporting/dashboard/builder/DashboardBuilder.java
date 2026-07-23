@@ -9,6 +9,7 @@ import common.reporting.dashboard.section.ApiSectionBuilder;
 import common.reporting.dashboard.section.PerformanceSectionBuilder;
 import common.reporting.dashboard.section.EnvironmentSectionBuilder;
 import common.reporting.dashboard.section.DownloadsSectionBuilder;
+import common.reporting.dashboard.section.WebSectionBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +20,11 @@ public class DashboardBuilder {
 
         public DashboardBuilder() {
                 register(new OverviewSectionBuilder());
-                register(new ApiSectionBuilder());
+		register(new ApiSectionBuilder());
+		register(new WebSectionBuilder());
 		register(new PerformanceSectionBuilder());
-                register(new EnvironmentSectionBuilder());
-                register(new DownloadsSectionBuilder());
+		register(new EnvironmentSectionBuilder());
+		register(new DownloadsSectionBuilder());
         }
 
         public DashboardBuilder register(
@@ -102,7 +104,11 @@ public class DashboardBuilder {
                                 configuration.isTabEnabled(
                                                 DashboardTab.DOWNLOADS);
 
-                        default -> true;
+			case "web" ->
+        			configuration.isTabEnabled(
+                				DashboardTab.WEB);
+                        
+			default -> true;
                 };
         }
 }

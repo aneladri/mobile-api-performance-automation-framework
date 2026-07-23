@@ -4,6 +4,7 @@ public enum DashboardTab {
 
     OVERVIEW("Overview"),
     API("API"),
+    WEB("Web"),
     PERFORMANCE("Performance"),
     ENVIRONMENT("Environment"),
     DOWNLOADS("Downloads");

@@ -14,11 +14,12 @@ public class DashboardConfiguration {
     private DashboardTheme theme = DashboardTheme.LIGHT;
 
     private List<DashboardTab> enabledTabs = new ArrayList<>(Arrays.asList(
-            DashboardTab.OVERVIEW,
-            DashboardTab.API,
-            DashboardTab.PERFORMANCE,
-            DashboardTab.ENVIRONMENT,
-            DashboardTab.DOWNLOADS));
+        DashboardTab.OVERVIEW,
+        DashboardTab.API,
+        DashboardTab.WEB,
+        DashboardTab.PERFORMANCE,
+        DashboardTab.ENVIRONMENT,
+        DashboardTab.DOWNLOADS));
 
     public static DashboardConfiguration defaultConfiguration() {
         return new DashboardConfiguration();

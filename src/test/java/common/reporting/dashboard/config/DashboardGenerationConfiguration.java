@@ -41,6 +41,13 @@ public class DashboardGenerationConfiguration {
                 )
                 .addSummaryPath(
                         Paths.get(
+                                "web",
+                                "reports",
+                                "summary.json"
+                        )
+                )
+                .addSummaryPath(
+                        Paths.get(
                                 "performance",
                                 "reports",
                                 "summary.json"
@@ -111,8 +118,9 @@ public class DashboardGenerationConfiguration {
                 );
             }
 
-            boolean containsNull = summaryPaths.stream()
-                    .anyMatch(path -> path == null);
+            boolean containsNull =
+                    summaryPaths.stream()
+                            .anyMatch(path -> path == null);
 
             if (containsNull) {
                 throw new IllegalArgumentException(
