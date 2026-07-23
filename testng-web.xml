@@ -12,6 +12,7 @@
             <class name="web.tests.BasePageTest"/>
             <class name="web.tests.WebLocatorTest"/>
             <class name="web.tests.LocatorRepositoryTest"/>
+            <class name="web.tests.ExecutionArtifactManagerTest"/>
         </classes>
 
     </test>

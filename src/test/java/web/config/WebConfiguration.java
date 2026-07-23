@@ -2,14 +2,14 @@ package web.config;
 
 import web.enums.BrowserType;
 import web.enums.ExecutionMode;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class WebConfiguration {
 
-    private BrowserType browser =
-            BrowserType.CHROMIUM;
+    private BrowserType browser = BrowserType.CHROMIUM;
 
-    private ExecutionMode executionMode =
-            ExecutionMode.LOCAL;
+    private ExecutionMode executionMode = ExecutionMode.LOCAL;
 
     private boolean headless = true;
 
@@ -18,6 +18,66 @@ public class WebConfiguration {
     private int viewportHeight = 900;
 
     private int timeoutSeconds = 30;
+
+    private boolean screenshotsEnabled = true;
+
+    private boolean traceEnabled = true;
+
+    private boolean videoEnabled = true;
+
+    private boolean consoleLogsEnabled = true;
+
+    private Path artifactDirectory = Paths.get("web", "artifacts");
+
+    public boolean isScreenshotsEnabled() {
+        return screenshotsEnabled;
+    }
+
+    public void setScreenshotsEnabled(
+            boolean screenshotsEnabled) {
+        this.screenshotsEnabled = screenshotsEnabled;
+    }
+
+    public boolean isTraceEnabled() {
+        return traceEnabled;
+    }
+
+    public void setTraceEnabled(
+            boolean traceEnabled) {
+        this.traceEnabled = traceEnabled;
+    }
+
+    public boolean isVideoEnabled() {
+        return videoEnabled;
+    }
+
+    public void setVideoEnabled(
+            boolean videoEnabled) {
+        this.videoEnabled = videoEnabled;
+    }
+
+    public boolean isConsoleLogsEnabled() {
+        return consoleLogsEnabled;
+    }
+
+    public void setConsoleLogsEnabled(
+            boolean consoleLogsEnabled) {
+        this.consoleLogsEnabled = consoleLogsEnabled;
+    }
+
+    public Path getArtifactDirectory() {
+        return artifactDirectory;
+    }
+
+    public void setArtifactDirectory(
+            Path artifactDirectory) {
+        if (artifactDirectory == null) {
+            throw new IllegalArgumentException(
+                    "Artifact directory must not be null");
+        }
+
+        this.artifactDirectory = artifactDirectory;
+    }
 
     public static WebConfiguration defaultConfiguration() {
         return new WebConfiguration();
@@ -30,8 +90,7 @@ public class WebConfiguration {
     public void setBrowser(BrowserType browser) {
         if (browser == null) {
             throw new IllegalArgumentException(
-                    "Browser type must not be null"
-            );
+                    "Browser type must not be null");
         }
 
         this.browser = browser;
@@ -42,12 +101,10 @@ public class WebConfiguration {
     }
 
     public void setExecutionMode(
-            ExecutionMode executionMode
-    ) {
+            ExecutionMode executionMode) {
         if (executionMode == null) {
             throw new IllegalArgumentException(
-                    "Execution mode must not be null"
-            );
+                    "Execution mode must not be null");
         }
 
         this.executionMode = executionMode;
@@ -69,8 +126,7 @@ public class WebConfiguration {
 
         if (viewportWidth <= 0) {
             throw new IllegalArgumentException(
-                    "Viewport width must be greater than zero"
-            );
+                    "Viewport width must be greater than zero");
         }
 
         this.viewportWidth = viewportWidth;
@@ -84,8 +140,7 @@ public class WebConfiguration {
 
         if (viewportHeight <= 0) {
             throw new IllegalArgumentException(
-                    "Viewport height must be greater than zero"
-            );
+                    "Viewport height must be greater than zero");
         }
 
         this.viewportHeight = viewportHeight;
@@ -96,13 +151,11 @@ public class WebConfiguration {
     }
 
     public void setTimeoutSeconds(
-            int timeoutSeconds
-    ) {
+            int timeoutSeconds) {
 
         if (timeoutSeconds <= 0) {
             throw new IllegalArgumentException(
-                    "Timeout must be greater than zero"
-            );
+                    "Timeout must be greater than zero");
         }
 
         this.timeoutSeconds = timeoutSeconds;

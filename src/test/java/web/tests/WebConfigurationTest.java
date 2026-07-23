@@ -8,121 +8,122 @@ import web.enums.ExecutionMode;
 
 public class WebConfigurationTest {
 
-    @Test
-    public void shouldCreateDefaultConfiguration() {
+        @Test
+        public void shouldCreateDefaultConfiguration() {
 
-        WebConfiguration configuration =
-                WebConfiguration.defaultConfiguration();
+                WebConfiguration configuration = WebConfiguration.defaultConfiguration();
 
-        Assert.assertEquals(
-                configuration.getBrowser(),
-                BrowserType.CHROMIUM
-        );
+                Assert.assertEquals(
+                                configuration.getBrowser(),
+                                BrowserType.CHROMIUM);
 
-        Assert.assertEquals(
-                configuration.getExecutionMode(),
-                ExecutionMode.LOCAL
-        );
+                Assert.assertEquals(
+                                configuration.getExecutionMode(),
+                                ExecutionMode.LOCAL);
 
-        Assert.assertTrue(
-                configuration.isHeadless()
-        );
+                Assert.assertTrue(
+                                configuration.isHeadless());
 
-        Assert.assertEquals(
-                configuration.getViewportWidth(),
-                1440
-        );
+                Assert.assertEquals(
+                                configuration.getViewportWidth(),
+                                1440);
 
-        Assert.assertEquals(
-                configuration.getViewportHeight(),
-                900
-        );
+                Assert.assertEquals(
+                                configuration.getViewportHeight(),
+                                900);
 
-        Assert.assertEquals(
-                configuration.getTimeoutSeconds(),
-                30
-        );
-    }
+                Assert.assertEquals(
+                                configuration.getTimeoutSeconds(),
+                                30);
 
-    @Test
-    public void shouldUpdateConfiguration() {
+                Assert.assertTrue(
+                                configuration.isScreenshotsEnabled());
 
-        WebConfiguration configuration =
-                new WebConfiguration();
+                Assert.assertTrue(
+                                configuration.isTraceEnabled());
 
-        configuration.setBrowser(
-                BrowserType.FIREFOX
-        );
+                Assert.assertTrue(
+                                configuration.isVideoEnabled());
 
-        configuration.setExecutionMode(
-                ExecutionMode.REMOTE
-        );
+                Assert.assertTrue(
+                                configuration.isConsoleLogsEnabled());
 
-        configuration.setHeadless(false);
+                Assert.assertEquals(
+                                configuration
+                                                .getArtifactDirectory()
+                                                .toString(),
+                                "web/artifacts");
+        }
 
-        configuration.setViewportWidth(1920);
+        @Test
+        public void shouldUpdateConfiguration() {
 
-        configuration.setViewportHeight(1080);
+                WebConfiguration configuration = new WebConfiguration();
 
-        configuration.setTimeoutSeconds(60);
+                configuration.setBrowser(
+                                BrowserType.FIREFOX);
 
-        Assert.assertEquals(
-                configuration.getBrowser(),
-                BrowserType.FIREFOX
-        );
+                configuration.setExecutionMode(
+                                ExecutionMode.REMOTE);
 
-        Assert.assertEquals(
-                configuration.getExecutionMode(),
-                ExecutionMode.REMOTE
-        );
+                configuration.setHeadless(false);
 
-        Assert.assertFalse(
-                configuration.isHeadless()
-        );
-    }
+                configuration.setViewportWidth(1920);
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class
-    )
-    public void shouldRejectNullBrowser() {
+                configuration.setViewportHeight(1080);
 
-        new WebConfiguration()
-                .setBrowser(null);
-    }
+                configuration.setTimeoutSeconds(60);
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class
-    )
-    public void shouldRejectNullExecutionMode() {
+                Assert.assertEquals(
+                                configuration.getBrowser(),
+                                BrowserType.FIREFOX);
 
-        new WebConfiguration()
-                .setExecutionMode(null);
-    }
+                Assert.assertEquals(
+                                configuration.getExecutionMode(),
+                                ExecutionMode.REMOTE);
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class
-    )
-    public void shouldRejectInvalidViewportWidth() {
+                Assert.assertFalse(
+                                configuration.isHeadless());
+        }
 
-        new WebConfiguration()
-                .setViewportWidth(0);
-    }
+        @Test(expectedExceptions = IllegalArgumentException.class)
+        public void shouldRejectNullBrowser() {
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class
-    )
-    public void shouldRejectInvalidViewportHeight() {
+                new WebConfiguration()
+                                .setBrowser(null);
+        }
 
-        new WebConfiguration()
-                .setViewportHeight(-1);
-    }
+        @Test(expectedExceptions = IllegalArgumentException.class)
+        public void shouldRejectNullExecutionMode() {
 
-    @Test(
-            expectedExceptions = IllegalArgumentException.class
-    )
-    public void shouldRejectInvalidTimeout() {
+                new WebConfiguration()
+                                .setExecutionMode(null);
+        }
 
-        new WebConfiguration()
-                .setTimeoutSeconds(0);
-    }
+        @Test(expectedExceptions = IllegalArgumentException.class)
+        public void shouldRejectInvalidViewportWidth() {
+
+                new WebConfiguration()
+                                .setViewportWidth(0);
+        }
+
+        @Test(expectedExceptions = IllegalArgumentException.class)
+        public void shouldRejectInvalidViewportHeight() {
+
+                new WebConfiguration()
+                                .setViewportHeight(-1);
+        }
+
+        @Test(expectedExceptions = IllegalArgumentException.class)
+        public void shouldRejectInvalidTimeout() {
+
+                new WebConfiguration()
+                                .setTimeoutSeconds(0);
+        }
+
+        @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Artifact directory must not be null")
+        public void shouldRejectNullArtifactDirectory() {
+                new WebConfiguration()
+                                .setArtifactDirectory(null);
+        }
 }
