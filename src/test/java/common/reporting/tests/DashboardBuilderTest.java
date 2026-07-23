@@ -6,8 +6,8 @@ import common.reporting.dashboard.builder.DashboardBuilder;
 import common.reporting.dashboard.builder.DashboardPage;
 import common.reporting.dashboard.config.DashboardConfiguration;
 import common.reporting.dashboard.config.DashboardTab;
+import common.reporting.dashboard.section.AbstractDashboardSectionBuilder;
 import common.reporting.dashboard.widget.DashboardSection;
-import common.reporting.dashboard.widget.WidgetStatus;
 import common.reporting.model.ExecutionEnvironment;
 import common.reporting.model.ExecutionMetrics;
 import common.reporting.model.ExecutionStatus;
@@ -20,17 +20,62 @@ import java.util.List;
 public class DashboardBuilderTest {
 
     @Test
-    public void shouldBuildConfiguredDashboardSections() {
-        DashboardSummary summary = createDashboardSummary();
-
+    public void shouldBuildRegisteredDashboardSections() {
         DashboardPage page = new DashboardBuilder().build(
-                summary,
+                createDashboardSummary(),
                 DashboardConfiguration.defaultConfiguration()
         );
 
         Assert.assertEquals(
                 page.getVisibleSections().size(),
-                5
+                1
+        );
+
+        Assert.assertEquals(
+                page.getVisibleSections().get(0).getId(),
+                "overview"
+        );
+    }
+
+    @Test
+    public void shouldRespectDisabledOverviewTab() {
+        DashboardConfiguration configuration =
+                DashboardConfiguration.defaultConfiguration();
+
+        configuration.setEnabledTabs(
+                List.of(DashboardTab.API)
+        );
+
+        DashboardPage page = new DashboardBuilder().build(
+                createDashboardSummary(),
+                configuration
+        );
+
+        Assert.assertTrue(
+                page.getVisibleSections().isEmpty()
+        );
+    }
+
+    @Test
+    public void shouldAllowAdditionalSectionBuilders() {
+        DashboardBuilder builder = new DashboardBuilder();
+
+        builder.register(
+                new TestSectionBuilder(
+                        "custom",
+                        "Custom",
+                        2
+                )
+        );
+
+        DashboardPage page = builder.build(
+                createDashboardSummary(),
+                DashboardConfiguration.defaultConfiguration()
+        );
+
+        Assert.assertEquals(
+                page.getVisibleSections().size(),
+                2
         );
 
         Assert.assertEquals(
@@ -40,170 +85,60 @@ public class DashboardBuilderTest {
 
         Assert.assertEquals(
                 page.getVisibleSections().get(1).getId(),
-                "api"
-        );
-
-        Assert.assertEquals(
-                page.getVisibleSections().get(2).getId(),
-                "performance"
+                "custom"
         );
     }
 
-    @Test
-    public void shouldRespectEnabledDashboardTabs() {
-        DashboardConfiguration configuration =
-                DashboardConfiguration.defaultConfiguration();
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp =
+                    "Dashboard section builder already registered: overview"
+    )
+    public void shouldRejectDuplicateSectionBuilder() {
+        DashboardBuilder builder = new DashboardBuilder();
 
-        configuration.setEnabledTabs(
-                List.of(
-                        DashboardTab.OVERVIEW,
-                        DashboardTab.API
+        builder.register(
+                new TestSectionBuilder(
+                        "overview",
+                        "Duplicate Overview",
+                        2
                 )
         );
+    }
 
-        DashboardPage page = new DashboardBuilder().build(
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp =
+                    "Dashboard summary must not be null"
+    )
+    public void shouldRejectNullDashboardSummary() {
+        new DashboardBuilder().build(
+                null,
+                DashboardConfiguration.defaultConfiguration()
+        );
+    }
+
+    @Test(
+            expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp =
+                    "Dashboard configuration must not be null"
+    )
+    public void shouldRejectNullDashboardConfiguration() {
+        new DashboardBuilder().build(
                 createDashboardSummary(),
-                configuration
-        );
-
-        Assert.assertEquals(
-                page.getVisibleSections().size(),
-                2
-        );
-
-        Assert.assertEquals(
-                page.getVisibleSections().get(1).getId(),
-                "api"
-        );
-    }
-
-    @Test
-    public void shouldCreateNotAvailableWidgetForMissingModule() {
-        ExecutionSummary api = createSummary(
-                "API",
-                ExecutionStatus.PASS,
-                5,
-                5,
-                0,
-                0
-        );
-
-        DashboardSummary summary =
-                new DashboardAggregator().aggregate(
-                        List.of(api)
-                );
-
-        DashboardPage page = new DashboardBuilder().build(
-                summary,
-                DashboardConfiguration.defaultConfiguration()
-        );
-
-        DashboardSection performanceSection =
-                page.getVisibleSections().stream()
-                        .filter(section ->
-                                "performance".equals(
-                                        section.getId()
-                                )
-                        )
-                        .findFirst()
-                        .orElseThrow();
-
-        Assert.assertEquals(
-                performanceSection
-                        .getVisibleWidgets()
-                        .get(0)
-                        .getStatus(),
-                WidgetStatus.NOT_AVAILABLE
-        );
-    }
-
-    @Test
-    public void shouldMapFailedExecutionToFailureWidget() {
-        ExecutionSummary api = createSummary(
-                "API",
-                ExecutionStatus.FAIL,
-                5,
-                4,
-                1,
-                0
-        );
-
-        DashboardSummary summary =
-                new DashboardAggregator().aggregate(
-                        List.of(api)
-                );
-
-        DashboardPage page = new DashboardBuilder().build(
-                summary,
-                DashboardConfiguration.defaultConfiguration()
-        );
-
-        DashboardSection apiSection =
-                page.getVisibleSections().stream()
-                        .filter(section ->
-                                "api".equals(section.getId())
-                        )
-                        .findFirst()
-                        .orElseThrow();
-
-        Assert.assertEquals(
-                apiSection.getVisibleWidgets()
-                        .get(0)
-                        .getStatus(),
-                WidgetStatus.FAILURE
+                null
         );
     }
 
     private DashboardSummary createDashboardSummary() {
-        ExecutionSummary api = createSummary(
+        ExecutionSummary api = new ExecutionSummary(
                 "API",
                 ExecutionStatus.PASS,
-                9,
-                9,
-                0,
-                0
-        );
-
-        ExecutionSummary performance = createSummary(
-                "Performance",
-                ExecutionStatus.PASS,
-                160,
-                160,
-                0,
-                0
-        );
-
-        api.addLink(
-                "htmlReport",
-                "build/reports/tests/apiTest/index.html"
-        );
-
-        performance.addLink(
-                "dashboard",
-                "performance/reports/index.html"
-        );
-
-        return new DashboardAggregator().aggregate(
-                List.of(api, performance)
-        );
-    }
-
-    private ExecutionSummary createSummary(
-            String module,
-            ExecutionStatus status,
-            int total,
-            int passed,
-            int failed,
-            int skipped
-    ) {
-        return new ExecutionSummary(
-                module,
-                status,
                 ExecutionMetrics.fromCounts(
-                        total,
-                        passed,
-                        failed,
-                        skipped,
+                        9,
+                        9,
+                        0,
+                        0,
                         5
                 ),
                 new ExecutionEnvironment(
@@ -211,8 +146,70 @@ public class DashboardBuilderTest {
                         "100",
                         "sprint-2-unified-dashboard",
                         "local",
-                        module.toLowerCase() + "-001"
+                        "api-001"
                 )
         );
+
+        ExecutionSummary performance = new ExecutionSummary(
+                "Performance",
+                ExecutionStatus.PASS,
+                ExecutionMetrics.fromCounts(
+                        160,
+                        160,
+                        0,
+                        0,
+                        20
+                ),
+                new ExecutionEnvironment(
+                        "QA",
+                        "100",
+                        "sprint-2-unified-dashboard",
+                        "local",
+                        "performance-001"
+                )
+        );
+
+        return new DashboardAggregator().aggregate(
+                List.of(api, performance)
+        );
+    }
+
+    private static final class TestSectionBuilder
+            extends AbstractDashboardSectionBuilder {
+
+        private final String sectionId;
+        private final String title;
+        private final int displayOrder;
+
+        private TestSectionBuilder(
+                String sectionId,
+                String title,
+                int displayOrder
+        ) {
+            this.sectionId = sectionId;
+            this.title = title;
+            this.displayOrder = displayOrder;
+        }
+
+        @Override
+        public String getSectionId() {
+            return sectionId;
+        }
+
+        @Override
+        public int getDisplayOrder() {
+            return displayOrder;
+        }
+
+        @Override
+        public DashboardSection build(
+                DashboardSummary summary
+        ) {
+            return new DashboardSection(
+                    sectionId,
+                    title,
+                    displayOrder
+            );
+        }
     }
 }

@@ -13,6 +13,7 @@
             <class name="common.reporting.tests.DashboardBuilderTest"/>
             <class name="common.reporting.tests.DashboardHtmlRendererTest"/>
             <class name="common.reporting.tests.DashboardSectionFrameworkTest"/>
+            <class name="common.reporting.tests.OverviewSectionBuilderTest"/>
         </classes>
     </test>
 </suite>
