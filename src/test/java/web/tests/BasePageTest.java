@@ -1,6 +1,7 @@
 package web.tests;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import web.pages.TestFormPage;
@@ -13,7 +14,8 @@ import java.util.List;
 
 public class BasePageTest extends BaseWebTest {
 
-    private TestFormPage formPage;
+    private final ThreadLocal<TestFormPage> formPageHolder =
+            new ThreadLocal<>();
 
     @BeforeMethod(alwaysRun = true)
     public void loadTestPage() {
@@ -67,44 +69,51 @@ public class BasePageTest extends BaseWebTest {
                 """
         );
 
-        formPage = new TestFormPage(page());
+        formPageHolder.set(
+                new TestFormPage(page())
+        );
+    }
+
+    @AfterMethod(alwaysRun = true)
+    public void clearTestPage() {
+        formPageHolder.remove();
     }
 
     @Test
     public void shouldFillAndReadInputValue() {
-        formPage.enterName("MAPAF");
+        formPage().enterName("MAPAF");
 
         Assert.assertEquals(
-                formPage.getNameValue(),
+                formPage().getNameValue(),
                 "MAPAF"
         );
 
-        formPage.clearName();
+        formPage().clearName();
 
         Assert.assertEquals(
-                formPage.getNameValue(),
+                formPage().getNameValue(),
                 ""
         );
     }
 
     @Test
     public void shouldCheckAndUncheckCheckbox() {
-        formPage.setActive(true);
+        formPage().setActive(true);
 
         Assert.assertTrue(
-                formPage.isActive()
+                formPage().isActive()
         );
 
-        formPage.setActive(false);
+        formPage().setActive(false);
 
         Assert.assertFalse(
-                formPage.isActive()
+                formPage().isActive()
         );
     }
 
     @Test
     public void shouldSelectDropdownOption() {
-        formPage.selectCountryByValue("IN");
+        formPage().selectCountryByValue("IN");
 
         Assert.assertEquals(
                 page()
@@ -113,7 +122,7 @@ public class BasePageTest extends BaseWebTest {
                 "IN"
         );
 
-        formPage.selectCountryByLabel(
+        formPage().selectCountryByLabel(
                 "United States"
         );
 
@@ -127,14 +136,14 @@ public class BasePageTest extends BaseWebTest {
 
     @Test
     public void shouldClickButtonAndReadText() {
-        formPage.enterName(
+        formPage().enterName(
                 "Web Automation Engine"
         );
 
-        formPage.submit();
+        formPage().submit();
 
         Assert.assertEquals(
-                formPage.getResult(),
+                formPage().getResult(),
                 "Web Automation Engine"
         );
     }
@@ -142,21 +151,21 @@ public class BasePageTest extends BaseWebTest {
     @Test
     public void shouldReadAttributesAndElementLists() {
         Assert.assertEquals(
-                formPage.getEmailPlaceholder(),
+                formPage().getEmailPlaceholder(),
                 "name@example.com"
         );
 
         Assert.assertTrue(
-                formPage.isSubmitEnabled()
+                formPage().isSubmitEnabled()
         );
 
         Assert.assertEquals(
-                formPage.getItemCount(),
+                formPage().getItemCount(),
                 3
         );
 
         Assert.assertEquals(
-                formPage.getItems(),
+                formPage().getItems(),
                 List.of(
                         "API",
                         "Mobile",
@@ -174,34 +183,38 @@ public class BasePageTest extends BaseWebTest {
                 ".txt"
         );
 
-        Files.writeString(
-                file,
-                "MAPAF upload test",
-                StandardCharsets.UTF_8
-        );
+        try {
+            Files.writeString(
+                    file,
+                    "MAPAF upload test",
+                    StandardCharsets.UTF_8
+            );
 
-        formPage.upload(file);
+            formPage().upload(file);
 
-        Assert.assertTrue(
-                page()
-                        .locator("#file")
-                        .evaluate(
-                                "element => "
-                                        + "element.files.length === 1"
-                        )
-                        .equals(true)
-        );
+            Assert.assertEquals(
+                    page()
+                            .locator("#file")
+                            .evaluate(
+                                    "element => "
+                                            + "element.files.length === 1"
+                            ),
+                    true
+            );
 
-        Assert.assertEquals(
-                page()
-                        .locator("#file")
-                        .evaluate(
-                                "element => "
-                                        + "element.files[0].name"
-                        )
-                        .toString(),
-                file.getFileName().toString()
-        );
+            Assert.assertEquals(
+                    page()
+                            .locator("#file")
+                            .evaluate(
+                                    "element => "
+                                            + "element.files[0].name"
+                            )
+                            .toString(),
+                    file.getFileName().toString()
+            );
+        } finally {
+            Files.deleteIfExists(file);
+        }
     }
 
     @Test(
@@ -212,5 +225,19 @@ public class BasePageTest extends BaseWebTest {
     )
     public void shouldRejectNullPage() {
         new TestFormPage(null);
+    }
+
+    private TestFormPage formPage() {
+        TestFormPage formPage =
+                formPageHolder.get();
+
+        if (formPage == null) {
+            throw new IllegalStateException(
+                    "Test form page is not initialized "
+                            + "for the current thread"
+            );
+        }
+
+        return formPage;
     }
 }
