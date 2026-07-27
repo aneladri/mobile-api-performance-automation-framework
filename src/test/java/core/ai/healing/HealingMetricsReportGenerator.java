@@ -32,6 +32,9 @@ public class HealingMetricsReportGenerator {
                 Claude Escalations:
                 %d
 
+                Claude Recommendations Accepted:
+                %d
+
                 Estimated API Calls Avoided:
                 %d
 
@@ -43,6 +46,7 @@ public class HealingMetricsReportGenerator {
                 metrics.getRuleHits(),
                 metrics.getBudgetBlocks(),
                 metrics.getClaudeCalls(),
+                metrics.getClaudeHits(),
                 avoidedCalls,
                 estimatedCostSaved
         );

@@ -55,11 +55,15 @@ public class AutomationEngineerService {
 
                                 Target Package:
                                 %s
+
+                                Verified Locator Context:
+                                %s
                                 """.formatted(
                                 request.getUserStory(),
                                 request.getPlatform(),
                                 request.getScreenName(),
                                 request.getAcceptanceCriteria(),
-                                request.getTargetPackage());
+                                request.getTargetPackage(),
+                                request.getLocatorContext());
         }
 }

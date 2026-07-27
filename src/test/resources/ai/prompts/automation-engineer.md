@@ -117,11 +117,14 @@ AppiumBy.accessibilityId()
 
 Avoid XPath unless absolutely necessary.
 
-If locators are unknown, generate:
+When verified locator context is supplied:
 
-```java
-AppiumBy.accessibilityId("TODO_LOGIN_BUTTON")
-```
+* Use only the supplied locator values.
+* Do not invent, rewrite, or replace locator values.
+* Prefer higher-confidence candidates.
+* If a required element has no supplied locator, mark it as `UNRESOLVED_LOCATOR` in TODO Items instead of generating a fake locator.
+
+When no verified locator context is supplied, clearly mark unresolved elements in TODO Items. Do not silently claim that placeholder locators are production-ready.
 
 ---
 

@@ -2,6 +2,10 @@ package core.ai.cli;
 
 import core.ai.generation.AutomationGenerationEngine;
 import core.ai.models.AutomationGenerationRequest;
+import core.locator.discovery.AndroidHierarchyLocatorDiscovery;
+import core.locator.discovery.LocatorPromptFormatter;
+
+import java.nio.file.Path;
 
 public final class GenerateAutomationTask {
 
@@ -45,13 +49,30 @@ public final class GenerateAutomationTask {
                         "generated/ai/automation"
                 );
 
+        String hierarchyFile =
+                System.getProperty("hierarchyFile", "");
+
+        String locatorContext = "";
+        if (!hierarchyFile.isBlank()) {
+            if (!platform.equalsIgnoreCase("android")) {
+                throw new IllegalArgumentException(
+                        "hierarchyFile discovery currently supports platform=android only"
+                );
+            }
+            locatorContext = LocatorPromptFormatter.format(
+                    new AndroidHierarchyLocatorDiscovery()
+                            .discover(Path.of(hierarchyFile))
+            );
+        }
+
         AutomationGenerationRequest request =
                 new AutomationGenerationRequest(
                         story,
                         platform,
                         screenName,
                         acceptanceCriteria,
-                        targetPackage
+                        targetPackage,
+                        locatorContext
                 );
 
         if (dryRun) {
@@ -60,6 +81,9 @@ public final class GenerateAutomationTask {
             );
             System.out.println(
                     "Story: " + story
+            );
+            System.out.println(
+                    "Hierarchy file: " + (hierarchyFile.isBlank() ? "not supplied" : hierarchyFile)
             );
             return;
         }

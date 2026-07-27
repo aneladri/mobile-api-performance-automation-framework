@@ -7,6 +7,7 @@ public class HealingMetrics {
     private int ruleHits;
     private int budgetBlocks;
     private int claudeCalls;
+    private int claudeHits;
 
     public void incrementHealingAttempts() {
         healingAttempts++;
@@ -28,6 +29,10 @@ public class HealingMetrics {
         claudeCalls++;
     }
 
+    public void incrementClaudeHits() {
+        claudeHits++;
+    }
+
     public int getHealingAttempts() {
         return healingAttempts;
     }
@@ -46,5 +51,9 @@ public class HealingMetrics {
 
     public int getClaudeCalls() {
         return claudeCalls;
+    }
+
+    public int getClaudeHits() {
+        return claudeHits;
     }
 }
