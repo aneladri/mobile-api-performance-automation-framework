@@ -1054,3 +1054,19 @@ tasks.register('aiConfigurationTest', Test) {
         exceptionFormat = 'full'
     }
 }
+
+tasks.register('aiClientTest', Test) {
+    description = 'Runs reusable Claude client tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.client.tests.ClaudeClientTest'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
