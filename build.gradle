@@ -1128,3 +1128,19 @@ tasks.register('claudeHealthCheck', JavaExec) {
                 project.property('claudeMaxRetries')
     }
 }
+
+tasks.register('aiPromptTest', Test) {
+    description = 'Runs AI prompt framework tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.prompt.tests.*'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
