@@ -29,3 +29,8 @@ Docker mode:
 - approved Docker runtime
 
 Every performance lab uses the same standalone mock API and explains setup, execution, reports, cleanup, extension, troubleshooting, and best practices.
+
+## Playwright and Unified Dashboard Labs
+
+- [Lab 13 — Playwright Enterprise Testing](13-playwright-testing-lab.md)
+- [Lab 14 — Unified Dashboard Training](14-unified-dashboard-training.md)
