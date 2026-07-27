@@ -4,14 +4,14 @@ import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import web.artifacts.ExecutionArtifactManager;
 import web.config.WebConfiguration;
 import web.driver.PlaywrightManager;
 
-import org.testng.ITestResult;
-import web.artifacts.ExecutionArtifactManager;
-
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 
 public abstract class BaseWebTest {
@@ -21,14 +21,16 @@ public abstract class BaseWebTest {
     private final ThreadLocal<ExecutionArtifactManager> artifactManagerHolder = new ThreadLocal<>();
 
     @BeforeMethod(alwaysRun = true)
-    public void setUpWebTest(
-            java.lang.reflect.Method testMethod) {
+    public void setUpWebTest(Method testMethod) {
+
         PlaywrightManager manager = createPlaywrightManager();
 
         WebConfiguration configuration = createWebConfiguration();
 
         try {
+
             manager.initialize(configuration);
+
             managerHolder.set(manager);
 
             ExecutionArtifactManager artifactManager = new ExecutionArtifactManager(
@@ -43,8 +45,11 @@ public abstract class BaseWebTest {
 
             artifactManagerHolder.set(
                     artifactManager);
+
         } catch (RuntimeException exception) {
+
             manager.close();
+
             managerHolder.remove();
             artifactManagerHolder.remove();
 
@@ -54,15 +59,17 @@ public abstract class BaseWebTest {
 
     @AfterMethod(alwaysRun = true)
     public void tearDownWebTest(
-            ITestResult testResult) {
+            ITestResult result) {
+
         PlaywrightManager manager = managerHolder.get();
 
         ExecutionArtifactManager artifactManager = artifactManagerHolder.get();
 
-        boolean failed = testResult != null
-                && !testResult.isSuccess();
+        boolean failed = result != null
+                && !result.isSuccess();
 
         try {
+
             if (artifactManager != null
                     && manager != null
                     && manager.isInitialized()) {
@@ -76,12 +83,17 @@ public abstract class BaseWebTest {
                         manager.getContext(),
                         failed);
             }
+
         } finally {
+
             try {
+
                 if (manager != null) {
                     manager.close();
                 }
+
             } finally {
+
                 artifactManagerHolder.remove();
                 managerHolder.remove();
             }
@@ -89,7 +101,26 @@ public abstract class BaseWebTest {
     }
 
     protected WebConfiguration createWebConfiguration() {
-        return WebConfiguration.defaultConfiguration();
+
+        WebConfiguration configuration = WebConfiguration.defaultConfiguration();
+
+        configuration.setHeadless(
+                Boolean.parseBoolean(
+                        System.getProperty(
+                                "web.headless",
+                                "true")));
+
+        String browserProperty = System.getProperty(
+                "web.browser",
+                "CHROMIUM");
+
+        configuration.setBrowser(
+                web.enums.BrowserType.valueOf(
+                        browserProperty
+                                .trim()
+                                .toUpperCase()));
+
+        return configuration;
     }
 
     protected PlaywrightManager createPlaywrightManager() {
@@ -97,12 +128,12 @@ public abstract class BaseWebTest {
     }
 
     protected PlaywrightManager manager() {
+
         PlaywrightManager manager = managerHolder.get();
 
         if (manager == null) {
             throw new IllegalStateException(
-                    "Web test lifecycle is not initialized "
-                            + "for the current thread");
+                    "Playwright manager is not initialized for the current thread");
         }
 
         return manager;
@@ -129,18 +160,41 @@ public abstract class BaseWebTest {
     }
 
     protected ExecutionArtifactManager artifacts() {
-        ExecutionArtifactManager artifactManager = artifactManagerHolder.get();
 
-        if (artifactManager == null) {
+        ExecutionArtifactManager manager = artifactManagerHolder.get();
+
+        if (manager == null) {
             throw new IllegalStateException(
-                    "Execution artifact manager is not initialized "
-                            + "for the current thread");
+                    "ExecutionArtifactManager is not initialized for the current thread");
         }
 
-        return artifactManager;
+        return manager;
     }
 
     protected Path artifactDirectory() {
         return artifacts().getExecutionDirectory();
+    }
+
+    protected boolean isParallelExecution() {
+        return Boolean.parseBoolean(
+                System.getProperty(
+                        "web.parallel",
+                        "false"));
+    }
+
+    protected int configuredThreadCount() {
+
+        return Integer.parseInt(
+                System.getProperty(
+                        "web.threads",
+                        "1"));
+    }
+
+    protected boolean isHeadless() {
+
+        return Boolean.parseBoolean(
+                System.getProperty(
+                        "web.headless",
+                        "true"));
     }
 }

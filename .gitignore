@@ -37,3 +37,9 @@ dashboard/reports/
 published/
 web/artifacts/
 web/reports/summary.json
+
+# Browser-specific Web summaries
+web/reports/chromium-summary.json
+web/reports/firefox-summary.json
+web/reports/webkit-summary.json
+web/reports/cross-browser-summary.json
