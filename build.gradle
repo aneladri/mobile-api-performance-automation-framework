@@ -1144,3 +1144,19 @@ tasks.register('aiPromptTest', Test) {
         exceptionFormat = 'full'
     }
 }
+
+tasks.register('aiFailureAnalysisTest', Test) {
+    description = 'Runs AI failure analysis tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.analysis.tests.*'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
