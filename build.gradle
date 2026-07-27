@@ -1037,3 +1037,20 @@ tasks.register('playwrightDemo') {
         println '================================================'
     }
 }
+
+tasks.register('aiConfigurationTest', Test) {
+    description = 'Runs Claude configuration foundation tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.config.tests.ClaudeConfigurationTest'
+        includeTestsMatching 'core.ai.config.tests.ClaudeConfigurationLoaderTest'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
