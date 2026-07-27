@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Reporting Tests">
+    <test name="Common Reporting">
+        <classes>
+            <class name="common.reporting.tests.SummaryReaderWriterTest"/>
+            <class name="common.reporting.tests.DashboardModelTest"/>
+            <class name="common.reporting.tests.DashboardAggregatorTest"/>
+            <class name="common.reporting.tests.PerformanceSummaryGeneratorTest"/>
+            <class name="common.reporting.tests.ApiSummaryGeneratorTest"/>
+            <class name="common.reporting.tests.DashboardConfigurationTest"/>
+            <class name="common.reporting.tests.DashboardWidgetModelTest"/>
+            <class name="common.reporting.tests.DashboardBuilderTest"/>
+            <class name="common.reporting.tests.DashboardHtmlRendererTest"/>
+            <class name="common.reporting.tests.DashboardSectionFrameworkTest"/>
+            <class name="common.reporting.tests.OverviewSectionBuilderTest"/>
+            <class name="common.reporting.tests.DashboardWidgetFactoryTest"/>
+            <class name="common.reporting.tests.ApiSectionBuilderTest"/>
+            <class name="common.reporting.tests.PerformanceSectionBuilderTest"/>
+            <class name="common.reporting.tests.EnvironmentSectionBuilderTest"/>
+            <class name="common.reporting.tests.DownloadsSectionBuilderTest"/>
+            <class name="common.reporting.tests.DashboardGeneratorTest"/>
+            <class name="common.reporting.tests.DashboardGeneratorCliTest"/>
+            <class name="common.reporting.tests.DashboardGenerationConfigurationTest"/>
+            <class name="common.reporting.tests.DashboardPublisherTest"/>
+            <class name="common.reporting.tests.DashboardGenerationPipelineTest"/>
+        </classes>
+    </test>
+</suite>

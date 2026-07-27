@@ -1,353 +1,345 @@
-# MAPAF - Mobile API Performance Automation Framework
+# MAPAF — Modern Automation Platform and Framework
 
-## Framework Owner
+MAPAF is a unified Quality Engineering framework for API, mobile, performance, AI-assisted analysis, locator discovery, reporting, and CI/CD enablement.
 
-**Aneesh Neladri**
-Automation Manager | Test Architect | Quality Engineering Leader
+## Supported capabilities
 
----
+| Capability | Technology | Status |
+|---|---|---|
+| API automation | Java, TestNG, REST Assured | Available |
+| Functional API mock | Embedded WireMock | Available |
+| Android/iOS automation | Appium 2 | Available |
+| Performance testing | k6 and Apache JMeter | Available |
+| Performance demo target | Standalone Node.js mock API | Available |
+| Reporting | Allure, k6 summaries, JMeter HTML dashboard | Available |
+| AI code generation | Configurable generation workflow | Available |
+| Verified mobile locator discovery | Appium hierarchy parsing | Initial implementation |
+| Web automation | Playwright Java | Planned |
 
-## Overview
-
-MAPAF (Mobile API Performance Automation Framework) is an enterprise-grade Quality Engineering platform that combines:
-
-* API Automation
-* Android Automation
-* iOS Automation
-* Performance Testing
-* AI-Assisted Analysis
-* Locator Healing
-* Grafana Observability
-* CI/CD Automation
-* Training & Enablement
-
-## Overview
-
-MAPAF (Mobile API Performance Automation Framework) is an enterprise-grade Quality Engineering platform that combines:
-
-* API Automation
-* Android Automation
-* iOS Automation
-* Performance Testing
-* AI-Assisted Analysis
-* Locator Healing
-* Grafana Observability
-* CI/CD Automation
-* Training & Enablement
-
-MAPAF provides a single platform for test execution, reporting, AI-driven analysis, performance observability, and engineer onboarding.
-
----
-
-## Framework Capabilities
-
-### API Automation
-
-* REST Assured
-* Authentication Management
-* Token Management
-* Schema Validation
-* Request Builder Pattern
-* Test Data Management
-
-### Mobile Automation
-
-* Appium 2.x
-* Android Automation
-* iOS Automation
-* Screen Object Pattern
-* Business Flow Layer
-* Screenshot Management
-* BrowserStack Execution
-* Self-Healing Locator Framework
-
-### Performance Testing
-
-* Smoke Testing
-* Load Testing
-* Stress Testing
-* Soak Testing
-* Threshold Validation
-* Regression Detection
-
-### AI Engineering Layer
-
-* Failure Analysis Agent
-* Performance Analysis Agent
-* Healing Analysis Agent
-* Unified Healing Advisor
-* AI Report Generation
-* Agent Metrics & History
-
-### Locator Healing
-
-* Healed Locator Store
-* Local Healing Rule Engine
-* Healing Budget Guard
-* Page Source Compression
-* Healing Metrics
-* Healing Reports
-
-### Reporting & Observability
-
-* Allure Reports
-* AI Reports
-* Healing Reports
-* Performance Reports
-* Grafana Dashboards
-* InfluxDB Metrics Storage
-
-### Training Platform
-
-* 10 Guided Labs
-* Trainer Guide
-* Training Plan
-* Capstone Project
-* AI Healing Exercises
-
----
-
-## Technology Stack
-
-| Layer           | Technology     |
-| --------------- | -------------- |
-| Language        | Java 17        |
-| Build Tool      | Gradle         |
-| Test Framework  | TestNG         |
-| Mobile          | Appium 2       |
-| API             | REST Assured   |
-| Performance     | k6             |
-| Reporting       | Allure         |
-| Observability   | Grafana        |
-| Metrics Storage | InfluxDB       |
-| CI/CD           | GitHub Actions |
-| Cloud Execution | BrowserStack   |
-| Source Control  | Git            |
-
----
-
-## Architecture
+## Design overview
 
 ```text
-MAPAF
-│
-├── Core Layer
-├── API Layer
-├── Mobile Layer
-├── Performance Layer
-├── AI Layer
-├── Healing Layer
-├── Reporting Layer
-├── Observability Layer
-├── CI/CD Layer
-└── Training Platform
+Functional API tests --> Embedded WireMock (random port, TestNG lifecycle)
+Performance tests    --> Standalone mock API (port 8089)
+                           |                     |
+                           +--> k6              +--> JMeter
+
+All test types --> common configuration, logging, reports, and CI/CD
 ```
 
----
-
-## Project Structure
+## Repository structure
 
 ```text
-src/test/java
-│
-├── api
-├── mobile
-├── core
-├── ai
-└── performance
-
-performance/
-│
-├── smoke
-├── load
-├── stress
-├── soak
-├── auth
-└── config
-
-docs/
-│
-├── training
-├── performance
-├── agents
-└── decisions
+src/test/java/                  Java framework and tests
+src/test/resources/             Payloads, schemas, prompts, configuration
+performance/mock-api/           Long-running performance/demo API
+performance/k6/                 k6 smoke/load/stress/spike/soak scripts
+performance/jmeter/             JMX plans, CSV data, JTL and HTML reports
+performance/scripts/            Portable and Docker runners
+docs/training/framework-labs/   Step-by-step labs
 ```
 
----
+## Prerequisites
 
-## Quick Start
+Required for all users:
 
-Clone:
+- Git
+- Java 17
+- Gradle wrapper included in the repository
+
+Capability-specific tools:
+
+| Capability | Requirement |
+|---|---|
+| API | No extra tool; WireMock is embedded |
+| Performance mock API | Node.js 18+ in portable mode, or Docker |
+| k6 | k6 on `PATH`, or Docker mode |
+| JMeter | Portable Apache JMeter 5.6.3, or Docker mode |
+| Mobile | Node.js, Appium 2, Android/iOS tools |
+
+## JMeter setup on a managed corporate Mac
+
+Do **not** change ownership of a company-managed Homebrew installation. Use the portable binary archive.
+
+### 1. Create a user-owned tools directory
 
 ```bash
-git clone <repository-url>
-cd automation-framework
+mkdir -p "$HOME/Tools"
 ```
 
-Compile:
+### 2. Download and extract Apache JMeter 5.6.3
+
+Download `apache-jmeter-5.6.3.tgz` from the approved Apache distribution location, then run:
+
+```bash
+tar -xzf "$HOME/Downloads/apache-jmeter-5.6.3.tgz" -C "$HOME/Tools"
+chmod +x "$HOME/Tools/apache-jmeter-5.6.3/bin/jmeter"
+```
+
+### 3. Configure the current terminal
+
+```bash
+export JMETER_HOME="$HOME/Tools/apache-jmeter-5.6.3"
+export PATH="$JMETER_HOME/bin:$PATH"
+```
+
+Verify:
+
+```bash
+jmeter --version
+bash performance/scripts/resolve-jmeter.sh
+```
+
+Persist the configuration when permitted:
+
+```bash
+echo 'export JMETER_HOME="$HOME/Tools/apache-jmeter-5.6.3"' >> ~/.zshrc
+echo 'export PATH="$JMETER_HOME/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+## Quick start
 
 ```bash
 ./gradlew clean compileTestJava
-```
-
-Run API Tests:
-
-```bash
 ./gradlew apiTest
 ```
 
-Run Mobile Tests:
+### Portable performance mode
+
+Terminal 1:
 
 ```bash
-./gradlew mobileTest
+bash performance/scripts/start-mock-api.sh
 ```
 
-Run iOS Tests:
+Terminal 2:
 
 ```bash
-./gradlew iosTest
+curl http://localhost:8089/health
+./gradlew k6Smoke
+./gradlew jmeterSmoke -PjmeterHome="$HOME/Tools/apache-jmeter-5.6.3"
 ```
 
-Run AI Tests:
+Open the JMeter dashboard:
 
 ```bash
-./gradlew aiTest
+open performance/jmeter/reports/smoke/index.html
 ```
 
-Run Smoke Performance Test:
+Combined smoke demo:
 
 ```bash
-k6 run performance/k6/smoke/api-health-smoke.js
+./gradlew performanceDemoSmoke \
+  -PjmeterHome="$HOME/Tools/apache-jmeter-5.6.3"
 ```
 
-Generate Allure Report:
+### Docker performance mode
 
 ```bash
-allure serve build/allure-results
+./gradlew performanceDemoSmokeDocker
 ```
 
----
+No local Node.js, k6, or JMeter installation is required for the combined Docker demo.
 
-## AI Locator Healing
+## Extension guide
 
-MAPAF includes a tiered locator healing architecture:
+- Add k6 profiles under `performance/k6/<profile>/`.
+- Add JMeter plans under `performance/jmeter/plans/` and keep host, port, protocol, threads, loops, and ramp-up parameterized.
+- Add deterministic mock endpoints under `performance/mock-api/server.js`.
+- Add new Gradle tasks only after the direct shell command works.
+- Update the relevant lab, setup guide, and demo guide with every capability change.
 
-```text
-Broken Locator
-↓
-Cache
-↓
-Local Rule Engine
-↓
-Budget Guard
-↓
-AI Recommendation
+## Troubleshooting
+
+### JMeter not found
+
+```bash
+bash performance/scripts/resolve-jmeter.sh
+ls -l "$HOME/Tools/apache-jmeter-5.6.3/bin/jmeter"
+chmod +x "$HOME/Tools/apache-jmeter-5.6.3/bin/jmeter"
 ```
 
-Healing metrics are automatically tracked and reported.
+Run with an explicit path:
 
----
-
-## Grafana Observability
-
-MAPAF supports:
-
-```text
-k6
-↓
-InfluxDB
-↓
-Grafana
-↓
-Performance Dashboard
+```bash
+./gradlew jmeterSmoke \
+  -PjmeterHome="$HOME/Tools/apache-jmeter-5.6.3"
 ```
 
-Dashboard Metrics:
+### Port 8089 is occupied
 
-* Response Time
-* Request Rate
-* Error Rate
-* Virtual Users
-* Iterations
-
----
-
-## Training Programme
-
-Training Path:
-
-```text
-Lab 00 – Introduction
-Lab 01 – Setup
-Lab 02 – Architecture
-Lab 03 – API Testing
-Lab 04 – Android Testing
-Lab 05 – iOS Testing
-Lab 06 – Performance Testing
-Lab 07 – AI Analysis
-Lab 07b – AI Healing Exercise
-Lab 08 – Debugging
-Lab 09 – Git Workflow
-Lab 10 – Capstone Project
+```bash
+lsof -i :8089
+bash performance/scripts/stop-mock-api.sh
 ```
 
----
+### JMeter report already exists
 
-## Documentation
-
-Training:
-
-```text
-docs/training/framework-labs/
+```bash
+rm -rf performance/jmeter/reports/smoke
+rm -f performance/jmeter/results/smoke.jtl
 ```
 
-Performance:
+## Best practices
 
-```text
-docs/performance/
+- Run JMeter in non-GUI mode for load generation.
+- Use GUI only to design or inspect a plan.
+- Run smoke before load, stress, spike, or soak.
+- Reset mock API state between comparison runs.
+- Keep workloads equivalent when comparing k6 and JMeter.
+- Use portable mode on managed laptops and Docker mode in CI/shared demos.
+- Never treat laptop demo results as production capacity baselines.
+
+## Detailed guides
+
+- [Start here](docs/START_HERE.md)
+- [Training guide](docs/TRAINING.md)
+- [Demo preparation](DEMO_PREP_README.md)
+- [k6 and JMeter demo guide](docs/performance/K6_JMETER_DEMO_GUIDE.md)
+- [JMeter guide](performance/jmeter/README.md)
+- [Training labs](docs/training/framework-labs/README.md)
+
+## Unified k6 and JMeter HTML reporting
+
+Both performance engines now generate browser-ready HTML reports.
+
+### k6 HTML report
+
+Run:
+
+```bash
+./gradlew k6Smoke
 ```
 
-Architecture Decisions:
+Open:
 
-```text
-docs/DECISIONS/
+```bash
+open performance/k6/reports/smoke/index.html
 ```
 
-AI Documentation:
+The k6 runner retains the machine-readable summary at:
 
 ```text
-docs/agents/
+performance/results/k6/smoke-summary.json
 ```
 
----
+and converts it into a dependency-free MAPAF HTML report containing request volume, request rate, response-time percentiles, failed-request rate, thresholds, checks, virtual users, iterations, and data transfer.
 
-## Ownership
+### JMeter HTML report
 
-### Framework Owner
+Run:
 
-**Aneesh Neladri**
-Automation Manager | Test Architect | Quality Engineering Leader
-
-### Responsibilities
-
-* Framework Architecture
-* Automation Standards
-* AI Platform
-* Performance Platform
-* Training Programme
-* CI/CD Governance
-* Release Management
-
----
-
-## Current Version
-
-```text
-MAPAF v3.0
+```bash
+./gradlew jmeterSmoke -PjmeterHome="$HOME/Tools/apache-jmeter-5.6.3"
 ```
 
-### Status
+Open:
+
+```bash
+open performance/jmeter/reports/smoke/index.html
+```
+
+### Unified performance dashboard
+
+Generate a common entry page for every available k6 and JMeter report:
+
+```bash
+./gradlew performanceReport
+```
+
+Open it directly on macOS:
+
+```bash
+./gradlew openPerformanceReport
+```
+
+Report location:
 
 ```text
-Production Ready
-Active Development
+performance/reports/index.html
+```
+
+The dashboard links to all generated smoke, load, stress, spike, and soak reports that are available for either tool.
+
+## Unified Performance Dashboard
+
+After running k6 and JMeter, generate a single dashboard:
+
+```bash
+./gradlew performanceReport
+```
+
+Generate and open it on macOS:
+
+```bash
+./gradlew openPerformanceReport
+```
+
+The entry point is:
+
+```text
+performance/reports/index.html
+```
+
+It summarizes k6 JSON data and JMeter JTL results, compares tools by profile, and links to each detailed HTML report. See `docs/performance/UNIFIED_PERFORMANCE_DASHBOARD.md`.
+
+## Smart performance dashboard launcher
+
+Generate, serve, and open the unified k6 + JMeter dashboard with one command:
+
+```bash
+./gradlew frameworkDashboard
+```
+
+The launcher:
+
+1. regenerates `performance/reports/index.html`;
+2. reuses the existing MAPAF report server when it is healthy;
+3. otherwise selects the first available port from `8090` through `8110`;
+4. starts the server in the background;
+5. opens the dashboard over HTTP to avoid Safari `file://` restrictions.
+
+Optional commands:
+
+```bash
+./gradlew servePerformanceReport
+./gradlew openPerformanceReportHttp
+./gradlew stopPerformanceReportServer
+```
+
+Choose a preferred port or search range:
+
+```bash
+./gradlew frameworkDashboard \
+  -PperformanceReportPort=8091 \
+  -PperformanceReportMaxPort=8120
+```
+
+## Unified Quality Engineering Dashboard
+
+MAPAF now provides one dashboard for API functional and performance testing, with reserved sections for Web, Mobile, and AI insights.
+
+Generate and open the dashboard from existing results:
+
+```bash
+./gradlew frameworkDashboard
+```
+
+Run the API suite and then open the refreshed dashboard:
+
+```bash
+./gradlew qualityDashboard
+```
+
+Generate the dashboard without opening a browser:
+
+```bash
+./gradlew qualityReport
+```
+
+Dashboard navigation:
+
+```text
+Overview | API | Performance | Web | Mobile | AI Insights | Environment | Downloads
+```

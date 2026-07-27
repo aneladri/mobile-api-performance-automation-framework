@@ -19,6 +19,9 @@ dependencies {
     testImplementation 'io.rest-assured:json-schema-validator:5.5.0'
 
     testImplementation 'io.qameta.allure:allure-testng:2.29.1'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    testImplementation 'org.wiremock:wiremock-standalone:3.13.1'
+    testImplementation 'com.microsoft.playwright:playwright:1.55.0'
 }
 
 tasks.withType(Test).configureEach {
@@ -26,7 +29,6 @@ tasks.withType(Test).configureEach {
     classpath = sourceSets.test.runtimeClasspath
 
     useTestNG() {
-        listeners.add("io.qameta.allure.testng.AllureTestNg")
     }
 
     systemProperty "allure.results.directory", "$buildDir/allure-results"
@@ -44,9 +46,14 @@ tasks.register('apiTest', Test) {
     description = 'Runs API TestNG suite'
     group = 'verification'
 
+    testLogging {
+        showStandardStreams = true
+        events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        exceptionFormat = 'full'
+    }
+
     useTestNG() {
         suites 'testng-api.xml'
-        listeners.add("io.qameta.allure.testng.AllureTestNg")
     }
 }
 
@@ -56,7 +63,6 @@ tasks.register('mobileTest', Test) {
 
     useTestNG() {
         suites 'testng-mobile.xml'
-        listeners.add("io.qameta.allure.testng.AllureTestNg")
     }
 }
 
@@ -66,7 +72,6 @@ tasks.register('regressionTest', Test) {
 
     useTestNG() {
         suites 'testng-regression.xml'
-        listeners.add("io.qameta.allure.testng.AllureTestNg")
     }
 }
 
@@ -80,6 +85,51 @@ tasks.register('iosTest', Test) {
 tasks.register('aiTest', Test) {
     useTestNG() {
         suites 'testng-ai.xml'
+    }
+}
+
+tasks.register('flowDemoTest', Test) {
+    description = 'Runs the multi-step Appium navigation flow demo'
+    group = 'MAPAF Demo'
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-flow-demo.xml'
+    }
+}
+
+tasks.register('failureDemoTest', Test) {
+    description = 'Runs a deliberate, deterministic failure for showing a real failure report'
+    group = 'MAPAF Demo'
+    ignoreFailures = true
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-failure-demo.xml'
+    }
+}
+
+tasks.register('healingDemoTest', Test) {
+    description = 'Runs the Tier 3 AI self-healing demo test'
+    group = 'MAPAF Demo'
+
+    systemProperty "waitTimeoutSeconds", project.findProperty("waitTimeoutSeconds") ?: "15"
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-healing-demo.xml'
     }
 }
 
@@ -112,5 +162,878 @@ tasks.register('generateAutomation', JavaExec) {
                     ?: 'generated/ai/automation'
 
     systemProperty 'dryRun',
-        project.findProperty('dryRun') ?: 'false'                
+        project.findProperty('dryRun') ?: 'false'
+
+    systemProperty 'hierarchyFile',
+        project.findProperty('hierarchyFile') ?: ''
+}
+
+tasks.register('performanceMockApi', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Starts the standalone performance mock API on port 8089'
+    commandLine 'node', 'performance/mock-api/server.js'
+}
+
+tasks.register('performanceMockApiHealth', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Checks the standalone performance mock API health endpoint'
+    commandLine 'curl', '--fail', '--silent', '--show-error', 'http://localhost:8089/health'
+}
+
+
+def performanceBaseUrl = providers.gradleProperty('performanceBaseUrl').orElse('http://localhost:8089')
+
+def configureJMeterEnvironment = { Exec task ->
+    def configuredHome = project.findProperty('jmeterHome') ?: System.getenv('JMETER_HOME')
+    def configuredBin = project.findProperty('jmeterBin') ?: System.getenv('JMETER_BIN')
+
+    if (configuredHome) {
+        task.environment 'JMETER_HOME', configuredHome.toString()
+    }
+    if (configuredBin) {
+        task.environment 'JMETER_BIN', configuredBin.toString()
+    }
+    task.environment 'BASE_URL', performanceBaseUrl.get()
+}
+
+tasks.register('k6Smoke', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the k6 smoke demo against the performance mock API'
+    environment 'BASE_URL', performanceBaseUrl.get()
+    commandLine 'bash', 'performance/scripts/run-k6-demo.sh', 'smoke'
+}
+
+tasks.register('k6Load', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the k6 load demo against the performance mock API'
+    environment 'BASE_URL', performanceBaseUrl.get()
+    commandLine 'bash', 'performance/scripts/run-k6-demo.sh', 'load'
+}
+
+tasks.register('jmeterSmoke', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the JMeter smoke demo and generates the HTML dashboard'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-jmeter-demo.sh', 'smoke'
+}
+
+tasks.register('jmeterLoad', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the JMeter load demo and generates the HTML dashboard'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-jmeter-demo.sh', 'load'
+}
+
+tasks.register('performanceDemoSmoke', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Starts the mock API and runs both k6 and JMeter smoke demos'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-performance-demo.sh', 'smoke'
+}
+
+tasks.register('performanceDemoLoad', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Starts the mock API and runs both k6 and JMeter load demos'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-performance-demo.sh', 'load'
+}
+
+tasks.register('performanceDockerUp', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Builds and starts the Dockerized performance mock API'
+    commandLine 'bash', 'performance/scripts/docker-performance-up.sh'
+}
+
+tasks.register('performanceDockerDown', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Stops the Dockerized performance demo services'
+    commandLine 'bash', 'performance/scripts/docker-performance-down.sh'
+}
+
+tasks.register('performanceDemoSmokeDocker', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the mock API, k6 smoke, and JMeter smoke entirely with Docker'
+    commandLine 'bash', 'performance/scripts/run-docker-performance-demo.sh', 'smoke'
+}
+
+tasks.register('performanceDemoLoadDocker', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the mock API, k6 load, and JMeter load entirely with Docker'
+    commandLine 'bash', 'performance/scripts/run-docker-performance-demo.sh', 'load'
+}
+
+// Generates the unified MAPAF Quality Engineering Dashboard.
+tasks.register('qualityReport', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Generates the unified API and performance quality dashboard'
+    commandLine 'bash', 'performance/scripts/generate-quality-dashboard.sh'
+}
+
+// Compatibility alias retained for existing documentation and commands.
+tasks.register('performanceReport') {
+    group = 'MAPAF Dashboard'
+    description = 'Compatibility alias for the unified MAPAF quality report'
+    dependsOn 'qualityReport'
+}
+
+// Starts or reuses a background HTTP server and opens the unified dashboard.
+tasks.register('frameworkDashboard', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Generates, serves, and opens the unified MAPAF quality dashboard using an available port'
+    dependsOn 'qualityReport'
+
+    environment 'PERFORMANCE_REPORT_PORT',
+            project.findProperty('performanceReportPort') ?: '8090'
+    environment 'PERFORMANCE_REPORT_MAX_PORT',
+            project.findProperty('performanceReportMaxPort') ?: '8110'
+
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'open'
+}
+
+// Starts or reuses the background report server without opening a browser.
+tasks.register('servePerformanceReport', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Generates and serves the unified quality dashboard in the background using an available port'
+    dependsOn 'qualityReport'
+
+    environment 'PERFORMANCE_REPORT_PORT',
+            project.findProperty('performanceReportPort') ?: '8090'
+    environment 'PERFORMANCE_REPORT_MAX_PORT',
+            project.findProperty('performanceReportMaxPort') ?: '8110'
+
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'serve'
+}
+
+// Opens the dashboard, reusing or starting the managed report server when required.
+tasks.register('openPerformanceReportHttp', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Opens the HTTP-served MAPAF quality dashboard'
+    dependsOn 'qualityReport'
+
+    environment 'PERFORMANCE_REPORT_PORT',
+            project.findProperty('performanceReportPort') ?: '8090'
+    environment 'PERFORMANCE_REPORT_MAX_PORT',
+            project.findProperty('performanceReportMaxPort') ?: '8110'
+
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'open'
+}
+
+// Stops only the report server started by MAPAF.
+tasks.register('stopPerformanceReportServer', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Stops the MAPAF-managed quality dashboard server'
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'stop'
+}
+
+// Runs API tests and then opens the unified quality dashboard.
+tasks.register('qualityDashboard') {
+    group = 'MAPAF Dashboard'
+    description = 'Runs API tests and opens the unified MAPAF quality dashboard'
+    dependsOn 'apiTest'
+    finalizedBy 'frameworkDashboard'
+}
+
+// Compatibility alias. Uses HTTP rather than file:// to avoid Safari local-file restrictions.
+tasks.register('openPerformanceReport') {
+    group = 'MAPAF Dashboard'
+    description = 'Generates, serves, and opens the MAPAF quality dashboard'
+    dependsOn 'openPerformanceReportHttp'
+}
+
+// Runs both smoke engines and refreshes the unified performance dashboard.
+tasks.register('performanceDashboardSmoke') {
+    group = 'MAPAF Performance'
+    description = 'Runs the combined smoke demo and generates the unified performance dashboard'
+    dependsOn 'performanceDemoSmoke'
+    finalizedBy 'performanceReport'
+}
+
+// Runs both load engines and refreshes the unified performance dashboard.
+tasks.register('performanceDashboardLoad') {
+    group = 'MAPAF Performance'
+    description = 'Runs the combined load demo and generates the unified performance dashboard'
+    dependsOn 'performanceDemoLoad'
+    finalizedBy 'performanceReport'
+}
+
+tasks.register('reportingTest', Test) {
+    description = 'Runs common reporting framework tests'
+    group = 'verification'
+
+    useTestNG {
+        suites 'testng-reporting.xml'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+def configuredRetryCount =
+        (project.findProperty('retryCount') ?: '0')
+                .toString()
+
+def supportedWebBrowsers = [
+        'CHROMIUM',
+        'FIREFOX',
+        'WEBKIT'
+]
+
+def configuredBrowserSelection =
+        (project.findProperty('browser') ?: 'CHROMIUM')
+                .toString()
+                .trim()
+                .toUpperCase()
+
+def selectedWebBrowsers = configuredBrowserSelection == 'ALL'
+        ? supportedWebBrowsers
+        : configuredBrowserSelection
+                .split(',')
+                .collect { it.trim() }
+                .findAll { !it.isEmpty() }
+
+def unsupportedWebBrowsers =
+        selectedWebBrowsers.findAll {
+            !supportedWebBrowsers.contains(it)
+        }
+def browserTestTaskByName = [
+        CHROMIUM: 'webChromiumTest',
+        FIREFOX : 'webFirefoxTest',
+        WEBKIT  : 'webWebkitTest'
+]
+
+def browserSummaryTaskByName = [
+        CHROMIUM: 'generateChromiumWebSummary',
+        FIREFOX : 'generateFirefoxWebSummary',
+        WEBKIT  : 'generateWebkitWebSummary'
+]
+
+def configuredEnvironment =
+        (project.findProperty('environment')
+                ?: System.getenv('TEST_ENVIRONMENT')
+                ?: 'LOCAL')
+                .toString()
+
+def configuredBuildNumber =
+        (project.findProperty('buildNumber')
+                ?: System.getenv('BUILD_NUMBER')
+                ?: System.getenv('BUILD_BUILDNUMBER')
+                ?: 'local')
+                .toString()
+
+def configuredBranch =
+        (project.findProperty('branch')
+                ?: System.getenv('GIT_BRANCH')
+                ?: System.getenv('BUILD_SOURCEBRANCHNAME')
+                ?: 'local')
+                .toString()
+
+def configuredCommit =
+        (project.findProperty('commit')
+                ?: System.getenv('GIT_COMMIT')
+                ?: System.getenv('BUILD_SOURCEVERSION')
+                ?: 'local')
+                .toString()  
+
+def configuredOpenDashboard =
+        (project.findProperty('openDashboard') ?: 'true')
+                .toString()
+                .toBoolean()                                    
+
+tasks.register('generatePerformanceSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common performance execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'performance.reporting.PerformanceSummaryCli'
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+}
+
+tasks.register('generateApiSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common API execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'api.reporting.ApiSummaryCli'
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+}
+
+tasks.register('generateDashboard', JavaExec) {
+    group = 'reporting'
+    description = 'Generates the MAPAF unified quality dashboard'
+
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'common.reporting.dashboard.generator.DashboardGeneratorCli'
+}
+
+tasks.register('openPlaywrightDashboard', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Opens the generated MAPAF dashboard'
+
+    dependsOn 'generateDashboard'
+
+    def dashboardPath =
+            layout.projectDirectory
+                    .file('dashboard/reports/index.html')
+                    .asFile
+
+    onlyIf {
+        if (!configuredOpenDashboard) {
+            println 'Dashboard auto-open disabled.'
+            return false
+        }
+
+        if (!dashboardPath.exists()) {
+            throw new GradleException(
+                    "Dashboard not found: ${dashboardPath.absolutePath}"
+            )
+        }
+
+        return true
+    }
+
+    commandLine 'open', dashboardPath.absolutePath
+
+    doFirst {
+        println ''
+        println 'Opening dashboard:'
+        println "  ${dashboardPath.absolutePath}"
+    }
+}
+
+tasks.register('playwrightInstall', JavaExec) {
+    group = 'MAPAF Web'
+    description = 'Installs Playwright browser binaries'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+
+    mainClass = 'com.microsoft.playwright.CLI'
+
+    args(
+            'install',
+            'chromium',
+            'firefox',
+            'webkit'
+    )
+}
+
+tasks.register('generateWebSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common web execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'web.reporting.WebSummaryCli'
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    systemProperty 'web.browser',
+            project.findProperty('browser') ?: 'CHROMIUM'
+}
+
+tasks.register('generateParallelWebSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the Web summary from parallel execution results'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'web.reporting.WebSummaryCli'
+
+    args(
+            'build/test-results/webParallelTest',
+            'web/reports/summary.json'
+    )
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    systemProperty 'web.browser',
+            project.findProperty('browser') ?: 'CHROMIUM'
+
+    systemProperty 'web.parallel', 'true'
+
+    systemProperty 'web.threads',
+            project.findProperty('webThreads') ?: '4'
+}
+
+if (selectedWebBrowsers.isEmpty()) {
+    throw new GradleException(
+            'Browser selection cannot be empty. Supported values: '
+                    + supportedWebBrowsers.join(', ')
+                    + ', ALL'
+    )
+}
+
+if (!unsupportedWebBrowsers.isEmpty()) {
+    throw new GradleException(
+            'Unsupported browser selection: '
+                    + unsupportedWebBrowsers.join(', ')
+                    + '. Supported values: '
+                    + supportedWebBrowsers.join(', ')
+                    + ', ALL'
+    )
+}
+
+tasks.register('webTest', Test) {
+    description = 'Runs Web TestNG suite'
+    group = 'verification'
+
+    useTestNG {
+        suites 'testng-web.xml'
+
+        if (project.hasProperty('webParallel')
+                && project.property('webParallel') == 'true') {
+
+            parallel = 'methods'
+
+            threadCount = (
+                    project.findProperty('webThreads') ?: '4'
+            ).toInteger()
+        }
+    }
+
+    systemProperty 'web.parallel',
+            project.findProperty('webParallel') ?: 'false'
+
+    systemProperty 'web.threads',
+            project.findProperty('webThreads') ?: '4'
+
+    systemProperty 'mapaf.retry.count',
+            configuredRetryCount
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit    
+
+    testLogging {
+    events 'passed', 'failed', 'skipped'
+    exceptionFormat 'full'
+    showStandardStreams = true
+    }
+
+    doFirst {
+        println 'Web execution configuration:'
+        println "  Threads     : ${project.findProperty('webThreads') ?: '4'}"
+        println "  Retry       : ${configuredRetryCount}"
+        println "  Environment : ${configuredEnvironment}"
+    }    
+}
+
+tasks.register('webParallelTest', Test) {
+    description = 'Runs Playwright Web tests in parallel'
+    group = 'verification'
+
+    dependsOn testClasses
+
+    maxParallelForks = 1
+
+    def configuredThreads =
+            (project.findProperty('webThreads') ?: '4')
+                    .toString()
+
+    def configuredHeadless =
+            (project.findProperty('headless') ?: 'true')
+                    .toString()
+
+    def configuredBrowser =
+            (project.findProperty('browser') ?: 'CHROMIUM')
+                    .toString()
+                    .trim()
+                    .toUpperCase()
+
+    useTestNG {
+        suites 'testng-web-parallel.xml'
+        parallel = 'methods'
+        threadCount = configuredThreads.toInteger()
+    }
+
+    systemProperty 'web.parallel', 'true'
+    systemProperty 'web.threads', configuredThreads
+    systemProperty 'web.headless', configuredHeadless
+    systemProperty 'web.browser', configuredBrowser
+    systemProperty 'mapaf.retry.count', configuredRetryCount
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat 'full'
+        showStandardStreams = true
+    }
+
+    doFirst {
+        println 'Web parallel execution configuration:'
+        println "  Threads  : ${configuredThreads}"
+        println "  Headless : ${configuredHeadless}"
+        println "  Browser  : ${configuredBrowser}"
+        println "  Retry    : ${configuredRetryCount}"
+    }
+}
+
+def crossBrowserDefinitions = [
+        [taskName: 'webChromiumTest', browser: 'CHROMIUM'],
+        [taskName: 'webFirefoxTest',  browser: 'FIREFOX'],
+        [taskName: 'webWebkitTest',   browser: 'WEBKIT']
+]
+
+crossBrowserDefinitions.each { definition ->
+
+    tasks.register(definition.taskName, Test) {
+        description =
+                "Runs Playwright Web tests on ${definition.browser}"
+
+        group = 'verification'
+
+        dependsOn testClasses
+
+        maxParallelForks = 1
+
+        def configuredThreads =
+                (project.findProperty('webThreads') ?: '4')
+                        .toString()
+
+        def configuredHeadless =
+                (project.findProperty('headless') ?: 'true')
+                        .toString()
+
+        useTestNG {
+            suites 'testng-web-parallel.xml'
+            parallel = 'methods'
+            threadCount = configuredThreads.toInteger()
+        }
+
+        systemProperty 'web.parallel', 'true'
+        systemProperty 'web.threads', configuredThreads
+        systemProperty 'web.headless', configuredHeadless
+        systemProperty 'web.browser', definition.browser
+        systemProperty 'mapaf.retry.count', configuredRetryCount
+
+        systemProperty 'mapaf.environment', configuredEnvironment
+        systemProperty 'mapaf.build', configuredBuildNumber
+        systemProperty 'mapaf.branch', configuredBranch
+        systemProperty 'mapaf.commit', configuredCommit
+
+        testLogging {
+            events 'passed', 'failed', 'skipped'
+            exceptionFormat 'full'
+            showStandardStreams = true
+        }
+
+        doFirst {
+            println 'MAPAF cross-browser execution configuration:'
+            println "  Task     : ${definition.taskName}"
+            println "  Browser  : ${definition.browser}"
+            println "  Threads  : ${configuredThreads}"
+            println "  Headless : ${configuredHeadless}"
+            println "  Retry    : ${configuredRetryCount}"
+        }
+    }
+}
+
+tasks.register('webCrossBrowserTest') {
+    description =
+            'Runs the Playwright Web suite across Chromium, Firefox and WebKit'
+
+    group = 'verification'
+
+    dependsOn(
+            'webChromiumTest',
+            'webFirefoxTest',
+            'webWebkitTest'
+    )
+
+    doLast {
+        println ''
+        println 'MAPAF cross-browser execution completed.'
+        println ''
+        println 'Result directories:'
+        println '  build/test-results/webChromiumTest'
+        println '  build/test-results/webFirefoxTest'
+        println '  build/test-results/webWebkitTest'
+        println ''
+        println 'HTML reports:'
+        println '  build/reports/tests/webChromiumTest/index.html'
+        println '  build/reports/tests/webFirefoxTest/index.html'
+        println '  build/reports/tests/webWebkitTest/index.html'
+    }
+}
+
+
+tasks.register('webSelectedBrowserTest') {
+    group = 'verification'
+    description =
+            'Runs Playwright Web tests on browsers selected using -Pbrowser'
+
+    dependsOn selectedWebBrowsers.collect { browser ->
+        browserTestTaskByName[browser]
+    }
+
+    doFirst {
+        println ''
+        println 'MAPAF flexible browser selection:'
+        println "Browsers executed: ${selectedWebBrowsers.join(', ')}"
+        println "  Selected  : ${selectedWebBrowsers.join(', ')}"
+        println "  Threads   : ${project.findProperty('webThreads') ?: '4'}"
+        println "  Headless  : ${project.findProperty('headless') ?: 'true'}"
+        println "  Retry     : ${configuredRetryCount}"
+        println ''
+    }
+
+    doLast {
+        println ''
+        println 'MAPAF selected-browser execution completed.'
+        println 'Browsers    : CHROMIUM, FIREFOX, WEBKIT'
+    }
+}
+
+tasks.register('generateSelectedBrowserWebSummaries') {
+    group = 'MAPAF Reporting'
+    description =
+            'Generates summaries only for browsers selected using -Pbrowser'
+
+    dependsOn selectedWebBrowsers.collect { browser ->
+        browserSummaryTaskByName[browser]
+    }
+
+    doLast {
+        println ''
+        println 'Selected browser summaries generated:'
+
+        selectedWebBrowsers.each { browser ->
+            println "  web/reports/${browser.toLowerCase()}-summary.json"
+        }
+    }
+}
+
+def browserSummaryDefinitions = [
+        [
+                taskName  : 'generateChromiumWebSummary',
+                testTask  : 'webChromiumTest',
+                browser   : 'CHROMIUM',
+                resultsDir: 'build/test-results/webChromiumTest',
+                outputFile: 'web/reports/chromium-summary.json'
+        ],
+        [
+                taskName  : 'generateFirefoxWebSummary',
+                testTask  : 'webFirefoxTest',
+                browser   : 'FIREFOX',
+                resultsDir: 'build/test-results/webFirefoxTest',
+                outputFile: 'web/reports/firefox-summary.json'
+        ],
+        [
+                taskName  : 'generateWebkitWebSummary',
+                testTask  : 'webWebkitTest',
+                browser   : 'WEBKIT',
+                resultsDir: 'build/test-results/webWebkitTest',
+                outputFile: 'web/reports/webkit-summary.json'
+        ]
+]
+
+browserSummaryDefinitions.each { definition ->
+    tasks.register(definition.taskName, JavaExec) {
+        group = 'MAPAF Reporting'
+        description =
+                "Generates the Web execution summary for ${definition.browser}"
+
+        dependsOn definition.testTask
+
+        classpath = sourceSets.test.runtimeClasspath
+        mainClass = 'web.reporting.WebSummaryCli'
+
+        args(
+                definition.resultsDir,
+                definition.outputFile
+        )
+
+        systemProperty 'mapaf.environment', configuredEnvironment
+        systemProperty 'mapaf.build', configuredBuildNumber
+        systemProperty 'mapaf.branch', configuredBranch
+        systemProperty 'mapaf.commit', configuredCommit
+
+        systemProperty 'web.browser',
+                definition.browser
+
+        systemProperty 'web.parallel', 'true'
+
+        systemProperty 'web.threads',
+                project.findProperty('webThreads') ?: '4'
+
+        doFirst {
+            println 'Generating browser-specific Web summary:'
+            println "  Browser : ${definition.browser}"
+            println "  Results : ${definition.resultsDir}"
+            println "  Output  : ${definition.outputFile}"
+        }
+    }
+}
+
+tasks.register('generateCrossBrowserWebSummaries') {
+    group = 'MAPAF Reporting'
+    description =
+            'Generates Chromium, Firefox and WebKit execution summaries'
+
+    dependsOn(
+            'generateChromiumWebSummary',
+            'generateFirefoxWebSummary',
+            'generateWebkitWebSummary'
+    )
+
+    doLast {
+        println ''
+        println 'Cross-browser Web summaries generated:'
+        println '  web/reports/chromium-summary.json'
+        println '  web/reports/firefox-summary.json'
+        println '  web/reports/webkit-summary.json'
+    }
+}
+
+tasks.register('generateCrossBrowserAggregateSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description =
+            'Combines Chromium, Firefox and WebKit summaries into one aggregate report'
+
+    dependsOn 'generateCrossBrowserWebSummaries'
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'web.reporting.CrossBrowserSummaryCli'
+
+    args(
+            'web/reports/cross-browser-summary.json'
+    )
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    doFirst {
+        println 'Generating cross-browser aggregate summary...'
+        println '  Chromium : web/reports/chromium-summary.json'
+        println '  Firefox  : web/reports/firefox-summary.json'
+        println '  WebKit   : web/reports/webkit-summary.json'
+        println '  Output   : web/reports/cross-browser-summary.json'
+    }
+}
+
+tasks.register('playwrightRegression') {
+    group = 'verification'
+    description =
+            'Runs the complete Playwright regression and generates reports'
+
+    dependsOn 'playwrightInstall'
+    dependsOn 'generateCrossBrowserAggregateSummary'
+
+    finalizedBy 'generateDashboard'
+
+    doFirst {
+        println ''
+        println '========================================'
+        println ' MAPAF PLAYWRIGHT REGRESSION'
+        println '========================================'
+        println "Browsers    : CHROMIUM, FIREFOX, WEBKIT"
+        println "Threads     : ${project.findProperty('webThreads') ?: '4'}"
+        println "Headless    : ${project.findProperty('headless') ?: 'true'}"
+        println "Retry       : ${configuredRetryCount}"
+        println "Environment : ${configuredEnvironment}"
+        println "Build       : ${configuredBuildNumber}"
+        println "Branch      : ${configuredBranch}"
+        println "Commit      : ${configuredCommit}"
+        println '========================================'
+        println ''
+    }
+
+    doLast {
+        println ''
+        println '========================================'
+        println ' PLAYWRIGHT REGRESSION COMPLETED'
+        println '========================================'
+        println ''
+        println 'Dashboard'
+        println '  dashboard/reports/index.html'
+        println ''
+        println 'Aggregate Summary'
+        println '  web/reports/cross-browser-summary.json'
+    }
+}
+
+tasks.register('playwrightDemo') {
+    group = 'MAPAF Demo'
+    description =
+            'Runs the headed Playwright cross-browser demo and generates reports'
+
+    dependsOn 'playwrightInstall'
+    dependsOn 'generateCrossBrowserAggregateSummary'
+    dependsOn 'generateDashboard'
+
+    finalizedBy 'openPlaywrightDashboard'
+
+    doFirst {
+        println ''
+        println '================================================'
+        println ' MAPAF ENTERPRISE PLAYWRIGHT AUTOMATION DEMO'
+        println '================================================'
+        println 'Browsers       : CHROMIUM, FIREFOX, WEBKIT'
+        println "Threads        : ${project.findProperty('webThreads') ?: '4'}"
+        println "Headless       : ${project.findProperty('headless') ?: 'false'}"
+        println "Retry          : ${configuredRetryCount}"
+        println "Environment    : ${configuredEnvironment}"
+        println "Build          : ${configuredBuildNumber}"
+        println "Branch         : ${configuredBranch}"
+        println "Commit         : ${configuredCommit}"
+        println "Open dashboard : ${configuredOpenDashboard}"
+        println '================================================'
+        println ''
+    }
+
+    doLast {
+        println ''
+        println '================================================'
+        println ' PLAYWRIGHT DEMO COMPLETED SUCCESSFULLY'
+        println '================================================'
+        println ''
+        println 'Browser reports:'
+        println '  build/reports/tests/webChromiumTest/index.html'
+        println '  build/reports/tests/webFirefoxTest/index.html'
+        println '  build/reports/tests/webWebkitTest/index.html'
+        println ''
+        println 'Browser summaries:'
+        println '  web/reports/chromium-summary.json'
+        println '  web/reports/firefox-summary.json'
+        println '  web/reports/webkit-summary.json'
+        println ''
+        println 'Aggregate summary:'
+        println '  web/reports/cross-browser-summary.json'
+        println ''
+        println 'Dashboard:'
+        println '  dashboard/reports/index.html'
+        println '================================================'
+    }
 }

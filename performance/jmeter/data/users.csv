@@ -1,0 +1,4 @@
+firstName,lastName,email,role
+Aneesh,Neladri,aneesh.neladri+perf1@example.com,QA
+Demo,User,demo.user+perf2@example.com,QA
+Load,Tester,load.tester+perf3@example.com,PERFORMANCE

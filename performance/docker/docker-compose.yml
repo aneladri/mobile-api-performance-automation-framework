@@ -1,0 +1,66 @@
+services:
+  mock-api:
+    build:
+      context: ../mock-api
+    container_name: mapaf-performance-mock-api
+    ports:
+      - "${PERFORMANCE_API_PORT:-8089}:8089"
+    environment:
+      PORT: "8089"
+      DEFAULT_DELAY_MS: "${DEFAULT_DELAY_MS:-0}"
+      DEFAULT_ERROR_RATE: "${DEFAULT_ERROR_RATE:-0}"
+      MAX_PAYLOAD_KB: "${MAX_PAYLOAD_KB:-1024}"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8089/health"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+  k6:
+    image: grafana/k6:0.54.0
+    working_dir: /workspace
+    volumes:
+      - ../..:/workspace
+    environment:
+      BASE_URL: "http://mock-api:8089"
+      PROFILE: "${PROFILE:-smoke}"
+      SOAK_DURATION: "${SOAK_DURATION:-3m}"
+    depends_on:
+      mock-api:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        mkdir -p /workspace/performance/results/k6 &&
+        k6 run
+        --summary-export=/workspace/performance/results/k6/$${PROFILE}-summary.json
+        /workspace/performance/k6/$${PROFILE}/api-$${PROFILE}.js
+
+  jmeter:
+    image: justb4/jmeter:5.6.3
+    working_dir: /workspace
+    volumes:
+      - ../..:/workspace
+    environment:
+      PROFILE: "${PROFILE:-smoke}"
+      JMETER_THREADS: "${JMETER_THREADS:-}"
+      JMETER_LOOPS: "${JMETER_LOOPS:-}"
+      JMETER_RAMP_SECONDS: "${JMETER_RAMP_SECONDS:-}"
+    depends_on:
+      mock-api:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        rm -f /workspace/performance/jmeter/results/$${PROFILE}.jtl &&
+        rm -rf /workspace/performance/jmeter/reports/$${PROFILE} &&
+        mkdir -p /workspace/performance/jmeter/results /workspace/performance/jmeter/reports/$${PROFILE} &&
+        jmeter -n
+        -t /workspace/performance/jmeter/plans/api-$${PROFILE}.jmx
+        -l /workspace/performance/jmeter/results/$${PROFILE}.jtl
+        -e -o /workspace/performance/jmeter/reports/$${PROFILE}
+        -Jhost=mock-api -Jport=8089 -Jprotocol=http
+        -JuserCsv=/workspace/performance/jmeter/data/users.csv
+        $${JMETER_THREADS:+-Jthreads=$${JMETER_THREADS}}
+        $${JMETER_LOOPS:+-Jloops=$${JMETER_LOOPS}}
+        $${JMETER_RAMP_SECONDS:+-JrampSeconds=$${JMETER_RAMP_SECONDS}}

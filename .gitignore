@@ -15,3 +15,31 @@ performance/results/
 
 # AI generated reports
 reports/ai/generated/*.md
+
+# AI-generated source and locator artifacts
+generated/
+
+# Performance demo generated output
+performance/results/k6/*.json
+performance/jmeter/results/*.jtl
+performance/jmeter/reports/*
+!performance/jmeter/reports/.gitkeep
+performance/reports/mock-api/*
+!performance/reports/mock-api/.gitkeep
+
+# Generated performance reports
+performance/k6/reports/*
+!performance/k6/reports/.gitkeep
+performance/reports/index.html
+performance/reports/summary.json
+api/reports/summary.json
+dashboard/reports/
+published/
+web/artifacts/
+web/reports/summary.json
+
+# Browser-specific Web summaries
+web/reports/chromium-summary.json
+web/reports/firefox-summary.json
+web/reports/webkit-summary.json
+web/reports/cross-browser-summary.json

@@ -1,0 +1,12 @@
+{
+  "name": "mapaf-performance-mock-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dependency-free mock API for MAPAF performance testing and demos",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

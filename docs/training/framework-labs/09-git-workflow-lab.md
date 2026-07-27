@@ -339,14 +339,6 @@ Git cannot decide which version is correct.
 Example:
 
 ```text id="git32"
-<<<<<<< HEAD
-new code
-=======
-old code
->>>>>>> feature
-```
-
-Resolve manually.
 
 Then:
 
