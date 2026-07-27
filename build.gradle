@@ -1070,3 +1070,61 @@ tasks.register('aiClientTest', Test) {
         exceptionFormat = 'full'
     }
 }
+
+tasks.register('aiHealthCheckTest', Test) {
+    description = 'Runs Claude health-check tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching(
+                'core.ai.health.tests.ClaudeHealthCheckTest'
+        )
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('claudeHealthCheck', JavaExec) {
+    description = 'Validates Claude configuration and connectivity'
+    group = 'MAPAF AI'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'core.ai.health.ClaudeHealthCheckCli'
+
+    systemProperty 'claude.enabled',
+            project.findProperty('claudeEnabled')
+                    ?: System.getenv('CLAUDE_ENABLED')
+                    ?: 'false'
+
+    if (project.hasProperty('claudeModel')) {
+        systemProperty 'claude.model',
+                project.property('claudeModel')
+    }
+
+    if (project.hasProperty('claudeBaseUrl')) {
+        systemProperty 'claude.base.url',
+                project.property('claudeBaseUrl')
+    }
+
+    if (project.hasProperty('claudeMaxTokens')) {
+        systemProperty 'claude.max.tokens',
+                project.property('claudeMaxTokens')
+    }
+
+    if (project.hasProperty('claudeTimeoutSeconds')) {
+        systemProperty 'claude.timeout.seconds',
+                project.property('claudeTimeoutSeconds')
+    }
+
+    if (project.hasProperty('claudeMaxRetries')) {
+        systemProperty 'claude.max.retries',
+                project.property('claudeMaxRetries')
+    }
+}
