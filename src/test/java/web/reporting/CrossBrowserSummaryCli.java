@@ -150,7 +150,7 @@ public final class CrossBrowserSummaryCli {
         ObjectNode root = OBJECT_MAPPER.createObjectNode();
 
         root.put("contractVersion", "1.0");
-        root.put("module", "Web Cross Browser");
+        root.put("module", "Web");
         root.put("status", overallStatus);
 
         ObjectNode metrics = root.putObject("metrics");
