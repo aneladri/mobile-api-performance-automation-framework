@@ -1190,3 +1190,19 @@ tasks.register('aiFailureAnalysisTest', Test) {
         exceptionFormat = 'full'
     }
 }
+
+tasks.register('aiLocatorTest', Test) {
+    description = 'Runs AI locator intelligence tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.locator.tests.*'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
