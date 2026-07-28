@@ -34,3 +34,12 @@ Every performance lab uses the same standalone mock API and explains setup, exec
 
 - [Lab 13 — Playwright Enterprise Testing](13-playwright-testing-lab.md)
 - [Lab 14 — Unified Dashboard Training](14-unified-dashboard-training.md)
+
+## Common Issues
+
+- Claude integration disabled
+- HTTP 405
+- HTML response instead of JSON
+- Appium session creation failures
+
+Refer to **Framework Lab 12** for detailed troubleshooting.

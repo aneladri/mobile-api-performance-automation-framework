@@ -276,3 +276,7 @@ Explain that unsupported values are rejected intentionally:
 - Cross-browser aggregate metrics are correct.
 - Unified dashboard opens and displays the expected KPIs.
 - The presenter can explain execution, reporting, and CI/CD flows.
+
+## Troubleshooting
+
+If the AI-assisted healing demo does not complete successfully, refer to **Framework Lab 12 – Locator Discovery and AI Healing** for common configuration issues, API integration guidance, and troubleshooting steps.

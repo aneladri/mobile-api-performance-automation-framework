@@ -70,7 +70,7 @@ public class HealingDemoTest extends BaseMobileTest {
     }
 
     @AfterSuite(alwaysRun = true)
-    public static void writeHealingMetricsReport() {
+    public void writeHealingMetricsReport(){
         HealingMetrics metrics =
                 HealingMetricsCollector.getMetrics();
 
