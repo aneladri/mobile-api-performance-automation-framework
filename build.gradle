@@ -1152,7 +1152,8 @@ tasks.register('aiFailureAnalysisTest', Test) {
     useTestNG()
 
     filter {
-        includeTestsMatching 'core.ai.analysis.tests.*'
+    includeTestsMatching 'core.ai.analysis.tests.*'
+    includeTestsMatching 'ai.tests.FailureAnalysisServiceTest'
     }
 
     testLogging {
