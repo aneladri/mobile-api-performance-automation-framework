@@ -10,27 +10,26 @@ import core.ai.providers.AIProvider;
 import core.ai.providers.AIResponse;
 import core.ai.services.HealingAIService;
 import core.ai.services.LocatorAnalysisService;
+
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import java.util.List;
 
 public class HealingAIServiceTest {
 
-    @Test
-    public void verifyHealingAIServiceCanBeCreated() {
+        @Test
+        public void verifyHealingAIServiceCanBeCreated() {
 
-        HealingAIService service =
-                new HealingAIService();
+                HealingAIService service = new HealingAIService();
 
-        Assert.assertNotNull(service);
-    }
+                Assert.assertNotNull(service);
+        }
 
-    @Test
-    public void shouldReturnBestRankedHealingCandidate() {
+        @Test
+        public void shouldReturnBestRankedHealingCandidate() {
 
-        AIProvider provider =
-                request ->
-                        AIResponse.success("""
+                AIProvider provider = request -> AIResponse.success("""
                                 ## Summary
 
                                 Accessibility ID is preferred.
@@ -50,178 +49,280 @@ public class HealingAIServiceTest {
                                 Reasoning: Stable accessibility identifier.
                                 """);
 
-        HealingAIService service =
-                service(provider);
+                HealingAIService service = service(provider);
 
-        HealedLocatorCandidate candidate =
-                service.recommendLocator(
-                        By.id("old-submit"),
-                        "CheckoutScreen",
-                        "submitOrderTest",
-                        "android",
-                        "<hierarchy content-desc=\"submit-order\"/>"
-                );
-
-        Assert.assertNotNull(candidate);
-
-        Assert.assertEquals(
-                candidate.getLocatorType(),
-                "ACCESSIBILITY_ID"
-        );
-
-        Assert.assertEquals(
-                candidate.getLocatorValue(),
-                "submit-order"
-        );
-
-        Assert.assertEquals(
-                candidate.getConfidence(),
-                90
-        );
-
-        Assert.assertEquals(
-                candidate.getExplanation(),
-                "Stable accessibility identifier."
-        );
-    }
-
-    @Test
-    public void shouldReturnNullWhenLocatorAnalysisFails() {
-
-        AIProvider provider =
-                request ->
-                        AIResponse.failure(
-                                "Claude integration is disabled"
-                        );
-
-        HealedLocatorCandidate candidate =
-                service(provider)
-                        .recommendLocator(
+                HealedLocatorCandidate candidate = service.recommendLocator(
                                 By.id("old-submit"),
                                 "CheckoutScreen",
                                 "submitOrderTest",
                                 "android",
-                                "<hierarchy/>"
-                        );
+                                "<hierarchy content-desc=\"submit-order\"/>");
 
-        Assert.assertNull(candidate);
-    }
+                Assert.assertNotNull(candidate);
 
-    @Test
-    public void shouldReturnNullForMalformedAIResponse() {
+                Assert.assertEquals(
+                                candidate.getLocatorType(),
+                                "ACCESSIBILITY_ID");
 
-        AIProvider provider =
-                request ->
-                        AIResponse.success("""
+                Assert.assertEquals(
+                                candidate.getLocatorValue(),
+                                "submit-order");
+
+                Assert.assertEquals(
+                                candidate.getConfidence(),
+                                90);
+
+                Assert.assertEquals(
+                                candidate.getExplanation(),
+                                "Stable accessibility identifier.");
+        }
+
+        @Test
+        public void shouldReturnNullWhenLocatorAnalysisFails() {
+
+                AIProvider provider = request -> AIResponse.failure(
+                                "Claude integration is disabled");
+
+                HealedLocatorCandidate candidate = service(provider)
+                                .recommendLocator(
+                                                By.id("old-submit"),
+                                                "CheckoutScreen",
+                                                "submitOrderTest",
+                                                "android",
+                                                "<hierarchy/>");
+
+                Assert.assertNull(candidate);
+        }
+
+        @Test
+        public void shouldReturnNullForMalformedAIResponse() {
+
+                AIProvider provider = request -> AIResponse.success("""
                                 ## Summary
 
                                 No valid locator found.
                                 """);
 
-        HealedLocatorCandidate candidate =
-                service(provider)
-                        .recommendLocator(
+                HealedLocatorCandidate candidate = service(provider)
+                                .recommendLocator(
+                                                By.id("old-submit"),
+                                                "CheckoutScreen",
+                                                "submitOrderTest",
+                                                "android",
+                                                "<hierarchy/>");
+
+                Assert.assertNull(candidate);
+        }
+
+        @Test(expectedExceptions = NullPointerException.class, expectedExceptionsMessageRegExp = "Broken locator must not be null")
+        public void shouldRejectNullBrokenLocator() {
+
+                service(
+                                request -> AIResponse.success("unused")).recommendLocator(
+                                                null,
+                                                "CheckoutScreen",
+                                                "submitOrderTest",
+                                                "android",
+                                                "<hierarchy/>");
+        }
+
+        @Test
+        public void shouldUseFallbackValuesForMissingContext() {
+
+                AIProvider provider = request -> {
+
+                        Assert.assertTrue(
+                                        request.getPrompt()
+                                                        .contains("Unknown screen"));
+
+                        Assert.assertTrue(
+                                        request.getPrompt()
+                                                        .contains("Unknown test"));
+
+                        Assert.assertTrue(
+                                        request.getPrompt()
+                                                        .contains(
+                                                                        "<page-source-unavailable/>"));
+
+                        return AIResponse.success("""
+                                        ## Summary
+                                        ID candidate found.
+
+                                        ## Candidates
+                                        Strategy: ID
+                                        Value: submit
+                                        Confidence: 80
+                                        Fallback: false
+                                        Reasoning: Stable identifier.
+                                        """);
+                };
+
+                HealedLocatorCandidate candidate = service(provider)
+                                .recommendLocator(
+                                                By.id("old-submit"),
+                                                null,
+                                                null,
+                                                null,
+                                                null);
+
+                Assert.assertNotNull(candidate);
+
+                Assert.assertEquals(
+                                candidate.getLocatorType(),
+                                "ID");
+        }
+
+        @Test
+        public void shouldReturnAllCandidatesInRankedOrder() {
+
+                AIProvider provider = request -> AIResponse.success("""
+                                ## Summary
+
+                                Multiple locator candidates found.
+
+                                ## Candidates
+
+                                Strategy: XPATH
+                                Value: //button[@text='Submit']
+                                Confidence: 100
+                                Fallback: false
+                                Reasoning: Text-based XPath.
+
+                                Strategy: ID
+                                Value: submit-button
+                                Confidence: 95
+                                Fallback: false
+                                Reasoning: Stable ID.
+
+                                Strategy: ACCESSIBILITY_ID
+                                Value: submit-order
+                                Confidence: 85
+                                Fallback: false
+                                Reasoning: Stable accessibility identifier.
+                                """);
+
+                List<HealedLocatorCandidate> candidates = service(provider)
+                                .recommendLocators(
+                                                By.id("old-submit"),
+                                                "CheckoutScreen",
+                                                "submitOrderTest",
+                                                "android",
+                                                "<hierarchy/>");
+
+                Assert.assertEquals(
+                                candidates.size(),
+                                3);
+
+                Assert.assertEquals(
+                                candidates.get(0).getLocatorType(),
+                                "ACCESSIBILITY_ID");
+
+                Assert.assertEquals(
+                                candidates.get(1).getLocatorType(),
+                                "ID");
+
+                Assert.assertEquals(
+                                candidates.get(2).getLocatorType(),
+                                "XPATH");
+        }
+
+        @Test
+        public void shouldReturnImmutableCandidateList() {
+
+                AIProvider provider = request -> AIResponse.success("""
+                                ## Summary
+                                Locator found.
+
+                                ## Candidates
+                                Strategy: ID
+                                Value: submit
+                                Confidence: 90
+                                Fallback: false
+                                Reasoning: Stable identifier.
+                                """);
+
+                List<HealedLocatorCandidate> candidates = service(provider)
+                                .recommendLocators(
+                                                By.id("old-submit"),
+                                                "CheckoutScreen",
+                                                "submitOrderTest",
+                                                "android",
+                                                "<hierarchy/>");
+
+                Assert.expectThrows(
+                                UnsupportedOperationException.class,
+                                candidates::clear);
+        }
+
+        @Test
+        public void shouldReturnEmptyListWhenAnalysisFails() {
+
+                AIProvider provider = request -> AIResponse.failure(
+                                "AI provider unavailable");
+
+                List<HealedLocatorCandidate> candidates = service(provider)
+                                .recommendLocators(
+                                                By.id("old-submit"),
+                                                "CheckoutScreen",
+                                                "submitOrderTest",
+                                                "android",
+                                                "<hierarchy/>");
+
+                Assert.assertTrue(
+                                candidates.isEmpty());
+        }
+
+        @Test
+        public void shouldPreserveSingleCandidateCompatibilityMethod() {
+
+                AIProvider provider = request -> AIResponse.success("""
+                                ## Summary
+                                Multiple candidates found.
+
+                                ## Candidates
+                                Strategy: XPATH
+                                Value: //button
+                                Confidence: 99
+                                Fallback: false
+                                Reasoning: XPath candidate.
+
+                                Strategy: ACCESSIBILITY_ID
+                                Value: submit-order
+                                Confidence: 85
+                                Fallback: false
+                                Reasoning: Accessibility candidate.
+                                """);
+
+                HealingAIService service = service(provider);
+
+                HealedLocatorCandidate candidate = service.recommendLocator(
                                 By.id("old-submit"),
                                 "CheckoutScreen",
                                 "submitOrderTest",
                                 "android",
-                                "<hierarchy/>"
-                        );
+                                "<hierarchy/>");
 
-        Assert.assertNull(candidate);
-    }
+                Assert.assertNotNull(candidate);
 
-    @Test(
-            expectedExceptions = NullPointerException.class,
-            expectedExceptionsMessageRegExp =
-                    "Broken locator must not be null"
-    )
-    public void shouldRejectNullBrokenLocator() {
+                Assert.assertEquals(
+                                candidate.getLocatorType(),
+                                "ACCESSIBILITY_ID");
+        }
 
-        service(
-                request ->
-                        AIResponse.success("unused")
-        ).recommendLocator(
-                null,
-                "CheckoutScreen",
-                "submitOrderTest",
-                "android",
-                "<hierarchy/>"
-        );
-    }
+        private HealingAIService service(
+                        AIProvider provider) {
 
-    @Test
-    public void shouldUseFallbackValuesForMissingContext() {
+                PromptRegistry registry = PromptRegistryInitializer
+                                .createDefaultRegistry();
 
-        AIProvider provider =
-                request -> {
+                LocatorAnalysisService locatorService = new LocatorAnalysisService(
+                                provider,
+                                registry,
+                                new PromptRenderer(),
+                                new LocatorAnalysisParser(),
+                                new LocatorRankingEngine());
 
-                    Assert.assertTrue(
-                            request.getPrompt()
-                                    .contains("Unknown screen")
-                    );
-
-                    Assert.assertTrue(
-                            request.getPrompt()
-                                    .contains("Unknown test")
-                    );
-
-                    Assert.assertTrue(
-                            request.getPrompt()
-                                    .contains(
-                                            "<page-source-unavailable/>"
-                                    )
-                    );
-
-                    return AIResponse.success("""
-                            ## Summary
-                            ID candidate found.
-
-                            ## Candidates
-                            Strategy: ID
-                            Value: submit
-                            Confidence: 80
-                            Fallback: false
-                            Reasoning: Stable identifier.
-                            """);
-                };
-
-        HealedLocatorCandidate candidate =
-                service(provider)
-                        .recommendLocator(
-                                By.id("old-submit"),
-                                null,
-                                null,
-                                null,
-                                null
-                        );
-
-        Assert.assertNotNull(candidate);
-
-        Assert.assertEquals(
-                candidate.getLocatorType(),
-                "ID"
-        );
-    }
-
-    private HealingAIService service(
-            AIProvider provider) {
-
-        PromptRegistry registry =
-                PromptRegistryInitializer
-                        .createDefaultRegistry();
-
-        LocatorAnalysisService locatorService =
-                new LocatorAnalysisService(
-                        provider,
-                        registry,
-                        new PromptRenderer(),
-                        new LocatorAnalysisParser(),
-                        new LocatorRankingEngine()
-                );
-
-        return new HealingAIService(
-                locatorService
-        );
-    }
+                return new HealingAIService(
+                                locatorService);
+        }
 }

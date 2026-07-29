@@ -4,10 +4,14 @@ import core.ai.healing.HealedLocatorCandidate;
 import core.ai.locator.LocatorAnalysisRequest;
 import core.ai.locator.LocatorAnalysisResult;
 import core.ai.locator.LocatorCandidate;
+import core.ai.locator.LocatorStrategy;
+
 import core.utils.LoggerUtil;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -16,147 +20,168 @@ import java.util.Objects;
  */
 public final class HealingAIService {
 
-    private static final Logger logger =
-            LoggerUtil.getLogger(HealingAIService.class);
+        private static final Logger logger = LoggerUtil.getLogger(HealingAIService.class);
 
-    private final LocatorAnalysisService locatorAnalysisService;
+        private final LocatorAnalysisService locatorAnalysisService;
 
-    public HealingAIService() {
-        this(
-                new LocatorAnalysisService()
-        );
-    }
+        public HealingAIService() {
+                this(
+                                new LocatorAnalysisService());
+        }
 
-    public HealingAIService(
-            LocatorAnalysisService locatorAnalysisService) {
+        public HealingAIService(
+                        LocatorAnalysisService locatorAnalysisService) {
 
-        this.locatorAnalysisService =
+                this.locatorAnalysisService = Objects.requireNonNull(
+                                locatorAnalysisService,
+                                "Locator analysis service must not be null");
+        }
+
+        /**
+         * Returns the highest-ranked locator recommendation.
+         *
+         * Retained for compatibility with existing healing callers.
+         */
+        public HealedLocatorCandidate recommendLocator(
+                        By brokenLocator,
+                        String screenClass,
+                        String testName,
+                        String platform,
+                        String compressedPageSource) {
+
+                List<HealedLocatorCandidate> candidates = recommendLocators(
+                                brokenLocator,
+                                screenClass,
+                                testName,
+                                platform,
+                                compressedPageSource);
+
+                return candidates.isEmpty()
+                                ? null
+                                : candidates.get(0);
+        }
+
+        /**
+         * Returns all valid locator recommendations in ranked order.
+         */
+        public List<HealedLocatorCandidate> recommendLocators(
+                        By brokenLocator,
+                        String screenClass,
+                        String testName,
+                        String platform,
+                        String compressedPageSource) {
+
                 Objects.requireNonNull(
-                        locatorAnalysisService,
-                        "Locator analysis service must not be null"
-                );
-    }
+                                brokenLocator,
+                                "Broken locator must not be null");
 
-    public HealedLocatorCandidate recommendLocator(
-            By brokenLocator,
-            String screenClass,
-            String testName,
-            String platform,
-            String compressedPageSource) {
+                LocatorAnalysisRequest request = LocatorAnalysisRequest.builder()
+                                .platform(
+                                                normalisePlatform(platform))
+                                .screenName(
+                                                normaliseRequired(
+                                                                screenClass,
+                                                                "Unknown screen"))
+                                .elementDescription(
+                                                buildElementDescription(
+                                                                brokenLocator,
+                                                                testName))
+                                .existingLocator(
+                                                brokenLocator.toString())
+                                .failureMessage(
+                                                "Element lookup failed for "
+                                                                + brokenLocator)
+                                .pageSource(
+                                                normaliseRequired(
+                                                                compressedPageSource,
+                                                                "<page-source-unavailable/>"))
+                                .build();
 
-        Objects.requireNonNull(
-                brokenLocator,
-                "Broken locator must not be null"
-        );
+                LocatorAnalysisResult result = locatorAnalysisService.analyze(request);
 
-        LocatorAnalysisRequest request =
-                LocatorAnalysisRequest.builder()
-                        .platform(
-                                normalisePlatform(platform)
-                        )
-                        .screenName(
-                                normaliseRequired(
-                                        screenClass,
-                                        "Unknown screen"
-                                )
-                        )
-                        .elementDescription(
-                                buildElementDescription(
-                                        brokenLocator,
-                                        testName
-                                )
-                        )
-                        .existingLocator(
-                                brokenLocator.toString()
-                        )
-                        .failureMessage(
-                                "Element lookup failed for "
-                                        + brokenLocator
-                        )
-                        .pageSource(
-                                normaliseRequired(
-                                        compressedPageSource,
-                                        "<page-source-unavailable/>"
-                                )
-                        )
-                        .build();
+                if (!result.isSuccessful()) {
+                        logger.warn(
+                                        "[Healing AI] Locator analysis failed: {}",
+                                        result.getErrorMessage());
 
-        LocatorAnalysisResult result =
-                locatorAnalysisService.analyze(
-                        request
-                );
+                        return List.of();
+                }
 
-        if (!result.isSuccessful()) {
-            logger.warn(
-                    "[Healing AI] Locator analysis failed: {}",
-                    result.getErrorMessage()
-            );
+                List<HealedLocatorCandidate> recommendations = new ArrayList<>();
 
-            return null;
+                for (LocatorCandidate candidate : result.getCandidates()) {
+
+                        if (candidate == null
+                                        || candidate.getStrategy() == LocatorStrategy.UNKNOWN) {
+
+                                logger.debug(
+                                                "[Healing AI] Ignoring unsupported candidate: {}",
+                                                candidate);
+
+                                continue;
+                        }
+
+                        recommendations.add(
+                                        toHealingCandidate(candidate));
+                }
+
+                if (recommendations.isEmpty()) {
+                        logger.warn(
+                                        "[Healing AI] Locator analysis returned no usable candidates");
+
+                        return List.of();
+                }
+
+                logger.info(
+                                "[Healing AI] Returning {} ranked locator candidates",
+                                recommendations.size());
+
+                return Collections.unmodifiableList(
+                                recommendations);
         }
 
-        LocatorCandidate bestCandidate =
-                result.getBestCandidate();
+        private HealedLocatorCandidate toHealingCandidate(
+                        LocatorCandidate candidate) {
 
-        if (bestCandidate == null) {
-            logger.warn(
-                    "[Healing AI] Locator analysis returned no candidates"
-            );
-
-            return null;
+                return new HealedLocatorCandidate(
+                                candidate.getStrategy().name(),
+                                candidate.getValue(),
+                                candidate.getConfidence(),
+                                candidate.getReasoning() == null
+                                                ? "AI locator recommendation"
+                                                : candidate.getReasoning());
         }
 
-        return toHealingCandidate(
-                bestCandidate
-        );
-    }
+        private String buildElementDescription(
+                        By brokenLocator,
+                        String testName) {
 
-    private HealedLocatorCandidate toHealingCandidate(
-            LocatorCandidate candidate) {
+                String normalisedTestName = normaliseRequired(
+                                testName,
+                                "Unknown test");
 
-        return new HealedLocatorCandidate(
-                candidate.getStrategy().name(),
-                candidate.getValue(),
-                candidate.getConfidence(),
-                candidate.getReasoning() == null
-                        ? "AI locator recommendation"
-                        : candidate.getReasoning()
-        );
-    }
-
-    private String buildElementDescription(
-            By brokenLocator,
-            String testName) {
-
-        String normalisedTestName =
-                normaliseRequired(
-                        testName,
-                        "Unknown test"
-                );
-
-        return "Replacement locator for "
-                + brokenLocator
-                + " in test "
-                + normalisedTestName;
-    }
-
-    private String normalisePlatform(
-            String platform) {
-
-        return normaliseRequired(
-                platform,
-                "android"
-        );
-    }
-
-    private String normaliseRequired(
-            String value,
-            String fallback) {
-
-        if (value == null || value.isBlank()) {
-            return fallback;
+                return "Replacement locator for "
+                                + brokenLocator
+                                + " in test "
+                                + normalisedTestName;
         }
 
-        return value.trim();
-    }
+        private String normalisePlatform(
+                        String platform) {
+
+                return normaliseRequired(
+                                platform,
+                                "android");
+        }
+
+        private String normaliseRequired(
+                        String value,
+                        String fallback) {
+
+                if (value == null || value.isBlank()) {
+                        return fallback;
+                }
+
+                return value.trim();
+        }
 }
