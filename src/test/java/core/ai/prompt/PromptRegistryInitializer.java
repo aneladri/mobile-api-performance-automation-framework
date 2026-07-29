@@ -1,6 +1,7 @@
 package core.ai.prompt;
 
 import core.ai.prompt.templates.FailureAnalysisPrompt;
+import core.ai.prompt.templates.LocatorAnalysisPrompt;
 
 /**
  * Creates a registry containing all production prompt definitions.
@@ -17,6 +18,10 @@ public final class PromptRegistryInitializer {
 
         registry.register(
                 new FailureAnalysisPrompt()
+        );
+
+        registry.register(
+                new LocatorAnalysisPrompt()
         );
 
         return registry;
