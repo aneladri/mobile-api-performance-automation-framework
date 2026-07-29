@@ -1222,6 +1222,8 @@ tasks.register('aiHealingTest', Test) {
         includeTestsMatching 'ai.tests.HealingMetricsCollectorTest'
         includeTestsMatching 'ai.tests.HealedLocatorRecordTest'
         includeTestsMatching 'ai.tests.HealedLocatorStoreTest'
+        includeTestsMatching 'ai.tests.HealingExpiryPolicyTest'
+        includeTestsMatching 'ai.tests.StrategyLearningRecordTest'
     }
 
     testLogging {

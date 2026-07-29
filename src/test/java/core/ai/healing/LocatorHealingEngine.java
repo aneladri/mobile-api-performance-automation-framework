@@ -21,7 +21,7 @@ public class LocatorHealingEngine {
 
         private static final int RETRY_TIMEOUT_SECONDS = 10;
         private static final int MIN_CONFIDENCE = 60;
-        private static final int MAX_CACHED_FAILURES = 3;
+        private static final HealingExpiryPolicy EXPIRY_POLICY = HealingExpiryPolicy.defaultPolicy();
 
         private final LocalHealingRuleEngine ruleEngine = new LocalHealingRuleEngine();
 
@@ -218,20 +218,13 @@ public class LocatorHealingEngine {
                 HealedLocatorStore.recordFailure(
                                 locatorKey);
 
-                HealedLocatorRecord record = HealedLocatorStore.getRecord(
-                                locatorKey);
-
-                if (record != null
-                                && record.isStale(
-                                                MAX_CACHED_FAILURES)) {
+                if (HealedLocatorStore.evictIfExpired(
+                                locatorKey,
+                                EXPIRY_POLICY)) {
 
                         logger.warn(
-                                        "[Healing] Removing stale cached locator after {} failure(s): {}",
-                                        record.getFailureCount(),
+                                        "[Healing] Removed expired cached locator: {}",
                                         cached);
-
-                        HealedLocatorStore.remove(
-                                        locatorKey);
                 }
 
                 logger.warn(
