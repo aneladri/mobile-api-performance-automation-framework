@@ -99,12 +99,22 @@ public class LocatorHealingEngine {
                                 platform,
                                 compressedSource.length());
 
+                long aiStartTime = System.currentTimeMillis();
+
                 List<HealedLocatorCandidate> aiCandidates = aiService.recommendLocators(
                                 brokenLocator,
                                 screenClass,
                                 testName,
                                 platform,
                                 compressedSource);
+
+                long aiDuration = System.currentTimeMillis() - aiStartTime;
+
+                HealingMetricsCollector.recordAiHealingDuration(
+                                aiDuration);
+
+                HealingMetricsCollector.recordAiCandidatesGenerated(
+                                aiCandidates.size());
 
                 if (aiCandidates.isEmpty()) {
                         logger.warn(
@@ -139,6 +149,8 @@ public class LocatorHealingEngine {
                                         aiCandidates.size(),
                                         candidate);
 
+                        HealingMetricsCollector.recordAiCandidateAttempt();
+
                         WebElement healedElement = tryCandidate(candidate);
 
                         if (healedElement == null) {
@@ -151,6 +163,10 @@ public class LocatorHealingEngine {
                         }
 
                         HealingMetricsCollector.recordClaudeHit();
+
+                        HealingMetricsCollector.recordAiHealingSuccess(
+                                        rank,
+                                        candidate.getConfidence());
 
                         logger.info(
                                         "[Healing] Tier 3 HIT - AI candidate rank {} after {} attempt(s): {}",
