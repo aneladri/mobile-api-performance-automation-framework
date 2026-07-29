@@ -18,6 +18,7 @@ reports/ai/generated/*.md
 
 # AI-generated source and locator artifacts
 generated/
+.healing-store/
 
 # Performance demo generated output
 performance/results/k6/*.json
