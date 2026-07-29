@@ -21,6 +21,7 @@ public class LocatorHealingEngine {
 
         private static final int RETRY_TIMEOUT_SECONDS = 10;
         private static final int MIN_CONFIDENCE = 60;
+        private static final int MAX_CACHED_FAILURES = 3;
 
         private final LocalHealingRuleEngine ruleEngine = new LocalHealingRuleEngine();
 
@@ -190,8 +191,11 @@ public class LocatorHealingEngine {
                 return null;
         }
 
-        private WebElement tryCachedLocator(String locatorKey) {
-                HealedLocatorCandidate cached = HealedLocatorStore.getCached(locatorKey);
+        private WebElement tryCachedLocator(
+                        String locatorKey) {
+
+                HealedLocatorCandidate cached = HealedLocatorStore.getCached(
+                                locatorKey);
 
                 if (cached == null) {
                         return null;
@@ -200,11 +204,38 @@ public class LocatorHealingEngine {
                 WebElement element = tryCandidate(cached);
 
                 if (element != null) {
+
+                        HealedLocatorStore.recordSuccess(
+                                        locatorKey);
+
+                        logger.info(
+                                        "[Healing] Cached locator reuse succeeded: {}",
+                                        cached);
+
                         return element;
                 }
 
+                HealedLocatorStore.recordFailure(
+                                locatorKey);
+
+                HealedLocatorRecord record = HealedLocatorStore.getRecord(
+                                locatorKey);
+
+                if (record != null
+                                && record.isStale(
+                                                MAX_CACHED_FAILURES)) {
+
+                        logger.warn(
+                                        "[Healing] Removing stale cached locator after {} failure(s): {}",
+                                        record.getFailureCount(),
+                                        cached);
+
+                        HealedLocatorStore.remove(
+                                        locatorKey);
+                }
+
                 logger.warn(
-                                "[Healing] Cached locator no longer works: {}",
+                                "[Healing] Cached locator reuse failed: {}",
                                 cached);
 
                 return null;
