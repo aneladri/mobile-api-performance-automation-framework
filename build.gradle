@@ -1206,3 +1206,24 @@ tasks.register('aiLocatorTest', Test) {
         exceptionFormat = 'full'
     }
 }
+
+tasks.register('aiHealingTest', Test) {
+    description = 'Runs AI healing integration tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'ai.tests.HealingAIServiceTest'
+        includeTestsMatching 'ai.tests.SelfHealingRuntimeTest'
+        includeTestsMatching 'ai.tests.HealingAnalysisAgentTest'
+        includeTestsMatching 'ai.tests.HealingAgentConfigurationTest'
+        includeTestsMatching 'ai.tests.HealingAgentMetricsTest'
+        includeTestsMatching 'ai.tests.HealingMetricsCollectorTest'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
