@@ -1,0 +1,1 @@
+package dashboard.enterprise.agent.llm.registry;import dashboard.enterprise.agent.llm.provider.LlmProvider;import java.util.Collection;public interface LlmProviderRegistry{void register(LlmProvider provider);LlmProvider require(String providerId);Collection<LlmProvider> all();}

@@ -1,0 +1,7 @@
+name: roomscan-domain
+version: 1.0.0
+purpose: Provide consistent RoomScan terminology, workflow, risks, quality gates, and production workload context to MAPAF AI agents.
+domain: RoomScan
+human_approval_required: true
+permanent_code_changes_allowed: false
+minimum_confidence: 0.75

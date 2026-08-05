@@ -1,0 +1,19 @@
+{
+  "id": "501",
+  "key": "AB-501",
+  "title": "Technician completes a RoomScan capture",
+  "description": "Capture room images and submit them for floor-plan processing.",
+  "acceptanceCriteria": [
+    "Technician can start a scan session",
+    "Images can be uploaded",
+    "AI processing status is visible",
+    "Completed scan can be submitted"
+  ],
+  "type": "User Story",
+  "status": "Committed",
+  "priority": "1",
+  "labels": ["mobile", "api", "performance"],
+  "assignee": "demo-user",
+  "parentId": "500",
+  "sourceUrl": "https://dev.azure.com/example/project/_workitems/edit/501"
+}

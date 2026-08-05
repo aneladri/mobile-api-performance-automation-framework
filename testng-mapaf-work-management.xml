@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Work Management Integration">
+  <test name="Jira and Azure Boards Replay Integration">
+    <classes>
+      <class name="dashboard.enterprise.agent.integration.work.tests.WorkManagementIntegrationTest"/>
+    </classes>
+  </test>
+</suite>

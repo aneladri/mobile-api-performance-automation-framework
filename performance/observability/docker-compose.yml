@@ -1,0 +1,57 @@
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-remote-write-receiver
+      - --web.enable-lifecycle
+    ports:
+      - "${MAPAF_PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - mapaf-prometheus-data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  grafana:
+    image: grafana/grafana:11.2.2
+    ports:
+      - "${MAPAF_GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: "${MAPAF_GRAFANA_USER:-admin}"
+      GF_SECURITY_ADMIN_PASSWORD: "${MAPAF_GRAFANA_PASSWORD:-mapaf-admin}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/mapaf-k6-performance.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - mapaf-grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    command: ["--config=/etc/otelcol-contrib/config.yml"]
+    ports:
+      - "${MAPAF_OTEL_GRPC_PORT:-4317}:4317"
+      - "${MAPAF_OTEL_HTTP_PORT:-4318}:4318"
+      - "${MAPAF_OTEL_METRICS_PORT:-8889}:8889"
+    volumes:
+      - ./opentelemetry/collector-config.yml:/etc/otelcol-contrib/config.yml:ro
+    depends_on:
+      prometheus:
+        condition: service_healthy
+
+volumes:
+  mapaf-prometheus-data:
+  mapaf-grafana-data:

@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Knowledge Integration">
+    <test name="Knowledge Retrieval and Governance">
+        <classes>
+            <class name="dashboard.enterprise.agent.integration.knowledge.tests.KnowledgeIntegrationTest"/>
+        </classes>
+    </test>
+</suite>

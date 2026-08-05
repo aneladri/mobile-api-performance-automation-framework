@@ -1,0 +1,12 @@
+[
+  {
+    "schemaVersion": "mapaf.knowledge.document/v1",
+    "documentId": "roomscan-api-guidelines",
+    "source": "REPLAY_CONFLUENCE",
+    "title": "RoomScan API Quality Guidelines",
+    "content": "Validate multipart upload boundaries, file type and size restrictions, authentication, idempotency, retry headers, timeout responses, and object-storage failure mapping. API regression must include negative and resilience scenarios.",
+    "sourceUri": "confluence://quality/roomscan-api-guidelines",
+    "tags": ["roomscan", "api", "multipart", "resilience"],
+    "metadata": {"space": "QUALITY", "pageId": "1001"}
+  }
+]

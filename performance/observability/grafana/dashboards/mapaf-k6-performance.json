@@ -1,0 +1,85 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Request Rate",
+      "id": 1,
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "sum(rate(k6_http_reqs_total[1m]))", "legendFormat": "req/s", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "reqps"}, "overrides": []}
+    },
+    {
+      "type": "stat",
+      "title": "HTTP Failure Rate",
+      "id": 2,
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0},
+      "targets": [{"expr": "avg(k6_http_req_failed_rate)", "legendFormat": "failure rate", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "percentunit", "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 0.01}]}}, "overrides": []}
+    },
+    {
+      "type": "stat",
+      "title": "Active Virtual Users",
+      "id": 3,
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0},
+      "targets": [{"expr": "sum(k6_vus_value)", "legendFormat": "VUs", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []}
+    },
+    {
+      "type": "stat",
+      "title": "P95 HTTP Duration",
+      "id": 4,
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0},
+      "targets": [{"expr": "max(k6_http_req_duration_p95)", "legendFormat": "P95", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "Request Throughput",
+      "id": 5,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 5},
+      "targets": [{"expr": "sum(rate(k6_http_reqs_total[30s]))", "legendFormat": "Requests/sec", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "reqps"}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency Percentiles",
+      "id": 6,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 5},
+      "targets": [
+        {"expr": "max(k6_http_req_duration_p90)", "legendFormat": "P90", "refId": "A"},
+        {"expr": "max(k6_http_req_duration_p95)", "legendFormat": "P95", "refId": "B"},
+        {"expr": "max(k6_http_req_duration_p99)", "legendFormat": "P99", "refId": "C"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "UPDR Business Transaction P95",
+      "id": 7,
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 13},
+      "targets": [
+        {"expr": "max(updr_order_latency_p95)", "legendFormat": "Order Intake", "refId": "A"},
+        {"expr": "max(updr_autosave_latency_p95)", "legendFormat": "Autosave", "refId": "B"},
+        {"expr": "max(updr_ai_latency_p95)", "legendFormat": "AI Analysis", "refId": "C"},
+        {"expr": "max(updr_submit_latency_p95)", "legendFormat": "Submission", "refId": "D"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []}
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["MAPAF", "k6", "UPDR", "performance"],
+  "templating": {"list": []},
+  "time": {"from": "now-15m", "to": "now"},
+  "timezone": "browser",
+  "title": "MAPAF k6 Enterprise Performance",
+  "uid": "mapaf-k6-performance",
+  "version": 1
+}

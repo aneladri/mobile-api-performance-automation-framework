@@ -1,0 +1,4 @@
+package dashboard.enterprise.agent.llm.model;
+import java.util.Map;
+public record LlmModelConfiguration(String schemaVersion,String modelId,String providerId,double temperature,int maxTokens,long timeoutMillis,Map<String,String> attributes){
+ public LlmModelConfiguration{schemaVersion=safe(schemaVersion);modelId=req(modelId,"Model id");providerId=req(providerId,"Provider id");if(temperature<0||temperature>2)throw new IllegalArgumentException("Temperature must be between 0 and 2.");if(maxTokens<1)throw new IllegalArgumentException("Max tokens must be positive.");if(timeoutMillis<1)throw new IllegalArgumentException("Timeout must be positive.");attributes=attributes==null?Map.of():Map.copyOf(attributes);}private static String safe(String v){return v==null?"":v.trim();}private static String req(String v,String l){String n=safe(v);if(n.isEmpty())throw new IllegalArgumentException(l+" is required.");return n;}}

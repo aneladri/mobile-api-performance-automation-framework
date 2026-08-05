@@ -1,0 +1,56 @@
+name: API Tests
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - develop
+      - main
+
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  api-tests:
+    name: Run API Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x gradlew
+
+      - name: Run API tests
+        run: ./gradlew clean apiTest
+
+      - name: Upload Gradle HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-gradle-html-report
+          path: build/reports/tests/apiTest
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-allure-results
+          path: build/allure-results
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-logs
+          path: logs

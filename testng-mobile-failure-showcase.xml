@@ -1,0 +1,1 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd"><suite name="Mobile Failure Showcase" parallel="none"><test name="Mobile Failure"><classes><class name="failure.showcase.MobileEnterpriseFailureDemoTest"/></classes></test></suite>

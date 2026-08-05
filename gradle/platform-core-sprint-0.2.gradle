@@ -1,0 +1,25 @@
+// MAPAF Architecture Sprint 0.2 - Platform Core validation tasks
+
+tasks.register('platformCoreTest', Test) {
+    group = 'MAPAF Architecture'
+    description = 'Runs MAPAF Platform Core architecture and executable-kernel tests'
+    useTestNG() {
+        suites 'testng-platform-core.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validatePlatformCoreArchitecture', Exec) {
+    group = 'MAPAF Architecture'
+    description = 'Validates Sprint 0.2 architecture, ADR, contract and source artifacts'
+    commandLine 'bash', 'scripts/architecture/validate-platform-core-sprint-0.2.sh'
+}
+
+tasks.register('platformCoreGate') {
+    group = 'MAPAF Architecture'
+    description = 'Runs the complete Sprint 0.2 architecture gate'
+    dependsOn 'compileTestJava', 'platformCoreTest', 'validatePlatformCoreArchitecture'
+}

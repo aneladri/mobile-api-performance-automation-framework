@@ -1,0 +1,19 @@
+{
+  "provider": "github",
+  "repository": "mapaf/roomscan",
+  "branch": "feature/scan-upload-hardening",
+  "commitId": "a1b2c3d4",
+  "author": "demo.engineer",
+  "filesChanged": 6,
+  "linesAdded": 184,
+  "linesRemoved": 42,
+  "changedFiles": [
+    "mobile/android/RoomScanUploadService.java",
+    "backend/api/RoomScanController.java",
+    "backend/service/ScanSessionService.java",
+    "performance/upload-worker.js",
+    ".github/workflows/quality-gate.yml",
+    "docs/roomscan-upload.md"
+  ],
+  "generatedAt": "2026-08-03T00:00:00Z"
+}

@@ -1,0 +1,8 @@
+{
+  "contract": "mapaf.performance.baseline-policy/v1",
+  "promotionRequiresRecommendation": "READY",
+  "promotionRequiresZeroThresholdViolations": true,
+  "minimumReadinessScore": 90,
+  "minimumRequests": 1000,
+  "allowSilentReplacement": false
+}

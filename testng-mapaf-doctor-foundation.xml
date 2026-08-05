@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Doctor Foundation">
+  <test name="Doctor Domain and Engine">
+    <classes>
+      <class name="dashboard.enterprise.doctor.tests.DoctorFoundationTest"/>
+      <class name="dashboard.enterprise.doctor.tests.DoctorProbeContractTest"/>
+      <class name="dashboard.enterprise.doctor.tests.EnvironmentHealthProbeTest"/>
+      <class name="dashboard.enterprise.doctor.tests.BrowserHealthProbeTest"/>
+      <class name="dashboard.enterprise.doctor.tests.DashboardHealthProbeTest"/>
+      <class name="dashboard.enterprise.doctor.tests.ClaudeHealthProbeTest"/>
+      <class name="dashboard.enterprise.doctor.tests.DeviceHealthProbeTest"/>
+      <class name="dashboard.enterprise.doctor.tests.ApiHealthProbeTest"/>
+    </classes>
+  </test>
+</suite>

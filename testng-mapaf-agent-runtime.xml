@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Agent Runtime and Tool Ecosystem">
+  <test name="Provider Resolution and MCP Contracts">
+    <classes>
+      <class name="dashboard.enterprise.agent.runtime.tests.AgentRuntimeToolEcosystemTest"/>
+    </classes>
+  </test>
+</suite>

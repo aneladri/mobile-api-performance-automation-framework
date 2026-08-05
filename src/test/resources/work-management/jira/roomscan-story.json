@@ -1,0 +1,19 @@
+{
+  "id": "10001",
+  "key": "RS-101",
+  "title": "Technician completes a RoomScan capture",
+  "description": "Capture room images and submit them for floor-plan processing.",
+  "acceptanceCriteria": [
+    "Technician can start a scan session",
+    "Images can be uploaded",
+    "AI processing status is visible",
+    "Completed scan can be submitted"
+  ],
+  "type": "Story",
+  "status": "Ready for QA",
+  "priority": "High",
+  "labels": ["mobile", "api", "performance"],
+  "assignee": "demo-user",
+  "parentId": "EPIC-10",
+  "sourceUrl": "https://example.atlassian.net/browse/RS-101"
+}

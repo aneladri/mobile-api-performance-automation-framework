@@ -1,0 +1,11 @@
+{
+  "provider": "azure-pipelines",
+  "pipelineId": "roomscan-quality-gate",
+  "runId": "BUILD-5301",
+  "status": "PASSED",
+  "durationSeconds": 1120,
+  "failedStage": "",
+  "stages": ["compile", "api-regression", "mobile-smoke", "performance-smoke"],
+  "artifacts": ["allure-report", "doctor-report", "impact-analysis"],
+  "logHighlights": ["All tests passed", "Release readiness updated to READY"]
+}

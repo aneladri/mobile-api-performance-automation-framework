@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="MAPAF Mobile Demo">
+
+    <listeners>
+        <listener class-name="core.listeners.TestListener"/>
+    </listeners>
+
+    <test name="Enterprise Mobile Demo">
+
+        <classes>
+
+            <class name="mobile.demo.MobileFrameworkDemoTest"/>
+
+        </classes>
+
+    </test>
+
+</suite>

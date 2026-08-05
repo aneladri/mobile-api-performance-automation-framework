@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UPDR Business Transaction Player</title>
+  <link rel="stylesheet" href="/api-monitor.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">M</div><div><h1>UPDR Business Transaction Player</h1><p>Interactive API journey · LIVE with governed REPLAY fallback</p></div></div>
+    <a href="/demo-launcher.html">Demo Launcher</a>
+  </header>
+  <main class="page">
+    <section class="hero-card">
+      <div><p class="eyebrow">Enterprise inspection journey</p><h2>UPDR-1001</h2><p class="muted">Admin setup → Inspector evidence → QC decision → Approval</p></div>
+      <div class="control-stack">
+        <label class="pace-control">Playback
+          <select id="paceSelect">
+            <option value="5000">Slow · 5.0s</option>
+            <option value="3500" selected>Client · 3.5s</option>
+            <option value="2000">Normal · 2.0s</option>
+            <option value="800">Fast · 0.8s</option>
+            <option value="manual">Manual · Next only</option>
+          </select>
+        </label>
+        <div class="controls">
+          <button id="runButton" class="primary">▶ Run Inspection Journey</button>
+          <button id="pauseButton">Pause</button>
+          <button id="nextButton">Next</button>
+          <button id="resetButton">Reset</button>
+        </div>
+      </div>
+    </section>
+    <section class="metrics">
+      <article><span>Transaction</span><strong id="transactionId">READY</strong></article>
+      <article><span>Progress</span><strong id="progressText">0 / 19</strong></article>
+      <article><span>Passed</span><strong id="passedCount">0</strong></article>
+      <article><span>Replayed</span><strong id="replayCount">0</strong></article>
+      <article><span>Business status</span><strong id="businessStatus">READY</strong></article>
+    </section>
+    <div class="progress"><div id="progressBar"></div></div>
+    <section class="layout">
+      <div class="main-column">
+        <article class="card active-card">
+          <div class="card-head"><div><p class="eyebrow" id="stepCounter">Ready</p><h3 id="stepTitle">Press Run to begin</h3></div><div id="modeBadge" class="badge neutral">READY</div></div>
+          <div class="business-panel">
+            <div><span>Business event</span><strong id="businessEvent">Waiting for journey</strong></div>
+            <div><span>Outcome</span><strong id="businessOutcome">READY</strong></div>
+          </div>
+          <div class="request-line"><span id="method">—</span><code id="endpoint">—</code><strong id="latency">—</strong></div>
+          <div class="payload-grid">
+            <div><h4>Request</h4><pre id="requestPayload">Waiting for transaction.</pre></div>
+            <div><h4>Response</h4><pre id="responsePayload">Waiting for transaction.</pre></div>
+          </div>
+          <div class="validation" id="validation">The player calls real APIs first and uses transparent replay only when a capability is unavailable.</div>
+          <div class="evidence-actions">
+            <button id="copyRequestButton">Copy Request</button>
+            <button id="copyResponseButton">Copy Response</button>
+            <button id="downloadEvidenceButton">Download Evidence JSON</button>
+          </div>
+        </article>
+        <article class="card recommendation"><p class="eyebrow">MAPAF explains</p><h3 id="recommendationTitle">Journey ready</h3><p id="recommendationText">Start the journey to visualize each API request, response, validation and business status.</p></article>
+      </div>
+      <aside class="card timeline-card"><div class="card-head"><div><p class="eyebrow">Interactive timeline</p><h3>Business events</h3><p class="muted">Select any completed step to inspect its evidence.</p></div></div><div id="timeline" class="timeline"><p class="muted">No events yet.</p></div></aside>
+    </section>
+    <section id="finalSummary" class="final hidden">
+      <p class="eyebrow">Journey completed</p><h2>Inspection approved</h2>
+      <div class="summary-grid"><div><span>APIs</span><strong id="summaryApis">19</strong></div><div><span>Passed</span><strong id="summaryPassed">19</strong></div><div><span>Average latency</span><strong id="summaryLatency">—</strong></div><div><span>Recommendation</span><strong>READY</strong></div></div>
+      <div class="next-actions"><a href="/inspector.html">Open Inspector Mobile</a><a href="/qc.html">Open QC Portal</a><a href="/metrics">Open API Metrics</a></div>
+    </section>
+  </main>
+
+  <div id="evidenceModal" class="evidence-modal hidden" role="dialog" aria-modal="true" aria-labelledby="evidenceModalTitle">
+    <div class="evidence-backdrop" data-close-evidence></div>
+    <section class="evidence-dialog">
+      <header class="evidence-dialog-head">
+        <div>
+          <p class="eyebrow">Transaction evidence</p>
+          <h2 id="evidenceModalTitle">Inspection evidence</h2>
+          <p id="evidenceModalSubtitle" class="muted">Select a completed business event.</p>
+        </div>
+        <button id="closeEvidenceButton" type="button" class="icon-button" aria-label="Close evidence">×</button>
+      </header>
+      <div class="evidence-kpis">
+        <div><span>Mode</span><strong id="evidenceMode">—</strong></div>
+        <div><span>Status</span><strong id="evidenceStatus">—</strong></div>
+        <div><span>Latency</span><strong id="evidenceLatency">—</strong></div>
+        <div><span>Business state</span><strong id="evidenceBusinessStatus">—</strong></div>
+      </div>
+      <div class="evidence-endpoint"><span id="evidenceMethod">—</span><code id="evidenceEndpoint">—</code></div>
+      <div class="payload-grid evidence-payload-grid">
+        <div><div class="evidence-section-head"><h4>Request</h4><button id="copyEvidenceRequest" type="button">Copy</button></div><pre id="evidenceRequest">{}</pre></div>
+        <div><div class="evidence-section-head"><h4>Response</h4><button id="copyEvidenceResponse" type="button">Copy</button></div><pre id="evidenceResponse">{}</pre></div>
+      </div>
+      <div class="evidence-details-grid">
+        <div><h4>Assertions</h4><p id="evidenceValidation">—</p></div>
+        <div><h4>MAPAF explanation</h4><p id="evidenceExplanation">—</p></div>
+      </div>
+      <footer class="evidence-actions">
+        <button id="downloadEvidenceButton" type="button" class="primary">Download evidence JSON</button>
+        <button id="closeEvidenceFooterButton" type="button">Close</button>
+      </footer>
+    </section>
+  </div>
+  <script src="/api-monitor.js"></script>
+</body>
+</html>

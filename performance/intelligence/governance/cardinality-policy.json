@@ -1,0 +1,7 @@
+{
+  "contract": "mapaf.performance.cardinality-policy/v1",
+  "maximumEstimatedSeries": 50000,
+  "approvedTagKeys": ["profile", "transaction", "module", "environment", "status_class", "scenario", "group", "name", "method", "status"],
+  "prohibitedTagKeys": ["correlation_id", "request_id", "execution_id", "inspection_id", "order_id", "user_id", "email", "timestamp", "full_url", "uuid"],
+  "approvedTransactions": ["order-intake", "autosave", "ai-photo-analysis", "inspection-submit"]
+}

@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Enterprise API Demo">
+    <listeners>
+        <listener class-name="core.listeners.TestListener"/>
+    </listeners>
+    <test name="Enterprise API Automation">
+        <classes>
+            <class name="api.enterprise.ApiEnterpriseDemoTest"/>
+        </classes>
+    </test>
+</suite>

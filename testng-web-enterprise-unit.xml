@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Web Enterprise Unit Tests" parallel="none">
+    <test name="Web Enterprise Contracts">
+        <classes>
+            <class name="web.enterprise.tests.WebMetricsCollectorTest"/>
+            <class name="web.enterprise.tests.RoomScanPortalFlowContractTest"/>
+        </classes>
+    </test>
+</suite>

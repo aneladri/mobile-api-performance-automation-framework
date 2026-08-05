@@ -1,0 +1,8 @@
+'use strict';
+const fs=require('fs'),os=require('os'),path=require('path'),cp=require('child_process'),assert=require('assert');
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'mapaf-ucc-')); fs.mkdirSync(path.join(root,'reports/updr-integrated'),{recursive:true}); fs.mkdirSync(path.join(root,'web/reports'),{recursive:true}); fs.mkdirSync(path.join(root,'performance/updr/reports/intelligence'),{recursive:true});
+fs.writeFileSync(path.join(root,'reports/updr-integrated/summary.json'),JSON.stringify({quality:{api:{status:'PASSED',tests:5,failures:0},web:{status:'PASSED',tests:1,failures:0},mobile:{status:'NOT RUN',tests:0,failures:0}},release:{status:'READY',risk:'LOW',recommendation:'READY'}}));
+fs.writeFileSync(path.join(root,'web/reports/enterprise-summary.json'),JSON.stringify({result:'PASSED',successRate:100,totalSteps:4,passedSteps:4}));
+fs.writeFileSync(path.join(root,'performance/updr/reports/intelligence/performance-intelligence.json'),JSON.stringify({overall:{recommendation:'READY',risk:'LOW',readinessScore:99,confidence:'HIGH',totalRequests:10000,thresholdViolations:0},skills:['latency-analysis']}));
+cp.execFileSync('node',[path.resolve(__dirname,'../command-center/generate-command-center.js'),root],{stdio:'inherit'});
+const model=JSON.parse(fs.readFileSync(path.join(root,'reports/command-center/command-center.json'))); assert.equal(model.contract,'mapaf.command-center/v1'); assert.equal(model.release.recommendation,'READY'); assert.equal(model.modules.length,6); assert.ok(fs.existsSync(path.join(root,'reports/command-center/index.html'))); console.log('MAPAF Unified Command Center unit tests passed.');

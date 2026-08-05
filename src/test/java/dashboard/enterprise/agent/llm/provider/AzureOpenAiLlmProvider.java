@@ -1,0 +1,3 @@
+package dashboard.enterprise.agent.llm.provider;
+import dashboard.enterprise.agent.connector.credential.CredentialResolver;import dashboard.enterprise.agent.llm.model.LlmProviderType;import java.util.Set;
+public final class AzureOpenAiLlmProvider extends AbstractLiveLlmProvider {public AzureOpenAiLlmProvider(CredentialResolver credentials){super("AzureOpenAi".replaceAll("([a-z])([A-Z])","$1-$2").toLowerCase()+"-live",LlmProviderType.AZURE_OPENAI,80,"AZURE_OPENAI_API_KEY",credentials,"azure-openai-deployment",Set.of("reasoning.generate","test-design.generate","summary.generate","release-recommendation.generate"));}}

@@ -1,0 +1,330 @@
+package dashboard.enterprise.doctor.probe.performance;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import core.json.JsonMapper;
+import dashboard.enterprise.doctor.probe.DoctorContext;
+import dashboard.enterprise.doctor.probe.environment.CommandExecutor;
+import dashboard.enterprise.doctor.probe.environment.CommandResult;
+import dashboard.enterprise.doctor.probe.environment.ProcessCommandExecutor;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public final class FileSystemPerformanceInspector
+        implements PerformanceInspector {
+
+    private static final ObjectMapper MAPPER =
+            JsonMapper.getInstance();
+
+    private static final Duration COMMAND_TIMEOUT =
+            Duration.ofSeconds(10);
+
+    private final CommandExecutor commandExecutor;
+
+    public FileSystemPerformanceInspector() {
+        this(new ProcessCommandExecutor());
+    }
+
+    public FileSystemPerformanceInspector(
+            CommandExecutor commandExecutor
+    ) {
+        if (commandExecutor == null) {
+            throw new IllegalArgumentException(
+                    "Command executor is required."
+            );
+        }
+
+        this.commandExecutor = commandExecutor;
+    }
+
+    @Override
+    public PerformanceInspectionResult inspect(
+            DoctorContext context
+    ) {
+        long started = System.nanoTime();
+
+        CommandResult k6 = commandExecutor.execute(
+                List.of("k6", "version"),
+                COMMAND_TIMEOUT
+        );
+
+        CommandResult jmeter = commandExecutor.execute(
+                List.of("jmeter", "--version"),
+                COMMAND_TIMEOUT
+        );
+
+        Path summary = context.repositoryRoot()
+                .resolve("performance/reports/enterprise-summary.json");
+
+        Path dashboard = context.repositoryRoot()
+                .resolve("dashboard/reports/performance.html");
+
+        Path failureShowcase = context.repositoryRoot()
+                .resolve("performance/reports/failure-showcase.json");
+
+        Path productionSummary = context.repositoryRoot()
+                .resolve("performance/reports/production-summary.json");
+
+        boolean summaryAvailable = Files.isRegularFile(summary);
+        boolean dashboardAvailable = Files.isRegularFile(dashboard);
+        boolean failureAvailable = Files.isRegularFile(failureShowcase);
+        boolean productionAvailable =
+                Files.isRegularFile(productionSummary);
+
+        long totalRequests = 0;
+        double errorRate = 0;
+        double p95Latency = 0;
+        boolean workloadPassed = false;
+        boolean productionProfile = false;
+
+        Map<String, Object> extractedMetrics =
+                new LinkedHashMap<>();
+
+        if (summaryAvailable) {
+            try {
+                JsonNode root = MAPPER.readTree(summary.toFile());
+
+                totalRequests = firstLong(
+                        root,
+                        "totalRequests",
+                        "requests",
+                        "requestCount",
+                        "transactions"
+                );
+
+                errorRate = firstDouble(
+                        root,
+                        "errorRatePercent",
+                        "errorRate",
+                        "failureRatePercent"
+                );
+
+                p95Latency = firstDouble(
+                        root,
+                        "p95LatencyMillis",
+                        "p95Ms",
+                        "p95",
+                        "responseTimeP95",
+                        "p95ResponseTime"
+                );
+
+                String status = firstText(
+                        root,
+                        "overallResult",
+                        "qualityGate",
+                        "overallStatus",
+                        "status",
+                        "result"
+                );
+
+                workloadPassed =
+                        "PASS".equalsIgnoreCase(status)
+                                || "PASSED".equalsIgnoreCase(status)
+                                || "SUCCESS".equalsIgnoreCase(status);
+
+                String profile = firstText(
+                        root,
+                        "profile"
+                );
+
+                productionProfile =
+                        "PRODUCTION".equalsIgnoreCase(profile);
+
+                extractedMetrics.put(
+                        "summaryStatus",
+                        status
+                );
+
+                extractedMetrics.put(
+                        "profile",
+                        profile
+                );
+
+            } catch (Exception exception) {
+                extractedMetrics.put(
+                        "summaryParseError",
+                        exception.getMessage() == null
+                                ? exception.getClass().getSimpleName()
+                                : exception.getMessage()
+                );
+            }
+        }
+
+        double maxErrorRate = Double.parseDouble(
+                System.getProperty(
+                        "mapaf.performance.health.max.error.rate.percent",
+                        "1.0"
+                )
+        );
+
+        double maxP95 = Double.parseDouble(
+                System.getProperty(
+                        "mapaf.performance.health.max.p95.ms",
+                        "1000"
+                )
+        );
+
+        List<String> evidence = new ArrayList<>();
+
+        if (summaryAvailable) {
+            evidence.add(
+                    "performance/reports/enterprise-summary.json"
+            );
+        }
+
+        if (dashboardAvailable) {
+            evidence.add(
+                    "dashboard/reports/performance.html"
+            );
+        }
+
+        if (failureAvailable) {
+            evidence.add(
+                    "performance/reports/failure-showcase.json"
+            );
+        }
+
+        if (productionAvailable) {
+            evidence.add(
+                    "performance/reports/production-summary.json"
+            );
+        }
+
+        String diagnosis;
+
+        if (!summaryAvailable) {
+            diagnosis =
+                    "Performance enterprise summary is unavailable.";
+        } else if (!workloadPassed) {
+            diagnosis =
+                    "Published performance workload did not report a "
+                            + "passing outcome.";
+        } else if (errorRate > maxErrorRate) {
+            diagnosis =
+                    "Performance error rate exceeds the configured threshold.";
+        } else if (p95Latency > maxP95) {
+            diagnosis =
+                    "Performance P95 latency exceeds the configured threshold.";
+        } else if (!k6.successful() && !jmeter.successful()) {
+            diagnosis =
+                    "Performance evidence exists, but neither k6 nor "
+                            + "JMeter is currently available.";
+        } else {
+            diagnosis =
+                    "Performance tooling, evidence, and thresholds "
+                            + "are operational.";
+        }
+
+        Map<String, Object> metadata =
+                new LinkedHashMap<>(extractedMetrics);
+
+        metadata.put(
+                "k6Version",
+                firstLine(k6.combinedOutput())
+        );
+
+        metadata.put(
+                "jmeterVersion",
+                firstLine(jmeter.combinedOutput())
+        );
+
+        metadata.put(
+                "maxAllowedErrorRatePercent",
+                maxErrorRate
+        );
+
+        metadata.put(
+                "maxAllowedP95LatencyMillis",
+                maxP95
+        );
+
+        return new PerformanceInspectionResult(
+                k6.successful(),
+                jmeter.successful(),
+                summaryAvailable,
+                dashboardAvailable,
+                failureAvailable,
+                productionAvailable || productionProfile,
+                totalRequests,
+                errorRate,
+                p95Latency,
+                maxErrorRate,
+                maxP95,
+                workloadPassed,
+                diagnosis,
+                elapsedMillis(started),
+                evidence,
+                metadata
+        );
+    }
+
+    private long firstLong(
+            JsonNode root,
+            String... fields
+    ) {
+        for (String field : fields) {
+            JsonNode node = root.get(field);
+
+            if (node != null && node.isNumber()) {
+                return node.asLong();
+            }
+        }
+
+        return 0;
+    }
+
+    private double firstDouble(
+            JsonNode root,
+            String... fields
+    ) {
+        for (String field : fields) {
+            JsonNode node = root.get(field);
+
+            if (node != null && node.isNumber()) {
+                return node.asDouble();
+            }
+        }
+
+        return 0;
+    }
+
+    private String firstText(
+            JsonNode root,
+            String... fields
+    ) {
+        for (String field : fields) {
+            JsonNode node = root.get(field);
+
+            if (node != null && !node.isNull()) {
+                return node.asText("");
+            }
+        }
+
+        return "";
+    }
+
+    private String firstLine(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+
+        String[] lines = value.split("\\R");
+
+        return lines.length == 0
+                ? value.trim()
+                : lines[0].trim();
+    }
+
+    private long elapsedMillis(long started) {
+        return Math.max(
+                0,
+                (System.nanoTime() - started) / 1_000_000
+        );
+    }
+}

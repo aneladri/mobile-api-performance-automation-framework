@@ -1,0 +1,30 @@
+{
+  "title" : "MAPAF RoomScan Production Workload",
+  "uid" : "mapaf-roomscan-production",
+  "schemaVersion" : 39,
+  "panels" : [ {
+    "id" : 1,
+    "title" : "Request Volume",
+    "type" : "timeseries"
+  }, {
+    "id" : 2,
+    "title" : "Throughput",
+    "type" : "timeseries"
+  }, {
+    "id" : 3,
+    "title" : "P95 Latency",
+    "type" : "stat"
+  }, {
+    "id" : 4,
+    "title" : "Error Rate",
+    "type" : "stat"
+  }, {
+    "id" : 5,
+    "title" : "Availability",
+    "type" : "stat"
+  }, {
+    "id" : 6,
+    "title" : "Bandwidth",
+    "type" : "stat"
+  } ]
+}

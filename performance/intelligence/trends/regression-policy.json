@@ -1,0 +1,7 @@
+{
+  "contract": "mapaf.performance.regression-policy/v1",
+  "latencyIncreasePercent": {"stable": 10, "warning": 20, "regression": 35},
+  "throughputDecreasePercent": {"stable": 10, "warning": 20, "regression": 35},
+  "errorRateIncreaseAbsolute": {"warning": 0.0025, "regression": 0.01, "critical": 0.05},
+  "minimumComparableRequests": 100
+}

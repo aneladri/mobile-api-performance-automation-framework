@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Doctor Diagnosis Center">
+  <test name="Diagnosis and Corrective Actions">
+    <classes>
+      <class name="dashboard.enterprise.doctor.diagnosis.tests.DoctorDiagnosisEngineTest"/>
+      <class name="dashboard.enterprise.doctor.diagnosis.tests.DoctorDiagnosisPublisherTest"/>
+    </classes>
+  </test>
+</suite>

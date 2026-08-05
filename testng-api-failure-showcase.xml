@@ -1,0 +1,1 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd"><suite name="API Failure Showcase" parallel="none"><test name="API Failure"><classes><class name="failure.showcase.ApiEnterpriseFailureDemoTest"/></classes></test></suite>

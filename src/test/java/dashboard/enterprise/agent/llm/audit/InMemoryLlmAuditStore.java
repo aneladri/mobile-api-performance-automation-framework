@@ -1,0 +1,1 @@
+package dashboard.enterprise.agent.llm.audit;import dashboard.enterprise.agent.llm.model.LlmAuditEvent;import java.util.*;public final class InMemoryLlmAuditStore implements LlmAuditStore{private final List<LlmAuditEvent> events=new ArrayList<>();public void append(LlmAuditEvent e){events.add(e);}public List<LlmAuditEvent> events(){return List.copyOf(events);}}

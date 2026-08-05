@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="MAPAF Parallel Web Suite"
+       parallel="methods"
+       thread-count="4">
+
+    <test name="Parallel Web Execution">
+        <classes>
+            <class name="web.tests.parallel.ParallelExecutionTest"/>
+        </classes>
+    </test>
+
+</suite>

@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Multi-Agent Orchestration">
+  <test name="Governed Multi-Agent Workflows">
+    <classes>
+      <class name="dashboard.enterprise.agent.orchestration.tests.MultiAgentOrchestrationTest"/>
+    </classes>
+  </test>
+</suite>

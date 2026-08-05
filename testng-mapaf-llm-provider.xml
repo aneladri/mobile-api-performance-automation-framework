@@ -1,0 +1,2 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF LLM Provider Platform"><test name="Provider Resolution, Replay, Governance and Prompt Loading"><classes><class name="dashboard.enterprise.agent.llm.tests.LlmProviderPlatformTest"/></classes></test></suite>

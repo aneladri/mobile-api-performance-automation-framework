@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="MAPAF Web Suite"
+       parallel="methods"
+       thread-count="4">
+
+    <test name="Web Engine">
+
+        <classes>
+            <class name="web.tests.WebConfigurationTest"/>
+            <class name="web.tests.PlaywrightManagerTest"/>
+            <class name="web.tests.BaseWebTestLifecycleTest"/>
+            <class name="web.tests.BaseWebTestIsolationTest"/>
+            <class name="web.tests.BasePageTest"/>
+            <class name="web.tests.WebLocatorTest"/>
+            <class name="web.tests.LocatorRepositoryTest"/>
+            <class name="web.tests.ExecutionArtifactManagerTest"/>
+            <class name="web.tests.WebSummaryGeneratorTest"/>
+        </classes>
+
+    </test>
+
+</suite>

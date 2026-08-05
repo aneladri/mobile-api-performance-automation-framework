@@ -1,0 +1,1 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd"><suite name="MAPAF UPDR Mobile Demo"><test name="Inspector Mobile Journey"><classes><class name="web.updr.demo.UpdrMobileDemoTest"/></classes></test></suite>

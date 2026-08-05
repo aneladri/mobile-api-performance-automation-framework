@@ -1,0 +1,8 @@
+package dashboard.enterprise.agent.connector.provider;
+import dashboard.enterprise.agent.connector.model.*; import dashboard.enterprise.agent.model.AgentContext;
+public final class HybridEnterpriseConnectorProvider implements EnterpriseConnectorProvider { private final EnterpriseConnectorProvider live; private final EnterpriseConnectorProvider replay;
+ public HybridEnterpriseConnectorProvider(EnterpriseConnectorProvider live,EnterpriseConnectorProvider replay){this.live=live;this.replay=replay;}
+ public ConnectorDefinition definition(){return new ConnectorDefinition("mapaf.connector.definition/v1",live.definition().connectorId()+"-hybrid",live.definition().name()+" Hybrid",live.definition().provider(),ConnectorMode.HYBRID,live.definition().capabilityIds(),live.definition().secrets());}
+ public ConnectorConnection connection(){return new ConnectorConnection("mapaf.connector.connection/v1",definition().connectorId()+"-connection",live.connection().endpoint(),ConnectorMode.HYBRID,live.connection().attributes());}
+ public int priority(){return Math.max(live.priority(),replay.priority())+1;} public ConnectorHealth health(){ConnectorHealth h=live.health();return h.status()==ConnectorStatus.HEALTHY?h:new ConnectorHealth("mapaf.connector.health/v1",definition().connectorId(),ConnectorStatus.DEGRADED,"Live unavailable; replay fallback ready.",h.diagnostics());}
+ public ConnectorResponse invoke(AgentContext context,ConnectorRequest request)throws Exception{if(live.health().status()==ConnectorStatus.HEALTHY){try{return live.invoke(context,request);}catch(Exception ignored){}}return replay.invoke(context,request);}}

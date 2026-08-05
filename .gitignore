@@ -1,0 +1,107 @@
+
+!performance/jmeter/reports/.gitkeep
+!performance/k6/reports/.gitkeep
+!performance/reports/mock-api/.gitkeep
+.DS_Store
+.gradle/
+.healing-store/
+.idea/
+.mapaf-backups/
+.mapaf-command-center.pid
+.mapaf-patches/
+.mapaf-studio/
+.mapaf-updr/
+.vscode/
+*.iml
+*.log
+*.zip
+# AI generated reports
+# AI-generated source and locator artifacts
+# Browser-specific Web summaries
+# Frontend dependencies and outputs
+# Generated performance reports
+# Generated source packs and diagnostic snapshots
+# IDE and OS
+# Local and generated MAPAF/ZENIQ state
+# MAPAF Studio runtime state
+# Performance demo generated output
+# Performance execution artifacts
+# Temporary repair copies
+allure-report/
+allure-results/
+api/reports/summary.json
+build.gradle.before-*
+build/
+build/allure-report/
+build/allure-results/
+coverage/
+dashboard/reports/
+dist/
+generated/
+local.properties
+logs/
+mapaf-*-baseline.txt
+node_modules/
+performance/jmeter/reports/*
+performance/jmeter/results/*.jtl
+performance/k6/reports/*
+performance/reports/index.html
+performance/reports/mock-api/*
+performance/reports/summary.json
+performance/results/
+performance/results/k6/*.json
+performance/updr/reports/
+published/
+reports/
+reports/ai/generated/*.md
+web/artifacts/
+web/reports/chromium-summary.json
+web/reports/cross-browser-summary.json
+web/reports/firefox-summary.json
+web/reports/summary.json
+web/reports/webkit-summary.json
+
+# Generated dashboards and API evidence
+dashboard/reports/
+api/reports/
+
+# Local diagnostic and legacy repair artifacts
+mapaf-k6-platform-baseline.txt
+mapaf-command-center-sprint2-baseline.txt
+mapaf-unified-dashboard-baseline.txt
+mapaf-v5-ui-platform-baseline.txt
+mapaf-demo.before-*
+touch
+
+# Runtime and local tool state
+.claude/
+.healing-store/
+.mapaf-studio/
+
+# Java
+bin/
+out/
+target/
+
+# Android
+*.apk
+*.apks
+*.aab
+*.idsig
+
+# Java bytecode
+*.class
+
+# IntelliJ
+*.iml
+
+# Maven
+.mvn/
+
+# Gradle outputs
+build/
+mapaf-studio/
+
+# Runtime history
+dashboard/history/
+performance/intelligence/history/

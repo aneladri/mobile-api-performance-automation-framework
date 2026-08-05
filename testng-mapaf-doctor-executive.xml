@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Doctor Executive Dashboard">
+  <test name="Doctor Executive Experience">
+    <classes>
+      <class name="dashboard.enterprise.doctor.executive.tests.DoctorExecutiveDashboardTest"/>
+      <class name="dashboard.enterprise.doctor.executive.tests.DoctorExecutivePublisherTest"/>
+    </classes>
+  </test>
+</suite>

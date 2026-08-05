@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd">
+<suite name="MAPAF Architecture Governance">
+    <test name="Architecture Foundation">
+        <classes>
+            <class name="architecture.governance.ArchitectureFoundationTest"/>
+        </classes>
+    </test>
+</suite>

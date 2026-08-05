@@ -1,0 +1,12 @@
+[
+  {
+    "schemaVersion": "mapaf.knowledge.document/v1",
+    "documentId": "roomscan-upload-architecture",
+    "source": "LOCAL_REPOSITORY",
+    "title": "RoomScan Image Upload Architecture",
+    "content": "The mobile client uploads room images through the backend API using multipart requests. Upload workers persist files to object storage. The flow must support retry, timeout handling, interrupted-network recovery, duplicate submission protection, and performance monitoring for large images.",
+    "sourceUri": "docs/architecture/roomscan-upload.md",
+    "tags": ["roomscan", "upload", "mobile", "api", "performance", "object-storage"],
+    "metadata": {"owner": "Architecture", "classification": "internal"}
+  }
+]

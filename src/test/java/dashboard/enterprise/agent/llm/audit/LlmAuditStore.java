@@ -1,0 +1,1 @@
+package dashboard.enterprise.agent.llm.audit;import dashboard.enterprise.agent.llm.model.LlmAuditEvent;import java.util.List;public interface LlmAuditStore{void append(LlmAuditEvent event);List<LlmAuditEvent> events();}

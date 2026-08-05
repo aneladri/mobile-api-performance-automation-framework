@@ -1,0 +1,10 @@
+{
+  "contract": "mapaf.performance.profile/v1",
+  "name": "ten-thousand",
+  "description": "Exact-volume 10,000 request profile.",
+  "baseUrl": "http://localhost:8090",
+  "vus": 100,
+  "iterations": 10000,
+  "maxDuration": "10m",
+  "thresholdProfile": "updr-default"
+}

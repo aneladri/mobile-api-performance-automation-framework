@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd">
+<suite name="MAPAF Platform Core" verbose="1">
+    <test name="Platform Core Architecture and Runtime">
+        <classes>
+            <class name="architecture.governance.PlatformCoreArchitectureTest"/>
+            <class name="architecture.governance.PlatformCoreRuntimeTest"/>
+        </classes>
+    </test>
+</suite>

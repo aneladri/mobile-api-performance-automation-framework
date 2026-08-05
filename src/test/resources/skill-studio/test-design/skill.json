@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "mapaf.skill.manifest/v1",
+  "skillId": "test-design",
+  "name": "Test Design",
+  "description": "Creates evidence-backed functional, API, mobile, performance, accessibility, and negative scenarios.",
+  "version": "1.0.0",
+  "requiredCapabilities": ["work-item.read", "knowledge.search", "repository.change.read"],
+  "entrypoints": ["prompts/system.md"],
+  "metadata": {"owner": "MAPAF", "domain": "quality-engineering"}
+}

@@ -1,0 +1,58 @@
+name: k6 and JMeter Performance Demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Demo profile
+        required: true
+        default: smoke
+        type: choice
+        options:
+          - smoke
+          - load
+
+jobs:
+  performance-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/k6.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/k6.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      - name: Install JMeter
+        run: |
+          curl --fail --location --output /tmp/apache-jmeter.tgz \
+            https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xzf /tmp/apache-jmeter.tgz -C /opt
+          echo "/opt/apache-jmeter-5.6.3/bin" >> "$GITHUB_PATH"
+
+      - name: Run both performance demos
+        run: bash performance/scripts/run-performance-demo.sh "${{ inputs.profile }}"
+
+      - name: Upload performance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-demo-${{ inputs.profile }}
+          path: |
+            performance/results/k6
+            performance/jmeter/results
+            performance/jmeter/reports
+            performance/reports/mock-api

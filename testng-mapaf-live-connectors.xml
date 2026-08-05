@@ -1,0 +1,6 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Live Enterprise Connector Framework">
+  <test name="Connector Modes, Health, Governance and Audit">
+    <classes><class name="dashboard.enterprise.agent.connector.tests.LiveEnterpriseConnectorFrameworkTest"/></classes>
+  </test>
+</suite>

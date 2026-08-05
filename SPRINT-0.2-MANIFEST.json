@@ -1,0 +1,9 @@
+{
+  "program": "MAPAF Enterprise Architecture",
+  "sprint": "0.2",
+  "releaseName": "Platform Core",
+  "status": "candidate",
+  "compatibility": "additive",
+  "adrs": ["ADR-012", "ADR-013", "ADR-014", "ADR-015", "ADR-016"],
+  "gates": ["compileTestJava", "platformCoreTest", "validatePlatformCoreArchitecture", "platformCoreGate"]
+}

@@ -1,0 +1,15 @@
+package enterprise.story;
+
+public enum WorkflowStage {
+    AUTHENTICATE,
+    CREATE_SCAN_SESSION,
+    CAPTURE_IMAGES,
+    UPLOAD_IMAGES,
+    SUBMIT_AI_PROCESSING,
+    POLL_AI_STATUS,
+    RETRIEVE_FLOOR_PLAN,
+    REVIEW_RESULTS,
+    SUBMIT_SCAN,
+    UPDATE_DASHBOARD,
+    RELEASE_DECISION
+}

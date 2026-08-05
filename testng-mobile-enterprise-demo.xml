@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="MAPAF Enterprise Mobile Demo" parallel="none">
+    <test name="RoomScan Mobile Enterprise Automation">
+        <classes>
+            <class name="mobile.enterprise.demo.MobileEnterpriseDemoTest"/>
+        </classes>
+    </test>
+</suite>

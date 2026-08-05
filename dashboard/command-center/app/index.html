@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MAPAF Command Center</title>
+  <link rel="stylesheet" href="/dashboard/command-center/app/assets/app.css">
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><b>M</b><span>MAPAF<br><small>Command Center</small></span></div>
+    <nav id="main-nav">
+      <a href="#home" data-view="home">Overview</a>
+      <a href="#modules" data-view="modules">Modules</a>
+      <a href="#journey" data-view="journey">Journey</a>
+      <a href="#evidence" data-view="evidence">Evidence</a>
+      <a href="#release" data-view="release">Release</a>
+    </nav>
+    <div id="server-state" class="server-state">Connecting…</div>
+  </aside>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">Enterprise quality application</p>
+        <h1 id="page-title">Unified Command Center</h1>
+      </div>
+      <div class="header-actions">
+        <button id="back-home" class="secondary hidden">Back to overview</button>
+        <button id="refresh">Refresh discovery</button>
+      </div>
+    </header>
+
+    <div id="overview-view">
+      <section id="home" class="hero">
+        <div>
+          <p class="eyebrow">Executive decision</p>
+          <h2 id="decision">ASSESSING</h2>
+          <p id="summary">Discovering available MAPAF modules and live services.</p>
+          <div class="kpis">
+            <div><small>Risk</small><strong id="risk">—</strong></div>
+            <div><small>Confidence</small><strong id="confidence">—</strong></div>
+            <div><small>Healthy modules</small><strong id="healthy">—</strong></div>
+          </div>
+        </div>
+        <div class="score"><span id="score">—</span><small>Release score</small></div>
+      </section>
+
+      <section id="execution-context" class="context-strip"></section>
+
+      <section id="modules">
+        <div class="section-title"><div><p class="eyebrow">Dynamic discovery</p><h2>Platform modules</h2></div><p>Internal reports stay inside the Command Center. Live tools open safely when embedding is restricted.</p></div>
+        <div id="module-grid" class="grid"></div>
+      </section>
+
+      <section id="journey">
+        <div class="section-title"><div><p class="eyebrow">UPDR lifecycle</p><h2>Business journey</h2></div></div>
+        <div class="journey" id="journey-steps"></div>
+      </section>
+
+      <section id="evidence">
+        <div class="section-title"><div><p class="eyebrow">Evidence hub</p><h2>Available artifacts</h2></div></div>
+        <div id="evidence-grid" class="evidence-grid"></div>
+      </section>
+    </div>
+
+    <section id="module-view" class="module-view hidden">
+      <div class="module-toolbar">
+        <div><p class="eyebrow" id="module-kind">Module</p><h2 id="module-title">Module</h2><p id="module-meta"></p></div>
+        <div class="toolbar-actions"><a id="open-new-tab" class="action secondary" target="_blank" rel="noopener">Open in new tab</a></div>
+      </div>
+      <div id="module-notice" class="module-notice hidden"></div>
+      <iframe id="module-frame" title="MAPAF module view" loading="lazy"></iframe>
+    </section>
+
+    <footer id="footer"></footer>
+  </main>
+</div>
+<script src="/dashboard/command-center/app/assets/app.js"></script>
+</body>
+</html>

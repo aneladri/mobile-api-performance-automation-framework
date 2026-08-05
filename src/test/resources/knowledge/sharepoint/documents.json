@@ -1,0 +1,12 @@
+[
+  {
+    "schemaVersion": "mapaf.knowledge.document/v1",
+    "documentId": "roomscan-performance-strategy",
+    "source": "REPLAY_SHAREPOINT",
+    "title": "RoomScan Performance Strategy",
+    "content": "Monitor upload worker saturation, object storage latency, queue depth, p95 response time, throughput, and failed upload percentage. Large-image tests must include concurrency and network degradation.",
+    "sourceUri": "sharepoint://qe/roomscan-performance-strategy",
+    "tags": ["roomscan", "performance", "upload", "workers"],
+    "metadata": {"library": "QE Architecture"}
+  }
+]

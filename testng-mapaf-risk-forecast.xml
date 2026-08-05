@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Risk Forecast Engine">
+  <test name="Predictive Intelligence">
+    <classes>
+      <class name="dashboard.enterprise.intelligence.forecast.tests.DoctorForecastEngineTest"/>
+      <class name="dashboard.enterprise.intelligence.forecast.tests.DoctorForecastPublisherTest"/>
+    </classes>
+  </test>
+</suite>

@@ -1,0 +1,173 @@
+{
+  "contract": "mapaf.performance.approved-baseline/v1",
+  "status": "ACTIVE",
+  "approvedAt": "2026-08-05T18:30:29.122Z",
+  "approvedBy": "Your Name",
+  "sourceExecutionId": "MAPAF-PI-20260805182854-260cbe",
+  "overall": {
+    "risk": "LOW",
+    "recommendation": "READY",
+    "readinessScore": 100,
+    "confidence": "MEDIUM",
+    "totalRequests": 22700,
+    "thresholdViolations": 0
+  },
+  "profiles": [
+    {
+      "profile": "smoke",
+      "requests": 15,
+      "throughputPerSecond": 14.718609621260738,
+      "errorRate": 0,
+      "errorRatePercent": 0,
+      "latency": {
+        "averageMs": 0.40719999999999995,
+        "p90Ms": 0.6724,
+        "p95Ms": 0.7547999999999999,
+        "p99Ms": 0.7547999999999999,
+        "maximumMs": 0.864
+      },
+      "transactions": [
+        {
+          "name": "order",
+          "p95": 0.8328,
+          "avg": 0.5561999999999999,
+          "max": 0.864
+        },
+        {
+          "name": "ai",
+          "p95": 0.6003999999999999,
+          "avg": 0.4262,
+          "max": 0.619
+        },
+        {
+          "name": "autosave",
+          "p95": 0.2848,
+          "avg": 0.2392,
+          "max": 0.286
+        }
+      ],
+      "slowestTransaction": {
+        "name": "order",
+        "p95": 0.8328,
+        "avg": 0.5561999999999999,
+        "max": 0.864
+      },
+      "thresholdFailures": [],
+      "risk": "LOW",
+      "recommendation": "READY",
+      "readinessScore": 100,
+      "confidence": "LOW"
+    },
+    {
+      "profile": "load",
+      "requests": 11180,
+      "throughputPerSecond": 159.21945439566034,
+      "errorRate": 0,
+      "errorRatePercent": 0,
+      "latency": {
+        "averageMs": 1.07857128801431,
+        "p90Ms": 2.268,
+        "p95Ms": 2.762,
+        "p99Ms": 2.762,
+        "maximumMs": 14.575
+      },
+      "transactions": [
+        {
+          "name": "autosave",
+          "p95": 2.9671499999999993,
+          "avg": 1.231212500000001,
+          "max": 9.144
+        },
+        {
+          "name": "order",
+          "p95": 2.05915,
+          "avg": 0.9201545226130657,
+          "max": 8.698
+        },
+        {
+          "name": "ai",
+          "p95": 1.622,
+          "avg": 0.8407808333333322,
+          "max": 14.575
+        }
+      ],
+      "slowestTransaction": {
+        "name": "autosave",
+        "p95": 2.9671499999999993,
+        "avg": 1.231212500000001,
+        "max": 9.144
+      },
+      "thresholdFailures": [],
+      "risk": "LOW",
+      "recommendation": "READY",
+      "readinessScore": 100,
+      "confidence": "HIGH"
+    },
+    {
+      "profile": "spike",
+      "requests": 1505,
+      "throughputPerSecond": 37.62359758040019,
+      "errorRate": 0,
+      "errorRatePercent": 0,
+      "latency": {
+        "averageMs": 0.37263588039867074,
+        "p90Ms": 0.4716,
+        "p95Ms": 0.587,
+        "p99Ms": 0.587,
+        "maximumMs": 3.147
+      },
+      "transactions": [
+        {
+          "name": "submit",
+          "p95": 0.587,
+          "avg": 0.37263588039867074,
+          "max": 3.147
+        }
+      ],
+      "slowestTransaction": {
+        "name": "submit",
+        "p95": 0.587,
+        "avg": 0.37263588039867074,
+        "max": 3.147
+      },
+      "thresholdFailures": [],
+      "risk": "LOW",
+      "recommendation": "READY",
+      "readinessScore": 100,
+      "confidence": "HIGH"
+    },
+    {
+      "profile": "ten-thousand",
+      "requests": 10000,
+      "throughputPerSecond": 27648.29161206129,
+      "errorRate": 0,
+      "errorRatePercent": 0,
+      "latency": {
+        "averageMs": 3.427985699999993,
+        "p90Ms": 4.468,
+        "p95Ms": 5.463099999999999,
+        "p99Ms": 5.463099999999999,
+        "maximumMs": 15.157
+      },
+      "transactions": [
+        {
+          "name": "order",
+          "p95": 5.463099999999999,
+          "avg": 3.427985699999993,
+          "max": 15.157
+        }
+      ],
+      "slowestTransaction": {
+        "name": "order",
+        "p95": 5.463099999999999,
+        "avg": 3.427985699999993,
+        "max": 15.157
+      },
+      "thresholdFailures": [],
+      "risk": "LOW",
+      "recommendation": "READY",
+      "readinessScore": 100,
+      "confidence": "HIGH"
+    }
+  ]
+}

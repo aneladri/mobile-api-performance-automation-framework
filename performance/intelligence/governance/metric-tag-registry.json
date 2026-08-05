@@ -1,0 +1,30 @@
+{
+  "contract": "mapaf.performance.metric-tag-registry/v1",
+  "validatedAt": "2026-08-05T18:30:36.806Z",
+  "filesScanned": 6,
+  "approvedTagKeys": [
+    "profile",
+    "transaction",
+    "module",
+    "environment",
+    "status_class",
+    "scenario",
+    "group",
+    "name",
+    "method",
+    "status"
+  ],
+  "prohibitedTagKeys": [
+    "correlation_id",
+    "request_id",
+    "execution_id",
+    "inspection_id",
+    "order_id",
+    "user_id",
+    "email",
+    "timestamp",
+    "full_url",
+    "uuid"
+  ],
+  "violations": []
+}

@@ -1,0 +1,31 @@
+{
+  "product": "MAPAF Enterprise Quality Engineering Platform",
+  "version": "2.8.0",
+  "release": "v2.8.0",
+  "generatedAt": "2026-08-01T18:26:03.307898+00:00",
+  "releaseReadinessContract": "mapaf.release-readiness/v3",
+  "executiveDecisionContract": "mapaf.executive-decision/v1",
+  "validationGate": "qualityGateSprint24Gate",
+  "files": [
+    {
+      "path": "dashboard/reports/release-readiness.json",
+      "sha256": "26bb4be13d7f8f33f63019dff39f8eeb7cc848307bf46c10d7fff1c46f400666",
+      "sizeBytes": 8959
+    },
+    {
+      "path": "dashboard/reports/executive-summary.json",
+      "sha256": "fbf786183495d3223a3b086652aa41af0729707ec515866ca49086deba35cb39",
+      "sizeBytes": 3619
+    },
+    {
+      "path": "docs/releases/MAPAF-v2.8.0-Release-Notes.md",
+      "sha256": "5af1cf20e86d94342c07a0751416a8cd8a265b90ce49dc4832f18f4cab5952c8",
+      "sizeBytes": 1157
+    },
+    {
+      "path": "MAPAF_VERSION",
+      "sha256": "dceb827995520dae388b7283c5bc7847ef58a16e8013318c3bb436feeb5dc51e",
+      "sizeBytes": 6
+    }
+  ]
+}

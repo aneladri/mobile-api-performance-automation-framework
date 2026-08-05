@@ -1,0 +1,11 @@
+'use strict';
+const fs=require('fs'),path=require('path'),cp=require('child_process'),os=require('os');
+const repo=path.resolve(process.argv[2]||'.'); const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'mapaf-pi-'));
+const p=path.join(tmp,'performance/updr/reports/platform/load');fs.mkdirSync(p,{recursive:true});
+fs.writeFileSync(path.join(p,'k6-summary.json'),JSON.stringify({metrics:{http_reqs:{count:1000,rate:50},http_req_failed:{value:0},http_req_duration:{avg:10,'p(90)':15,'p(95)':20,max:30},updr_order_latency:{avg:8,'p(95)':18,max:25}}}));
+cp.execFileSync('node',[path.join(repo,'performance/intelligence/analyze-performance.js'),tmp],{stdio:'inherit'});
+const out=JSON.parse(fs.readFileSync(path.join(tmp,'performance/updr/reports/intelligence/performance-intelligence.json')));
+if(out.contract!=='mapaf.performance.intelligence/v1') throw new Error('contract');
+if(out.overall.recommendation!=='READY') throw new Error('recommendation');
+if(out.profiles[0].requests!==1000) throw new Error('requests');
+console.log('MAPAF Performance Intelligence unit tests passed.');

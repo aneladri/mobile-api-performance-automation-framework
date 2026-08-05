@@ -1,0 +1,16 @@
+{
+  "contract": "mapaf.command-center.module-registry/v1",
+  "staleAfterHours": 72,
+  "modules": [
+    {"id":"api","name":"API Transaction Player","kind":"live","url":"http://localhost:8090/api-monitor.html","healthUrl":"http://localhost:8090/health","summary":"reports/updr-integrated/summary.json","report":"http://localhost:8090/api-monitor.html","embed":false,"category":"api","run":"./gradlew updrDemoStart"},
+    {"id":"mobile","name":"Mobile Automation","kind":"report","summary":"dashboard/reports/executive-summary.json","report":"dashboard/reports/mobile.html","alternates":["reports/updr-integrated/index.html"],"embed":true,"category":"mobile","run":"./gradlew updrMobileDemo"},
+    {"id":"playwright","name":"Playwright Web","kind":"report","summary":"web/reports/enterprise-summary.json","report":"web/reports/evidence-index.html","alternates":["dashboard/reports/web.html"],"embed":true,"category":"web","run":"./gradlew updrWebDemo -Dheadless=false"},
+    {"id":"performance","name":"Performance Intelligence","kind":"report","summary":"performance/updr/reports/intelligence/performance-intelligence.json","report":"performance/updr/reports/intelligence/index.html","embed":true,"category":"performance","run":"./gradlew performanceIntelligenceDemo"},
+    {"id":"trends","name":"Performance Trends","kind":"report","summary":"performance/updr/reports/trends/performance-trend.json","report":"performance/updr/reports/trends/index.html","embed":true,"category":"performance","run":"./gradlew performanceTrendDemo"},
+    {"id":"doctor","name":"MAPAF Doctor","kind":"report","summary":"dashboard/reports/doctor/doctor-overview.json","report":"dashboard/reports/doctor/doctor-overview.html","alternates":["dashboard/reports/doctor/doctor-report.html","dashboard/reports/index.html"],"embed":true,"category":"doctor","run":"./gradlew doctorCliGate"},
+    {"id":"allure","name":"Allure Evidence","kind":"report","report":"build/allure-report/index.html","alternates":["build/reports/allure-report/index.html"],"embed":true,"category":"evidence","run":"./gradlew allureReport"},
+    {"id":"grafana","name":"Grafana Live","kind":"live","url":"http://localhost:3000/d/mapaf-k6-performance","healthUrl":"http://localhost:3000/api/health","report":"http://localhost:3000/d/mapaf-k6-performance","embed":false,"category":"observability","run":"./gradlew performanceObservabilityStart"},
+    {"id":"prometheus","name":"Prometheus","kind":"live","url":"http://localhost:9090","healthUrl":"http://localhost:9090/-/ready","report":"http://localhost:9090","embed":false,"category":"observability","run":"./gradlew performanceObservabilityStart"},
+    {"id":"release","name":"Release Readiness","kind":"report","summary":"dashboard/reports/release-readiness.json","report":"dashboard/reports/release-readiness.html","alternates":["reports/updr-integrated/index.html"],"embed":true,"category":"release","run":"./gradlew releaseReadinessGate"}
+  ]
+}

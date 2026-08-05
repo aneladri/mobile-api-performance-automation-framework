@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF UPDR Web Demo" verbose="1">
+  <test name="UPDR Cross-Channel Journey">
+    <classes>
+      <class name="web.updr.demo.UpdrWebDemoTest"/>
+    </classes>
+  </test>
+</suite>

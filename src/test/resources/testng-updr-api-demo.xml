@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF UPDR API Demo" verbose="1">
+  <test name="UPDR API End-to-End">
+    <classes>
+      <class name="api.updr.demo.UpdrApiDemoTest"/>
+    </classes>
+  </test>
+</suite>

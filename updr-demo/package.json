@@ -1,0 +1,13 @@
+{
+  "name": "mapaf-updr-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deterministic UPDR end-to-end demo application for MAPAF",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

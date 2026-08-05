@@ -1,0 +1,12 @@
+[
+  {
+    "schemaVersion": "mapaf.knowledge.document/v1",
+    "documentId": "roomscan-mobile-test-notes",
+    "source": "REPLAY_GOOGLE_DRIVE",
+    "title": "RoomScan Mobile Test Notes",
+    "content": "Mobile validation includes camera permission handling, image compression, offline queueing, resume after connectivity restoration, upload progress, duplicate taps, and accessibility labels for upload controls.",
+    "sourceUri": "gdrive://roomscan/mobile-test-notes",
+    "tags": ["roomscan", "mobile", "accessibility", "offline"],
+    "metadata": {"folder": "RoomScan QA"}
+  }
+]

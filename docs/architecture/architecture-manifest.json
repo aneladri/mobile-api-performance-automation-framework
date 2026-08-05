@@ -1,0 +1,15 @@
+{
+  "name": "MAPAF Enterprise Architecture Foundation",
+  "version": "1.0",
+  "sprint": "0.1",
+  "status": "accepted",
+  "roadmapBaseline": {
+    "v2.7": "Allure Showcase",
+    "v2.8": "Release Readiness",
+    "v2.9": "MAPAF Doctor",
+    "v3.0": "Enterprise Integrations",
+    "v4.0": "AI Platform"
+  },
+  "mandatorySprintDeliverables": 8,
+  "acceptedAdrs": [7, 8, 9, 10, 11]
+}

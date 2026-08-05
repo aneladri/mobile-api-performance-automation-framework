@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Platform Intelligence Foundation">
+  <test name="Doctor Historical Snapshot Store">
+    <classes>
+      <class name="dashboard.enterprise.intelligence.tests.DoctorHistoryStoreTest"/>
+    </classes>
+  </test>
+</suite>

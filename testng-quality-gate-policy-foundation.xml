@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MAPAF Quality Gate Policy Foundation">
+  <test name="Quality Gate Policy Foundation">
+    <classes>
+      <class name="dashboard.enterprise.release.gates.tests.QualityGatePolicyFoundationTest"/>
+      <class name="dashboard.enterprise.release.gates.tests.QualityGateEvaluatorTest"/>
+      <class name="dashboard.enterprise.release.gates.tests.ReadinessComplianceGateTest"/>
+      <class name="dashboard.enterprise.release.decision.tests.ExecutiveDecisionEngineTest"/>
+    </classes>
+  </test>
+</suite>

@@ -1,0 +1,7 @@
+package core.enterprise.evidence;
+
+public enum EvidenceType {
+    SCREENSHOT, VIDEO, TRACE, DEVICE_LOG, CONSOLE_LOG, PAGE_SOURCE,
+    REQUEST, RESPONSE, METRICS, PERFORMANCE_REPORT, AI_ANALYSIS,
+    GENERATED_CODE, OTHER
+}

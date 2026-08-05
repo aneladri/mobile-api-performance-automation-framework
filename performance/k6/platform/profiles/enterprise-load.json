@@ -1,0 +1,11 @@
+{
+  "contract": "mapaf.performance.profile/v1",
+  "name": "enterprise-load",
+  "description": "Production-like UPDR load profile.",
+  "baseUrl": "http://localhost:8090",
+  "duration": "60s",
+  "orderVus": 20,
+  "autosaveVus": 40,
+  "aiVus": 10,
+  "thresholdProfile": "updr-default"
+}

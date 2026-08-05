@@ -1,0 +1,2931 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.testng:testng:7.10.2'
+
+    testImplementation 'io.appium:java-client:9.4.0'
+
+    testImplementation 'org.apache.logging.log4j:log4j-api:2.24.3'
+    testImplementation 'org.apache.logging.log4j:log4j-core:2.24.3'
+    testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3'
+
+    testImplementation 'io.rest-assured:rest-assured:5.5.0'
+    testImplementation 'io.rest-assured:json-schema-validator:5.5.0'
+
+    testImplementation 'io.qameta.allure:allure-testng:2.29.1'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    testImplementation 'org.wiremock:wiremock-standalone:3.13.1'
+    testImplementation 'com.microsoft.playwright:playwright:1.55.0'
+}
+
+tasks.withType(Test).configureEach {
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+
+    useTestNG() {
+    }
+
+    systemProperty "allure.results.directory", "$buildDir/allure-results"
+
+    outputs.upToDateWhen { false }
+}
+
+test {
+    useTestNG() {
+        suites 'testng.xml'
+    }
+}
+
+tasks.register('apiTest', Test) {
+    description = 'Runs API TestNG suite'
+    group = 'verification'
+
+    testLogging {
+        showStandardStreams = true
+        events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        exceptionFormat = 'full'
+    }
+
+    useTestNG() {
+        suites 'testng-api.xml'
+    }
+}
+
+tasks.register('mobileTest', Test) {
+    description = 'Runs Mobile TestNG suite'
+    group = 'verification'
+
+    useTestNG() {
+        suites 'testng-mobile.xml'
+    }
+}
+
+tasks.register('regressionTest', Test) {
+    description = 'Runs Regression TestNG suite'
+    group = 'verification'
+
+    useTestNG() {
+        suites 'testng-regression.xml'
+    }
+}
+
+tasks.register('iosTest', Test) {
+    useTestNG() {
+        suites 'testng-ios.xml'
+    }
+
+}
+
+tasks.register('aiTest', Test) {
+    useTestNG() {
+        suites 'testng-ai.xml'
+    }
+}
+
+tasks.register('flowDemoTest', Test) {
+    description = 'Runs the multi-step Appium navigation flow demo'
+    group = 'MAPAF Demo'
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-flow-demo.xml'
+    }
+}
+
+tasks.register('failureDemoTest', Test) {
+    description = 'Runs a deliberate, deterministic failure for showing a real failure report'
+    group = 'MAPAF Demo'
+    ignoreFailures = true
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-failure-demo.xml'
+    }
+}
+
+tasks.register('healingDemoTest', Test) {
+    description = 'Runs the Tier 3 AI self-healing demo test'
+    group = 'MAPAF Demo'
+
+    systemProperty "waitTimeoutSeconds", project.findProperty("waitTimeoutSeconds") ?: "15"
+
+    testLogging {
+        showStandardStreams = true
+        events "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-healing-demo.xml'
+    }
+}
+
+tasks.register('generateAutomation', JavaExec) {
+    group = 'MAPAF AI'
+    description = 'Generate MAPAF automation assets from a user story'
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'core.ai.cli.GenerateAutomationTask'
+
+    systemProperty 'story',
+            project.findProperty('story') ?: ''
+
+    systemProperty 'platform',
+            project.findProperty('platform') ?: 'android'
+
+    systemProperty 'screenName',
+            project.findProperty('screenName') ?: 'GeneratedScreen'
+
+    systemProperty 'acceptanceCriteria',
+            project.findProperty('acceptanceCriteria')
+                    ?: 'TODO_ACCEPTANCE_CRITERIA'
+
+    systemProperty 'targetPackage',
+            project.findProperty('targetPackage')
+                    ?: 'mobile.generated'
+
+    systemProperty 'outputDirectory',
+            project.findProperty('outputDirectory')
+                    ?: 'generated/ai/automation'
+
+    systemProperty 'dryRun',
+        project.findProperty('dryRun') ?: 'false'
+
+    // Code generation requires a larger output budget than short AI requests.
+    systemProperty 'claude.max.tokens',
+            project.findProperty('claudeMaxTokens')
+                    ?: System.getenv('CLAUDE_MAX_TOKENS')
+                    ?: '8192'
+
+    systemProperty 'claude.timeout.seconds',
+            project.findProperty('claudeTimeoutSeconds')
+                    ?: System.getenv('CLAUDE_TIMEOUT_SECONDS')
+                    ?: '120'
+
+    systemProperty 'hierarchyFile',
+        project.findProperty('hierarchyFile') ?: ''
+}
+
+tasks.register('mobileFrameworkDemo', Test) {
+    description = 'Enterprise Mobile Automation Demo'
+    group = 'MAPAF Demo'
+
+    testLogging {
+        showStandardStreams = true
+        events "passed", "failed", "standardOut"
+    }
+
+    useTestNG() {
+        suites 'testng-mobile-framework-demo.xml'
+    }
+}
+
+
+tasks.register('mobileEnterpriseDemo', Test) {
+    description = 'Runs the RoomScan mobile enterprise demo with business workflow, evidence, AI-ready analysis and dashboard summary'
+    group = 'MAPAF Demo'
+
+    useTestNG() {
+        suites 'testng-mobile-enterprise-demo.xml'
+    }
+
+    systemProperty 'mapaf.demo.pacing.enabled',
+            System.getProperty('mapaf.demo.pacing.enabled', 'true')
+    systemProperty 'mapaf.demo.pacing.millis',
+            System.getProperty('mapaf.demo.pacing.millis', '1500')
+
+    testLogging {
+        showStandardStreams = true
+        events 'passed', 'failed', 'skipped', 'standardOut', 'standardError'
+        exceptionFormat = 'full'
+    }
+
+    doFirst {
+        println ''
+        println '======================================================================'
+        println '        MAPAF MOBILE ENTERPRISE DEMO'
+        println '======================================================================'
+        println 'Scenario         : RoomScan Mobile End-to-End Validation'
+        println 'Automation       : Appium'
+        println 'AI Healing       : Enabled'
+        println 'Capture Provider : Mock RoomScan Capture'
+        println "Pacing Enabled   : ${System.getProperty('mapaf.demo.pacing.enabled', 'true')}"
+        println "Pacing Delay     : ${System.getProperty('mapaf.demo.pacing.millis', '1500')} ms"
+        println '======================================================================'
+    }
+}
+
+tasks.register('mobileEnterpriseUnitTest', Test) {
+    description = 'Runs MAPAF mobile enterprise unit tests'
+    group = 'verification'
+
+    useTestNG() {
+        suites 'testng-mobile-enterprise-unit.xml'
+    }
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+    }
+}
+
+tasks.register('performanceMockApi', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Starts the standalone performance mock API on port 8089'
+    commandLine 'node', 'performance/mock-api/server.js'
+}
+
+tasks.register('performanceMockApiHealth', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Checks the standalone performance mock API health endpoint'
+    commandLine 'curl', '--fail', '--silent', '--show-error', 'http://localhost:8089/health'
+}
+
+
+def performanceBaseUrl = providers.gradleProperty('performanceBaseUrl').orElse('http://localhost:8089')
+
+def configureJMeterEnvironment = { Exec task ->
+    def configuredHome = project.findProperty('jmeterHome') ?: System.getenv('JMETER_HOME')
+    def configuredBin = project.findProperty('jmeterBin') ?: System.getenv('JMETER_BIN')
+
+    if (configuredHome) {
+        task.environment 'JMETER_HOME', configuredHome.toString()
+    }
+    if (configuredBin) {
+        task.environment 'JMETER_BIN', configuredBin.toString()
+    }
+    task.environment 'BASE_URL', performanceBaseUrl.get()
+}
+
+tasks.register('k6Smoke', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the k6 smoke demo against the performance mock API'
+    environment 'BASE_URL', performanceBaseUrl.get()
+    commandLine 'bash', 'performance/scripts/run-k6-demo.sh', 'smoke'
+}
+
+tasks.register('k6Load', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the k6 load demo against the performance mock API'
+    environment 'BASE_URL', performanceBaseUrl.get()
+    commandLine 'bash', 'performance/scripts/run-k6-demo.sh', 'load'
+}
+
+tasks.register('jmeterSmoke', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the JMeter smoke demo and generates the HTML dashboard'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-jmeter-demo.sh', 'smoke'
+}
+
+tasks.register('jmeterLoad', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the JMeter load demo and generates the HTML dashboard'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-jmeter-demo.sh', 'load'
+}
+
+tasks.register('performanceDemoSmoke', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Starts the mock API and runs both k6 and JMeter smoke demos'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-performance-demo.sh', 'smoke'
+}
+
+tasks.register('performanceDemoLoad', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Starts the mock API and runs both k6 and JMeter load demos'
+    configureJMeterEnvironment(delegate)
+    commandLine 'bash', 'performance/scripts/run-performance-demo.sh', 'load'
+}
+
+tasks.register('performanceDockerUp', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Builds and starts the Dockerized performance mock API'
+    commandLine 'bash', 'performance/scripts/docker-performance-up.sh'
+}
+
+tasks.register('performanceDockerDown', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Stops the Dockerized performance demo services'
+    commandLine 'bash', 'performance/scripts/docker-performance-down.sh'
+}
+
+tasks.register('performanceDemoSmokeDocker', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the mock API, k6 smoke, and JMeter smoke entirely with Docker'
+    commandLine 'bash', 'performance/scripts/run-docker-performance-demo.sh', 'smoke'
+}
+
+tasks.register('performanceDemoLoadDocker', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the mock API, k6 load, and JMeter load entirely with Docker'
+    commandLine 'bash', 'performance/scripts/run-docker-performance-demo.sh', 'load'
+}
+
+// Generates the unified MAPAF Quality Engineering Dashboard.
+tasks.register('qualityReport', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Generates the unified API and performance quality dashboard'
+    commandLine 'bash', 'performance/scripts/generate-quality-dashboard.sh'
+}
+
+// Compatibility alias retained for existing documentation and commands.
+tasks.register('performanceReport') {
+    group = 'MAPAF Dashboard'
+    description = 'Compatibility alias for the unified MAPAF quality report'
+    dependsOn 'qualityReport'
+}
+
+tasks.register("promotePerformanceBaseline", Exec) {
+    group = "MAPAF AI"
+    description = "Promotes an eligible performance execution as the approved baseline"
+    workingDir projectDir
+
+    environment "MAPAF_BASELINE_APPROVER",
+            project.findProperty("baselineApprover")
+                    ?: System.getProperty("user.name", "unknown")
+
+    commandLine "node",
+            "performance/intelligence/baseline/promote-performance-baseline.js",
+            projectDir.absolutePath
+}
+
+tasks.register("performanceTrendDemo") {
+    group = "MAPAF AI"
+    description = "Analyzes performance, captures execution history, validates metric tags, and compares against the approved baseline"
+
+    dependsOn(
+            "analyzeUpdrPerformance",
+            "capturePerformanceHistory",
+            "validatePerformanceMetricTags",
+            "compareUpdrPerformance"
+    )
+}
+
+tasks.register('apiFrameworkDemo', Test) {
+    description = 'Enterprise API Automation Demo'
+    group = 'MAPAF Demo'
+
+    testLogging {
+        showStandardStreams = true
+        events "passed", "failed", "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-api-framework-demo.xml'
+    }
+}
+
+// Starts or reuses a background HTTP server and opens the unified dashboard.
+tasks.register('frameworkDashboard', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Generates, serves, and opens the unified MAPAF quality dashboard using an available port'
+    dependsOn 'qualityReport'
+
+    environment 'PERFORMANCE_REPORT_PORT',
+            project.findProperty('performanceReportPort') ?: '8090'
+    environment 'PERFORMANCE_REPORT_MAX_PORT',
+            project.findProperty('performanceReportMaxPort') ?: '8110'
+
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'open'
+}
+
+// Starts or reuses the background report server without opening a browser.
+tasks.register('servePerformanceReport', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Generates and serves the unified quality dashboard in the background using an available port'
+    dependsOn 'qualityReport'
+
+    environment 'PERFORMANCE_REPORT_PORT',
+            project.findProperty('performanceReportPort') ?: '8090'
+    environment 'PERFORMANCE_REPORT_MAX_PORT',
+            project.findProperty('performanceReportMaxPort') ?: '8110'
+
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'serve'
+}
+
+// Opens the dashboard, reusing or starting the managed report server when required.
+tasks.register('openPerformanceReportHttp', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Opens the HTTP-served MAPAF quality dashboard'
+    dependsOn 'qualityReport'
+
+    environment 'PERFORMANCE_REPORT_PORT',
+            project.findProperty('performanceReportPort') ?: '8090'
+    environment 'PERFORMANCE_REPORT_MAX_PORT',
+            project.findProperty('performanceReportMaxPort') ?: '8110'
+
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'open'
+}
+
+// Stops only the report server started by MAPAF.
+tasks.register('stopPerformanceReportServer', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Stops the MAPAF-managed quality dashboard server'
+    commandLine 'bash', 'performance/scripts/manage-performance-report-server.sh', 'stop'
+}
+
+// Runs API tests and then opens the unified quality dashboard.
+tasks.register('qualityDashboard') {
+    group = 'MAPAF Dashboard'
+    description = 'Runs API tests and opens the unified MAPAF quality dashboard'
+    dependsOn 'apiTest'
+    finalizedBy 'frameworkDashboard'
+}
+
+// Compatibility alias. Uses HTTP rather than file:// to avoid Safari local-file restrictions.
+tasks.register('openPerformanceReport') {
+    group = 'MAPAF Dashboard'
+    description = 'Generates, serves, and opens the MAPAF quality dashboard'
+    dependsOn 'openPerformanceReportHttp'
+}
+
+// Runs both smoke engines and refreshes the unified performance dashboard.
+tasks.register('performanceDashboardSmoke') {
+    group = 'MAPAF Performance'
+    description = 'Runs the combined smoke demo and generates the unified performance dashboard'
+    dependsOn 'performanceDemoSmoke'
+    finalizedBy 'performanceReport'
+}
+
+// Runs both load engines and refreshes the unified performance dashboard.
+tasks.register('performanceDashboardLoad') {
+    group = 'MAPAF Performance'
+    description = 'Runs the combined load demo and generates the unified performance dashboard'
+    dependsOn 'performanceDemoLoad'
+    finalizedBy 'performanceReport'
+}
+
+tasks.register('reportingTest', Test) {
+    description = 'Runs common reporting framework tests'
+    group = 'verification'
+
+    useTestNG {
+        suites 'testng-reporting.xml'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+def configuredRetryCount =
+        (project.findProperty('retryCount') ?: '0')
+                .toString()
+
+def supportedWebBrowsers = [
+        'CHROMIUM',
+        'FIREFOX',
+        'WEBKIT'
+]
+
+def configuredBrowserSelection =
+        (project.findProperty('browser') ?: 'CHROMIUM')
+                .toString()
+                .trim()
+                .toUpperCase()
+
+def selectedWebBrowsers = configuredBrowserSelection == 'ALL'
+        ? supportedWebBrowsers
+        : configuredBrowserSelection
+                .split(',')
+                .collect { it.trim() }
+                .findAll { !it.isEmpty() }
+
+def unsupportedWebBrowsers =
+        selectedWebBrowsers.findAll {
+            !supportedWebBrowsers.contains(it)
+        }
+def browserTestTaskByName = [
+        CHROMIUM: 'webChromiumTest',
+        FIREFOX : 'webFirefoxTest',
+        WEBKIT  : 'webWebkitTest'
+]
+
+def browserSummaryTaskByName = [
+        CHROMIUM: 'generateChromiumWebSummary',
+        FIREFOX : 'generateFirefoxWebSummary',
+        WEBKIT  : 'generateWebkitWebSummary'
+]
+
+def configuredEnvironment =
+        (project.findProperty('environment')
+                ?: System.getenv('TEST_ENVIRONMENT')
+                ?: 'LOCAL')
+                .toString()
+
+def configuredBuildNumber =
+        (project.findProperty('buildNumber')
+                ?: System.getenv('BUILD_NUMBER')
+                ?: System.getenv('BUILD_BUILDNUMBER')
+                ?: 'local')
+                .toString()
+
+def configuredBranch =
+        (project.findProperty('branch')
+                ?: System.getenv('GIT_BRANCH')
+                ?: System.getenv('BUILD_SOURCEBRANCHNAME')
+                ?: 'local')
+                .toString()
+
+def configuredCommit =
+        (project.findProperty('commit')
+                ?: System.getenv('GIT_COMMIT')
+                ?: System.getenv('BUILD_SOURCEVERSION')
+                ?: 'local')
+                .toString()  
+
+def configuredOpenDashboard =
+        (project.findProperty('openDashboard') ?: 'true')
+                .toString()
+                .toBoolean()                                    
+
+tasks.register('generatePerformanceSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common performance execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'performance.reporting.PerformanceSummaryCli'
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+}
+
+tasks.register('performanceFrameworkDemo', JavaExec) {
+
+    group = 'MAPAF Demo'
+
+    description = 'Enterprise Performance Demo'
+
+    dependsOn 'performanceDashboardSmoke'
+
+    classpath = sourceSets.test.runtimeClasspath
+
+    mainClass = 'performance.demo.PerformanceFrameworkDemo'
+}
+
+tasks.register('generateApiSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common API execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'api.reporting.ApiSummaryCli'
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+}
+
+tasks.register('generateDashboard', JavaExec) {
+    group = 'reporting'
+    description = 'Generates the MAPAF unified quality dashboard'
+
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'common.reporting.dashboard.generator.DashboardGeneratorCli'
+}
+
+tasks.register('openPlaywrightDashboard', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Opens the generated MAPAF dashboard'
+
+    dependsOn 'generateDashboard'
+
+    def dashboardPath =
+            layout.projectDirectory
+                    .file('dashboard/reports/index.html')
+                    .asFile
+
+    onlyIf {
+        if (!configuredOpenDashboard) {
+            println 'Dashboard auto-open disabled.'
+            return false
+        }
+
+        if (!dashboardPath.exists()) {
+            throw new GradleException(
+                    "Dashboard not found: ${dashboardPath.absolutePath}"
+            )
+        }
+
+        return true
+    }
+
+    commandLine 'open', dashboardPath.absolutePath
+
+    doFirst {
+        println ''
+        println 'Opening dashboard:'
+        println "  ${dashboardPath.absolutePath}"
+    }
+}
+
+tasks.register('playwrightInstall', JavaExec) {
+    group = 'MAPAF Web'
+    description = 'Installs Playwright browser binaries'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+
+    mainClass = 'com.microsoft.playwright.CLI'
+
+    args(
+            'install',
+            'chromium',
+            'firefox',
+            'webkit'
+    )
+}
+
+tasks.register('generateWebSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the common web execution summary'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'web.reporting.WebSummaryCli'
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    systemProperty 'web.browser',
+            project.findProperty('browser') ?: 'CHROMIUM'
+}
+
+tasks.register('generateParallelWebSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description = 'Generates the Web summary from parallel execution results'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'web.reporting.WebSummaryCli'
+
+    args(
+            'build/test-results/webParallelTest',
+            'web/reports/summary.json'
+    )
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    systemProperty 'web.browser',
+            project.findProperty('browser') ?: 'CHROMIUM'
+
+    systemProperty 'web.parallel', 'true'
+
+    systemProperty 'web.threads',
+            project.findProperty('webThreads') ?: '4'
+}
+
+if (selectedWebBrowsers.isEmpty()) {
+    throw new GradleException(
+            'Browser selection cannot be empty. Supported values: '
+                    + supportedWebBrowsers.join(', ')
+                    + ', ALL'
+    )
+}
+
+if (!unsupportedWebBrowsers.isEmpty()) {
+    throw new GradleException(
+            'Unsupported browser selection: '
+                    + unsupportedWebBrowsers.join(', ')
+                    + '. Supported values: '
+                    + supportedWebBrowsers.join(', ')
+                    + ', ALL'
+    )
+}
+
+tasks.register('webTest', Test) {
+    description = 'Runs Web TestNG suite'
+    group = 'verification'
+
+    useTestNG {
+        suites 'testng-web.xml'
+
+        if (project.hasProperty('webParallel')
+                && project.property('webParallel') == 'true') {
+
+            parallel = 'methods'
+
+            threadCount = (
+                    project.findProperty('webThreads') ?: '4'
+            ).toInteger()
+        }
+    }
+
+    systemProperty 'web.parallel',
+            project.findProperty('webParallel') ?: 'false'
+
+    systemProperty 'web.threads',
+            project.findProperty('webThreads') ?: '4'
+
+    systemProperty 'mapaf.retry.count',
+            configuredRetryCount
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit    
+
+    testLogging {
+    events 'passed', 'failed', 'skipped'
+    exceptionFormat 'full'
+    showStandardStreams = true
+    }
+
+    doFirst {
+        println 'Web execution configuration:'
+        println "  Threads     : ${project.findProperty('webThreads') ?: '4'}"
+        println "  Retry       : ${configuredRetryCount}"
+        println "  Environment : ${configuredEnvironment}"
+    }    
+}
+
+tasks.register('webParallelTest', Test) {
+    description = 'Runs Playwright Web tests in parallel'
+    group = 'verification'
+
+    dependsOn testClasses
+
+    maxParallelForks = 1
+
+    def configuredThreads =
+            (project.findProperty('webThreads') ?: '4')
+                    .toString()
+
+    def configuredHeadless =
+            (project.findProperty('headless') ?: 'true')
+                    .toString()
+
+    def configuredBrowser =
+            (project.findProperty('browser') ?: 'CHROMIUM')
+                    .toString()
+                    .trim()
+                    .toUpperCase()
+
+    useTestNG {
+        suites 'testng-web-parallel.xml'
+        parallel = 'methods'
+        threadCount = configuredThreads.toInteger()
+    }
+
+    systemProperty 'web.parallel', 'true'
+    systemProperty 'web.threads', configuredThreads
+    systemProperty 'web.headless', configuredHeadless
+    systemProperty 'web.browser', configuredBrowser
+    systemProperty 'mapaf.retry.count', configuredRetryCount
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat 'full'
+        showStandardStreams = true
+    }
+
+    doFirst {
+        println 'Web parallel execution configuration:'
+        println "  Threads  : ${configuredThreads}"
+        println "  Headless : ${configuredHeadless}"
+        println "  Browser  : ${configuredBrowser}"
+        println "  Retry    : ${configuredRetryCount}"
+    }
+}
+
+def crossBrowserDefinitions = [
+        [taskName: 'webChromiumTest', browser: 'CHROMIUM'],
+        [taskName: 'webFirefoxTest',  browser: 'FIREFOX'],
+        [taskName: 'webWebkitTest',   browser: 'WEBKIT']
+]
+
+crossBrowserDefinitions.each { definition ->
+
+    tasks.register(definition.taskName, Test) {
+        description =
+                "Runs Playwright Web tests on ${definition.browser}"
+
+        group = 'verification'
+
+        dependsOn testClasses
+
+        maxParallelForks = 1
+
+        def configuredThreads =
+                (project.findProperty('webThreads') ?: '4')
+                        .toString()
+
+        def configuredHeadless =
+                (project.findProperty('headless') ?: 'true')
+                        .toString()
+
+        useTestNG {
+            suites 'testng-web-parallel.xml'
+            parallel = 'methods'
+            threadCount = configuredThreads.toInteger()
+        }
+
+        systemProperty 'web.parallel', 'true'
+        systemProperty 'web.threads', configuredThreads
+        systemProperty 'web.headless', configuredHeadless
+        systemProperty 'web.browser', definition.browser
+        systemProperty 'mapaf.retry.count', configuredRetryCount
+
+        systemProperty 'mapaf.environment', configuredEnvironment
+        systemProperty 'mapaf.build', configuredBuildNumber
+        systemProperty 'mapaf.branch', configuredBranch
+        systemProperty 'mapaf.commit', configuredCommit
+
+        testLogging {
+            events 'passed', 'failed', 'skipped'
+            exceptionFormat 'full'
+            showStandardStreams = true
+        }
+
+        doFirst {
+            println 'MAPAF cross-browser execution configuration:'
+            println "  Task     : ${definition.taskName}"
+            println "  Browser  : ${definition.browser}"
+            println "  Threads  : ${configuredThreads}"
+            println "  Headless : ${configuredHeadless}"
+            println "  Retry    : ${configuredRetryCount}"
+        }
+    }
+}
+
+tasks.register('webCrossBrowserTest') {
+    description =
+            'Runs the Playwright Web suite across Chromium, Firefox and WebKit'
+
+    group = 'verification'
+
+    dependsOn(
+            'webChromiumTest',
+            'webFirefoxTest',
+            'webWebkitTest'
+    )
+
+    doLast {
+        println ''
+        println 'MAPAF cross-browser execution completed.'
+        println ''
+        println 'Result directories:'
+        println '  build/test-results/webChromiumTest'
+        println '  build/test-results/webFirefoxTest'
+        println '  build/test-results/webWebkitTest'
+        println ''
+        println 'HTML reports:'
+        println '  build/reports/tests/webChromiumTest/index.html'
+        println '  build/reports/tests/webFirefoxTest/index.html'
+        println '  build/reports/tests/webWebkitTest/index.html'
+    }
+}
+
+
+tasks.register('webSelectedBrowserTest') {
+    group = 'verification'
+    description =
+            'Runs Playwright Web tests on browsers selected using -Pbrowser'
+
+    dependsOn selectedWebBrowsers.collect { browser ->
+        browserTestTaskByName[browser]
+    }
+
+    doFirst {
+        println ''
+        println 'MAPAF flexible browser selection:'
+        println "Browsers executed: ${selectedWebBrowsers.join(', ')}"
+        println "  Selected  : ${selectedWebBrowsers.join(', ')}"
+        println "  Threads   : ${project.findProperty('webThreads') ?: '4'}"
+        println "  Headless  : ${project.findProperty('headless') ?: 'true'}"
+        println "  Retry     : ${configuredRetryCount}"
+        println ''
+    }
+
+    doLast {
+        println ''
+        println 'MAPAF selected-browser execution completed.'
+        println 'Browsers    : CHROMIUM, FIREFOX, WEBKIT'
+    }
+}
+
+tasks.register('generateSelectedBrowserWebSummaries') {
+    group = 'MAPAF Reporting'
+    description =
+            'Generates summaries only for browsers selected using -Pbrowser'
+
+    dependsOn selectedWebBrowsers.collect { browser ->
+        browserSummaryTaskByName[browser]
+    }
+
+    doLast {
+        println ''
+        println 'Selected browser summaries generated:'
+
+        selectedWebBrowsers.each { browser ->
+            println "  web/reports/${browser.toLowerCase()}-summary.json"
+        }
+    }
+}
+
+def browserSummaryDefinitions = [
+        [
+                taskName  : 'generateChromiumWebSummary',
+                testTask  : 'webChromiumTest',
+                browser   : 'CHROMIUM',
+                resultsDir: 'build/test-results/webChromiumTest',
+                outputFile: 'web/reports/chromium-summary.json'
+        ],
+        [
+                taskName  : 'generateFirefoxWebSummary',
+                testTask  : 'webFirefoxTest',
+                browser   : 'FIREFOX',
+                resultsDir: 'build/test-results/webFirefoxTest',
+                outputFile: 'web/reports/firefox-summary.json'
+        ],
+        [
+                taskName  : 'generateWebkitWebSummary',
+                testTask  : 'webWebkitTest',
+                browser   : 'WEBKIT',
+                resultsDir: 'build/test-results/webWebkitTest',
+                outputFile: 'web/reports/webkit-summary.json'
+        ]
+]
+
+browserSummaryDefinitions.each { definition ->
+    tasks.register(definition.taskName, JavaExec) {
+        group = 'MAPAF Reporting'
+        description =
+                "Generates the Web execution summary for ${definition.browser}"
+
+        dependsOn definition.testTask
+
+        classpath = sourceSets.test.runtimeClasspath
+        mainClass = 'web.reporting.WebSummaryCli'
+
+        args(
+                definition.resultsDir,
+                definition.outputFile
+        )
+
+        systemProperty 'mapaf.environment', configuredEnvironment
+        systemProperty 'mapaf.build', configuredBuildNumber
+        systemProperty 'mapaf.branch', configuredBranch
+        systemProperty 'mapaf.commit', configuredCommit
+
+        systemProperty 'web.browser',
+                definition.browser
+
+        systemProperty 'web.parallel', 'true'
+
+        systemProperty 'web.threads',
+                project.findProperty('webThreads') ?: '4'
+
+        doFirst {
+            println 'Generating browser-specific Web summary:'
+            println "  Browser : ${definition.browser}"
+            println "  Results : ${definition.resultsDir}"
+            println "  Output  : ${definition.outputFile}"
+        }
+    }
+}
+
+tasks.register('generateCrossBrowserWebSummaries') {
+    group = 'MAPAF Reporting'
+    description =
+            'Generates Chromium, Firefox and WebKit execution summaries'
+
+    dependsOn(
+            'generateChromiumWebSummary',
+            'generateFirefoxWebSummary',
+            'generateWebkitWebSummary'
+    )
+
+    doLast {
+        println ''
+        println 'Cross-browser Web summaries generated:'
+        println '  web/reports/chromium-summary.json'
+        println '  web/reports/firefox-summary.json'
+        println '  web/reports/webkit-summary.json'
+    }
+}
+
+tasks.register('generateCrossBrowserAggregateSummary', JavaExec) {
+    group = 'MAPAF Reporting'
+    description =
+            'Combines Chromium, Firefox and WebKit summaries into one aggregate report'
+
+    dependsOn 'generateCrossBrowserWebSummaries'
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'web.reporting.CrossBrowserSummaryCli'
+
+    args(
+            'web/reports/cross-browser-summary.json'
+    )
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    doFirst {
+        println 'Generating cross-browser aggregate summary...'
+        println '  Chromium : web/reports/chromium-summary.json'
+        println '  Firefox  : web/reports/firefox-summary.json'
+        println '  WebKit   : web/reports/webkit-summary.json'
+        println '  Output   : web/reports/cross-browser-summary.json'
+    }
+
+    doLast {
+        def sourceFile =
+                layout.projectDirectory
+                        .file('web/reports/cross-browser-summary.json')
+                        .asFile
+
+        def dashboardSummaryFile =
+                layout.projectDirectory
+                        .file('web/reports/summary.json')
+                        .asFile
+
+        if (!sourceFile.exists()) {
+            throw new GradleException(
+                    "Cross-browser summary not found: ${sourceFile.absolutePath}"
+            )
+        }
+
+        dashboardSummaryFile.parentFile.mkdirs()
+
+        dashboardSummaryFile.bytes = sourceFile.bytes
+
+        println ''
+        println 'Canonical Web dashboard summary generated:'
+        println '  web/reports/summary.json'
+    }
+}
+
+tasks.register('playwrightRegression') {
+    group = 'verification'
+    description =
+            'Runs the complete Playwright regression and generates reports'
+
+    dependsOn 'playwrightInstall'
+    dependsOn 'generateCrossBrowserAggregateSummary'
+
+    finalizedBy 'generateDashboard'
+
+    doFirst {
+        println ''
+        println '========================================'
+        println ' MAPAF PLAYWRIGHT REGRESSION'
+        println '========================================'
+        println "Browsers    : CHROMIUM, FIREFOX, WEBKIT"
+        println "Threads     : ${project.findProperty('webThreads') ?: '4'}"
+        println "Headless    : ${project.findProperty('headless') ?: 'true'}"
+        println "Retry       : ${configuredRetryCount}"
+        println "Environment : ${configuredEnvironment}"
+        println "Build       : ${configuredBuildNumber}"
+        println "Branch      : ${configuredBranch}"
+        println "Commit      : ${configuredCommit}"
+        println '========================================'
+        println ''
+    }
+
+    doLast {
+        def sourceFile =
+            layout.projectDirectory
+                    .file('web/reports/cross-browser-summary.json')
+                    .asFile
+
+        def dashboardSummaryFile =
+            layout.projectDirectory
+                    .file('web/reports/summary.json')
+                    .asFile
+
+        dashboardSummaryFile.parentFile.mkdirs()
+        dashboardSummaryFile.bytes = sourceFile.bytes
+    }
+}
+
+tasks.register('playwrightDemo') {
+    group = 'MAPAF Demo'
+    description =
+            'Runs the headed Playwright cross-browser demo and generates reports'
+
+    dependsOn 'playwrightInstall'
+    dependsOn 'generateCrossBrowserAggregateSummary'
+    dependsOn 'generateDashboard'
+
+    finalizedBy 'openPlaywrightDashboard'
+
+    doFirst {
+        println ''
+        println '================================================'
+        println ' MAPAF ENTERPRISE PLAYWRIGHT AUTOMATION DEMO'
+        println '================================================'
+        println 'Browsers       : CHROMIUM, FIREFOX, WEBKIT'
+        println "Threads        : ${project.findProperty('webThreads') ?: '4'}"
+        println "Headless       : ${project.findProperty('headless') ?: 'false'}"
+        println "Retry          : ${configuredRetryCount}"
+        println "Environment    : ${configuredEnvironment}"
+        println "Build          : ${configuredBuildNumber}"
+        println "Branch         : ${configuredBranch}"
+        println "Commit         : ${configuredCommit}"
+        println "Open dashboard : ${configuredOpenDashboard}"
+        println '================================================'
+        println ''
+    }
+
+    doLast {
+        println ''
+        println '================================================'
+        println ' PLAYWRIGHT DEMO COMPLETED SUCCESSFULLY'
+        println '================================================'
+        println ''
+        println 'Browser reports:'
+        println '  build/reports/tests/webChromiumTest/index.html'
+        println '  build/reports/tests/webFirefoxTest/index.html'
+        println '  build/reports/tests/webWebkitTest/index.html'
+        println ''
+        println 'Browser summaries:'
+        println '  web/reports/chromium-summary.json'
+        println '  web/reports/firefox-summary.json'
+        println '  web/reports/webkit-summary.json'
+        println ''
+        println 'Aggregate summary:'
+        println '  web/reports/cross-browser-summary.json'
+        println ''
+        println 'Dashboard:'
+        println '  dashboard/reports/index.html'
+        println '================================================'
+    }
+}
+
+tasks.register('aiConfigurationTest', Test) {
+    description = 'Runs Claude configuration foundation tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.config.tests.ClaudeConfigurationTest'
+        includeTestsMatching 'core.ai.config.tests.ClaudeConfigurationLoaderTest'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('aiClientTest', Test) {
+    description = 'Runs reusable Claude client tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.client.tests.ClaudeClientTest'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('aiHealthCheckTest', Test) {
+    description = 'Runs Claude health-check tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching(
+                'core.ai.health.tests.ClaudeHealthCheckTest'
+        )
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('claudeHealthCheck', JavaExec) {
+    description = 'Validates Claude configuration and connectivity'
+    group = 'MAPAF AI'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'core.ai.health.ClaudeHealthCheckCli'
+
+    systemProperty 'claude.enabled',
+            project.findProperty('claudeEnabled')
+                    ?: System.getenv('CLAUDE_ENABLED')
+                    ?: 'false'
+
+    if (project.hasProperty('claudeModel')) {
+        systemProperty 'claude.model',
+                project.property('claudeModel')
+    }
+
+    if (project.hasProperty('claudeBaseUrl')) {
+        systemProperty 'claude.base.url',
+                project.property('claudeBaseUrl')
+    }
+
+    if (project.hasProperty('claudeMaxTokens')) {
+        systemProperty 'claude.max.tokens',
+                project.property('claudeMaxTokens')
+    }
+
+    if (project.hasProperty('claudeTimeoutSeconds')) {
+        systemProperty 'claude.timeout.seconds',
+                project.property('claudeTimeoutSeconds')
+    }
+
+    if (project.hasProperty('claudeMaxRetries')) {
+        systemProperty 'claude.max.retries',
+                project.property('claudeMaxRetries')
+    }
+}
+
+tasks.register('aiPromptTest', Test) {
+    description = 'Runs AI prompt framework tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.prompt.tests.*'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('aiFailureAnalysisTest', Test) {
+    description = 'Runs AI failure analysis tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.analysis.tests.*'
+        includeTestsMatching 'ai.tests.FailureAnalysisServiceTest'
+        includeTestsMatching 'ai.platform.FailureAnalysisIntegrationTest'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('aiLocatorTest', Test) {
+    description = 'Runs AI locator intelligence tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'core.ai.locator.tests.*'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('aiHealingTest', Test) {
+    description = 'Runs AI healing integration tests'
+    group = 'verification'
+
+    useTestNG()
+
+    filter {
+        includeTestsMatching 'ai.tests.HealingAIServiceTest'
+        includeTestsMatching 'ai.tests.SelfHealingRuntimeTest'
+        includeTestsMatching 'ai.tests.HealingAnalysisAgentTest'
+        includeTestsMatching 'ai.tests.HealingAgentConfigurationTest'
+        includeTestsMatching 'ai.tests.HealingAgentMetricsTest'
+        includeTestsMatching 'ai.tests.HealingMetricsCollectorTest'
+        includeTestsMatching 'ai.tests.HealedLocatorRecordTest'
+        includeTestsMatching 'ai.tests.HealedLocatorStoreTest'
+        includeTestsMatching 'ai.tests.HealingExpiryPolicyTest'
+        includeTestsMatching 'ai.tests.StrategyLearningRecordTest'
+        includeTestsMatching 'ai.tests.JsonPersistentStoreTest'
+        includeTestsMatching 'ai.tests.StrategyLearningStoreTest'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('aiGenerateRoomScannerDemo', JavaExec) {
+    group = 'AI Demo'
+    description = 'Generates Room Scanner automation using the configured live AI provider'
+
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'core.ai.demo.RoomScannerCodeGenerationCli'
+
+    def storyPath = project.findProperty('story')
+            ?: 'docs/demo/ai-powered-development/room-scan-story.md'
+
+    args storyPath
+
+    systemProperty 'claude.enabled',
+            project.findProperty('claudeEnabled')
+                    ?: System.getenv('CLAUDE_ENABLED')
+                    ?: 'false'
+
+    def apiKey = project.findProperty('claudeApiKey')
+            ?: System.getenv('ANTHROPIC_API_KEY')
+
+    if (apiKey) {
+        systemProperty 'claude.api.key', apiKey
+    }
+
+    systemProperty 'claude.base.url',
+            project.findProperty('claudeBaseUrl')
+                    ?: System.getenv('CLAUDE_BASE_URL')
+                    ?: 'https://api.anthropic.com/v1/messages'
+
+    systemProperty 'claude.model',
+            project.findProperty('claudeModel')
+                    ?: System.getenv('CLAUDE_MODEL')
+                    ?: 'claude-sonnet-4-5'
+
+    standardInput = System.in
+
+    doFirst {
+        println ''
+        println 'Starting MAPAF AI-powered automation development demo...'
+        println ''
+        println "Claude enabled : ${project.findProperty('claudeEnabled') ?: System.getenv('CLAUDE_ENABLED') ?: 'false'}"
+        println "API key set    : ${apiKey != null && !apiKey.toString().isBlank()}"
+        println "Endpoint       : ${project.findProperty('claudeBaseUrl') ?: System.getenv('CLAUDE_BASE_URL')}"
+        println ''
+    }
+}
+// Additive enterprise API demo. Existing apiFrameworkDemo remains unchanged.
+tasks.register('apiEnterpriseDemo', Test) {
+    description = 'MAPAF Enterprise API Automation Demo with rich execution logs, metrics and Allure evidence'
+    group = 'MAPAF Enterprise Demo'
+
+    systemProperty 'allure.results.directory', "$buildDir/allure-results"
+
+    testLogging {
+        showStandardStreams = true
+        events "passed", "failed", "standardOut", "standardError"
+    }
+
+    useTestNG() {
+        suites 'testng-api-enterprise-demo.xml'
+    }
+}
+
+// Additive enterprise performance demo. Existing performanceFrameworkDemo remains unchanged.
+tasks.register('performanceEnterpriseDemo', JavaExec) {
+    group = 'MAPAF Enterprise Demo'
+    description = 'Runs k6 and JMeter smoke workloads and publishes enterprise performance diagnostics'
+
+    dependsOn 'performanceDemoSmoke'
+    dependsOn testClasses
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'performance.enterprise.PerformanceEnterpriseDemo'
+
+    systemProperty 'mapaf.environment', configuredEnvironment
+}
+
+tasks.register('enterpriseRuntimeTest', Test) {
+    group = 'MAPAF Enterprise'
+    description = 'Runs the Common Enterprise Runtime regression tests'
+    dependsOn testClasses
+    useTestNG()
+    filter {
+        includeTestsMatching 'core.enterprise.tests.*'
+    }
+}
+
+// Additive Experience Engineering story-layer validation.
+tasks.register('experienceEngineeringTest', Test) {
+    group = 'MAPAF Enterprise'
+    description = 'Runs the RoomScan Experience Engineering story-layer regression tests'
+    dependsOn testClasses
+    useTestNG()
+    filter {
+        includeTestsMatching 'enterprise.story.tests.*'
+    }
+}
+
+tasks.register('roomScanStoryDemo', JavaExec) {
+    group = 'MAPAF Enterprise Demo'
+    description = 'Displays the unified RoomScan business story, production workload, and executive outcome'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'enterprise.story.RoomScanStoryCli'
+}
+
+tasks.register('webEnterpriseDemo', Test) {
+    group = 'MAPAF Demo'
+    description = 'Runs the RoomScan Playwright enterprise demo with trace, video, network evidence and dashboard summary'
+
+    dependsOn 'playwrightInstall'
+    useTestNG() {
+        suites 'testng-web-enterprise-demo.xml'
+    }
+
+    systemProperty 'web.browser', project.findProperty('browser') ?: 'CHROMIUM'
+    systemProperty 'web.headless', project.findProperty('headless') ?: 'false'
+    systemProperty 'mapaf.environment', configuredEnvironment
+    systemProperty 'mapaf.build', configuredBuildNumber
+    systemProperty 'mapaf.branch', configuredBranch
+    systemProperty 'mapaf.commit', configuredCommit
+
+    testLogging {
+        events 'passed', 'failed', 'skipped', 'standardOut', 'standardError'
+        showStandardStreams = true
+    }
+
+    doFirst {
+        println ''
+        println '======================================================================'
+        println '        MAPAF PLAYWRIGHT ENTERPRISE DEMO'
+        println '======================================================================'
+        println 'Scenario      : RoomScan Portal End-to-End Validation'
+        println "Browser       : ${project.findProperty('browser') ?: 'CHROMIUM'}"
+        println "Headless      : ${project.findProperty('headless') ?: 'false'}"
+        println 'Trace         : Enabled'
+        println 'Video         : Enabled'
+        println 'Network       : Captured'
+        println 'Accessibility : Enabled'
+        println '======================================================================'
+    }
+}
+
+tasks.register('webEnterpriseUnitTest', Test) {
+    group = 'verification'
+    description = 'Runs MAPAF Playwright enterprise metrics and contract tests'
+    useTestNG() {
+        suites 'testng-web-enterprise-unit.xml'
+    }
+}
+
+// MAPAF Enterprise v2.6 - Executive Command Center
+tasks.register('executiveDashboardUnitTest', Test) {
+    group = 'MAPAF Demo'
+    description = 'Runs MAPAF v2.6 Executive Dashboard unit tests'
+    testLogging {
+        showStandardStreams = true
+        events 'passed', 'failed', 'standardOut', 'standardError'
+    }
+    useTestNG() {
+        suites 'testng-dashboard-enterprise-unit.xml'
+    }
+}
+
+tasks.register('frameworkDashboardDemo', JavaExec) {
+    group = 'MAPAF Demo'
+    description = 'Generates the MAPAF Enterprise Quality Command Center from enterprise module summaries'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dashboard.enterprise.demo.FrameworkDashboardDemo'
+
+    doLast {
+        println ''
+        println 'MAPAF Enterprise Command Center generated:'
+        println "  ${layout.projectDirectory.file('dashboard/reports/index.html').asFile.absolutePath}"
+        println "  ${layout.projectDirectory.file('dashboard/reports/executive-summary.json').asFile.absolutePath}"
+    }
+}
+
+tasks.register('openFrameworkDashboard', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Opens the MAPAF Enterprise Quality Command Center'
+    dependsOn 'frameworkDashboardDemo'
+    def dashboardFile = layout.projectDirectory.file('dashboard/reports/index.html').asFile
+    commandLine 'open', dashboardFile.absolutePath
+}
+
+// MAPAF Enterprise v2.7 - Allure Showcase and Presentation Mode
+
+tasks.register('presentationDemo', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Runs the guided MAPAF presentation using the selected profile'
+
+    environment 'PRESENTATION_PROFILE',
+            project.findProperty('presentationProfile') ?: 'FULL'
+
+    environment 'PRESENTATION_BROWSER',
+            project.findProperty('browser') ?: 'CHROMIUM'
+
+    environment 'PRESENTATION_HEADLESS',
+            project.findProperty('headless') ?: 'false'
+
+    environment 'PRESENTATION_PACING_ENABLED',
+            project.findProperty('presentationPacingEnabled') ?: 'true'
+
+    environment 'PRESENTATION_PACING_MILLIS',
+            project.findProperty('presentationPacingMillis') ?: '1500'
+
+    environment 'PRESENTATION_OPEN_DASHBOARD',
+            project.findProperty('presentationOpenDashboard') ?: 'true'
+
+    environment 'PRESENTATION_OPEN_ALLURE',
+            project.findProperty('presentationOpenAllure') ?: 'true'
+
+    environment 'PRESENTATION_PROJECT_DIR',
+            layout.projectDirectory.asFile.absolutePath
+
+    commandLine 'bash',
+            'performance/scripts/run-mapaf-presentation.sh'
+}
+
+tasks.register('presentationExecutiveDemo', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Runs the executive MAPAF presentation profile'
+    environment 'PRESENTATION_PROFILE', 'EXECUTIVE'
+    environment 'PRESENTATION_PROJECT_DIR', layout.projectDirectory.asFile.absolutePath
+    commandLine 'bash', 'performance/scripts/run-mapaf-presentation.sh'
+}
+
+tasks.register('presentationEngineeringDemo', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Runs the engineering MAPAF presentation profile'
+    environment 'PRESENTATION_PROFILE', 'ENGINEERING'
+    environment 'PRESENTATION_PROJECT_DIR', layout.projectDirectory.asFile.absolutePath
+    commandLine 'bash', 'performance/scripts/run-mapaf-presentation.sh'
+}
+
+tasks.register('generateAllureEvidence', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Generates the MAPAF Allure Evidence Center without starting a blocking server'
+    commandLine 'bash', '-lc', '''
+        set -e
+        PRESENTATION_PROJECT_DIR="$PWD" \
+        PRESENTATION_PROFILE=ALLURE_SHOWCASE \
+        PRESENTATION_BROWSER=CHROMIUM \
+        PRESENTATION_HEADLESS=false \
+        MAPAF_ENVIRONMENT=QA \
+          performance/scripts/publish-allure-metadata.sh
+        allure generate build/allure-results --clean -o build/allure-report
+        test -f build/allure-report/index.html
+    '''
+}
+
+tasks.register('openAllureEvidence', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Opens an already generated MAPAF Allure Evidence Center'
+    dependsOn 'generateAllureEvidence'
+    commandLine 'open', layout.projectDirectory.file('build/allure-report/index.html').asFile.absolutePath
+}
+
+tasks.register('serveAllureEvidence', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Serves the generated Allure Evidence Center; press Ctrl+C to stop'
+    dependsOn 'generateAllureEvidence'
+    commandLine 'allure', 'open', layout.projectDirectory.dir('build/allure-report').asFile.absolutePath
+}
+
+tasks.register('allureShowcase') {
+    group = 'MAPAF Demo'
+    description = 'Generates and opens the MAPAF Allure Evidence Center'
+    dependsOn 'openAllureEvidence'
+}
+
+// MAPAF Enterprise v2.7.4 - Production workload, API digital twin and failure intelligence
+tasks.register('apiRoomScanDigitalTwinDemo', Test) {
+    group = 'MAPAF Enterprise Demo'
+    description = 'Validates realistic RoomScan backend capabilities and publishes a Postman collection'
+    systemProperty 'allure.results.directory', "$buildDir/allure-results"
+    useTestNG() { suites 'testng-api-digital-twin.xml' }
+    testLogging { showStandardStreams = true; events 'passed', 'failed', 'standardOut', 'standardError' }
+}
+
+tasks.register('performanceProductionDemo', JavaExec) {
+    group = 'MAPAF Enterprise Demo'
+    description = 'Executes the deterministic RoomScan production workload model with 10,000+ requests'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'performance.production.RoomScanProductionWorkloadDemo'
+    systemProperty 'mapaf.target.requests', project.findProperty('targetRequests') ?: '10500'
+    systemProperty 'mapaf.environment', configuredEnvironment
+}
+
+def failureTask = { String name, String suite, String descriptionText ->
+    tasks.register(name, Test) {
+        group = 'MAPAF Failure Showcase'
+        description = descriptionText
+        systemProperty 'allure.results.directory', "$buildDir/allure-results"
+        ignoreFailures = true
+        useTestNG() { suites suite }
+        testLogging { showStandardStreams = true; events 'passed', 'failed', 'standardOut', 'standardError'; exceptionFormat = 'full' }
+    }
+}
+failureTask('mobileEnterpriseFailureDemo', 'testng-mobile-failure-showcase.xml', 'Publishes the deterministic RoomScan mobile locator/healing failure showcase')
+failureTask('webEnterpriseFailureDemo', 'testng-web-failure-showcase.xml', 'Publishes the deterministic RoomScan portal approval failure showcase')
+failureTask('apiEnterpriseFailureDemo', 'testng-api-failure-showcase.xml', 'Publishes the deterministic CubiCasa provider timeout failure showcase')
+failureTask('performanceEnterpriseFailureDemo', 'testng-performance-failure-showcase.xml', 'Publishes the deterministic performance SLA failure showcase')
+
+tasks.register('failureShowcaseDemo') {
+    group = 'MAPAF Failure Showcase'
+    description = 'Runs all deterministic failure scenarios and publishes dashboard and Allure debugging evidence'
+    dependsOn 'mobileEnterpriseFailureDemo', 'webEnterpriseFailureDemo', 'apiEnterpriseFailureDemo', 'performanceEnterpriseFailureDemo'
+    finalizedBy 'frameworkDashboardDemo'
+}
+
+
+// MAPAF Architecture Foundation Sprint 0.1
+apply from: 'gradle/platform-core-sprint-0.2.gradle'
+
+tasks.register('architectureGovernanceTest', Test) {
+    group = 'MAPAF Architecture'
+    description = 'Validates the MAPAF product architecture foundation and accepted ADR set'
+    useTestNG() { suites 'testng-architecture-governance.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateArchitectureFoundation', Exec) {
+    group = 'MAPAF Architecture'
+    description = 'Validates required MAPAF architecture and governance artifacts'
+    commandLine 'bash', 'scripts/architecture/validate-architecture-foundation.sh'
+}
+
+tasks.register('businessTransactionUnitTest', Test) {
+    group = 'verification'
+    description = 'Runs shared business transaction contract tests'
+    useTestNG() { suites 'testng-business-transactions.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateDemoRelease', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Validates dashboard data, evidence links, Allure output and release artifacts'
+    commandLine 'bash', 'scripts/demo/validate-demo-release.sh'
+}
+
+tasks.register('demoReadinessGate') {
+    group = 'MAPAF Demo'
+    description = 'Runs architecture, platform and business transaction pre-demo gates'
+    dependsOn 'architectureGovernanceTest', 'validateArchitectureFoundation', 'platformCoreGate', 'businessTransactionUnitTest'
+}
+
+tasks.register('demoArtifactGate') {
+    group = 'MAPAF Demo'
+    description = 'Validates generated dashboard, failure and Allure evidence artifacts'
+    dependsOn 'validateDemoRelease'
+}
+
+tasks.register('mondayDemo', Exec) {
+    group = 'MAPAF Demo'
+    description = 'Runs the complete guided Monday demo and generates dashboard plus Allure evidence'
+    commandLine 'bash', 'scripts/demo/run-monday-demo.sh'
+}
+
+// MAPAF v2.8 Sprint 1 - Release Readiness Foundation
+tasks.register('releaseReadinessTest', Test) {
+    group = 'MAPAF Release Readiness'
+    description = 'Runs MAPAF Release Readiness engine tests'
+
+    useTestNG() {
+        suites 'testng-release-readiness.xml'
+    }
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('releaseReadinessDemo', JavaExec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Generates the MAPAF Release Readiness decision report'
+
+    dependsOn 'frameworkDashboardDemo'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dashboard.enterprise.release.ReleaseReadinessPublisher'
+    args projectDir.absolutePath
+}
+
+tasks.register('validateReleaseReadinessArchitecture', Exec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Validates v2.8 Sprint 1 architecture and source artifacts'
+
+    commandLine 'bash',
+            'scripts/release/validate-release-readiness-sprint-1.sh'
+}
+
+tasks.register('releaseReadinessGate') {
+    group = 'MAPAF Release Readiness'
+    description = 'Runs the complete MAPAF v2.8 Sprint 1 gate'
+
+    dependsOn 'releaseReadinessTest'
+    dependsOn 'validateReleaseReadinessArchitecture'
+    dependsOn 'releaseReadinessDemo'
+}
+
+// MAPAF v2.8 Sprint 2.1 - Quality Gate Policy Foundation
+tasks.register('qualityGatePolicyFoundationTest', Test) {
+    group = 'MAPAF Release Readiness'
+    description = 'Runs the Sprint 2.1 quality-gate policy foundation tests'
+
+    useTestNG() {
+        suites 'testng-quality-gate-policy-foundation.xml'
+    }
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateQualityGatePolicyFoundation', Exec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Validates Sprint 2.1 gate policy artifacts'
+
+    commandLine 'bash',
+            'scripts/release/validate-quality-gate-policy-foundation.sh'
+}
+
+tasks.register('qualityGatePolicyFoundationGate') {
+    group = 'MAPAF Release Readiness'
+    description = 'Runs the complete MAPAF v2.8 Sprint 2.1 gate'
+
+    dependsOn 'qualityGatePolicyFoundationTest'
+    dependsOn 'validateQualityGatePolicyFoundation'
+    dependsOn 'releaseReadinessTest'
+}
+
+// MAPAF v2.8 Sprint 2.2 - Governed Release Gates
+tasks.register('validateQualityGatesSprint22', Exec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Validates Sprint 2.2 governed release-gate artifacts'
+
+    commandLine 'bash',
+            'scripts/release/validate-quality-gates-sprint-2.2.sh'
+}
+
+tasks.register('qualityGateSprint22Gate') {
+    group = 'MAPAF Release Readiness'
+    description = 'Runs the complete MAPAF v2.8 Sprint 2.2 gate'
+
+    dependsOn 'qualityGatePolicyFoundationTest'
+    dependsOn 'validateQualityGatePolicyFoundation'
+    dependsOn 'validateQualityGatesSprint22'
+    dependsOn 'releaseReadinessTest'
+}
+
+// MAPAF v2.8 Sprint 2.3 - Readiness and Compliance Gates
+tasks.register('validateQualityGatesSprint23', Exec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Validates Sprint 2.3 readiness and compliance gates'
+
+    commandLine 'bash',
+            'scripts/release/validate-quality-gates-sprint-2.3.sh'
+}
+
+tasks.register('qualityGateSprint23Gate') {
+    group = 'MAPAF Release Readiness'
+    description = 'Runs the complete MAPAF v2.8 Sprint 2.3 gate'
+
+    dependsOn 'qualityGatePolicyFoundationTest'
+    dependsOn 'validateQualityGatePolicyFoundation'
+    dependsOn 'validateQualityGatesSprint22'
+    dependsOn 'validateQualityGatesSprint23'
+    dependsOn 'releaseReadinessTest'
+}
+
+// MAPAF v2.8 Sprint 2.4 - Executive Decision Experience
+tasks.register('validateExecutiveDecisionSprint24', Exec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Validates Sprint 2.4 executive-decision artifacts'
+
+    commandLine 'bash',
+            'scripts/release/validate-executive-decision-sprint-2.4.sh'
+}
+
+tasks.register('executiveDecisionGreenDemo', JavaExec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Publishes the green executive-decision scenario'
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dashboard.enterprise.release.decision.ExecutiveDecisionScenarioPublisher'
+    args 'green'
+}
+
+tasks.register('executiveDecisionConditionalDemo', JavaExec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Publishes the conditional executive-decision scenario'
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dashboard.enterprise.release.decision.ExecutiveDecisionScenarioPublisher'
+    args 'conditional'
+}
+
+tasks.register('executiveDecisionBlockedDemo', JavaExec) {
+    group = 'MAPAF Release Readiness'
+    description = 'Publishes the blocked executive-decision scenario'
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dashboard.enterprise.release.decision.ExecutiveDecisionScenarioPublisher'
+    args 'blocked'
+}
+
+tasks.register('executiveDecisionScenarioDemo') {
+    group = 'MAPAF Release Readiness'
+    description = 'Publishes all v2.8 executive-decision scenarios'
+
+    dependsOn 'executiveDecisionGreenDemo'
+    dependsOn 'executiveDecisionConditionalDemo'
+    dependsOn 'executiveDecisionBlockedDemo'
+}
+
+tasks.register('qualityGateSprint24Gate') {
+    group = 'MAPAF Release Readiness'
+    description = 'Runs the complete MAPAF v2.8 Sprint 2.4 gate'
+
+    dependsOn 'qualityGatePolicyFoundationTest'
+    dependsOn 'validateQualityGatePolicyFoundation'
+    dependsOn 'validateQualityGatesSprint22'
+    dependsOn 'validateQualityGatesSprint23'
+    dependsOn 'validateExecutiveDecisionSprint24'
+    dependsOn 'releaseReadinessTest'
+}
+
+// MAPAF v2.9 Sprint 3.1 - Doctor Foundation
+tasks.register('doctorFoundationTest', Test) {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor foundation and probe contract tests'
+
+    useTestNG() {
+        suites 'testng-mapaf-doctor-foundation.xml'
+    }
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateDoctorFoundation', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates MAPAF Doctor Sprint 3.1 architecture and artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-doctor-foundation.sh'
+}
+
+tasks.register('mapafDoctor', JavaExec) {
+    // MAPAF v3.0 Sprint 4.1.1 - forward intelligence identifiers
+    ['mapaf.intelligence.release.id',
+     'mapaf.intelligence.execution.id',
+     'mapaf.intelligence.history.retention'].each { key ->
+        def value = System.getProperty(key)
+        if (value != null && !value.trim().isEmpty()) {
+            systemProperty key, value
+        }
+    }
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor and publishes platform health reports'
+
+    dependsOn 'compileTestJava'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dashboard.enterprise.doctor.publisher.MapafDoctorPublisher'
+    args projectDir.absolutePath
+}
+
+tasks.register('doctorFoundationGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs the complete MAPAF v2.9 Sprint 3.1 gate'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.2.1 - Environment Health
+tasks.register('validateEnvironmentHealthSprint321', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.2.1 Environment Health artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-environment-health-sprint-3.2.1.sh'
+}
+
+tasks.register('doctorEnvironmentGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Environment Health validation'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'validateEnvironmentHealthSprint321'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.2.2 - Browser Health
+tasks.register('validateBrowserHealthSprint322', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.2.2 Browser Health artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-browser-health-sprint-3.2.2.sh'
+}
+
+tasks.register('doctorBrowserGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Browser Health validation'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'validateEnvironmentHealthSprint321'
+    dependsOn 'validateBrowserHealthSprint322'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.2.3 - Dashboard Health
+tasks.register('validateDashboardHealthSprint323', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.2.3 Dashboard Health artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-dashboard-health-sprint-3.2.3.sh'
+}
+
+tasks.register('doctorDashboardGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Dashboard Health validation'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'validateEnvironmentHealthSprint321'
+    dependsOn 'validateBrowserHealthSprint322'
+    dependsOn 'validateDashboardHealthSprint323'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.3.1 - Claude Health
+tasks.register('validateClaudeHealthSprint331', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.3.1 Claude Health artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-claude-health-sprint-3.3.1.sh'
+}
+
+tasks.register('doctorClaudeGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Claude Health validation'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'validateEnvironmentHealthSprint321'
+    dependsOn 'validateBrowserHealthSprint322'
+    dependsOn 'validateDashboardHealthSprint323'
+    dependsOn 'validateClaudeHealthSprint331'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.3.2 - Device Health
+tasks.register('validateDeviceHealthSprint332', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.3.2 Device Health artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-device-health-sprint-3.3.2.sh'
+}
+
+tasks.register('doctorDeviceGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Device Health validation'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'validateEnvironmentHealthSprint321'
+    dependsOn 'validateBrowserHealthSprint322'
+    dependsOn 'validateDashboardHealthSprint323'
+    dependsOn 'validateClaudeHealthSprint331'
+    dependsOn 'validateDeviceHealthSprint332'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.3.3 - API Health
+tasks.register('validateApiHealthSprint333', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.3.3 API Health artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-api-health-sprint-3.3.3.sh'
+}
+
+tasks.register('doctorApiGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor API Health validation'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'validateEnvironmentHealthSprint321'
+    dependsOn 'validateBrowserHealthSprint322'
+    dependsOn 'validateDashboardHealthSprint323'
+    dependsOn 'validateClaudeHealthSprint331'
+    dependsOn 'validateDeviceHealthSprint332'
+    dependsOn 'validateApiHealthSprint333'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.3.4 - Performance Health
+tasks.register('validatePerformanceHealthSprint334', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.3.4 Performance Health artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-performance-health-sprint-3.3.4.sh'
+}
+
+tasks.register('doctorPerformanceGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Performance Health validation'
+
+    dependsOn 'doctorFoundationTest'
+    dependsOn 'validateDoctorFoundation'
+    dependsOn 'validateEnvironmentHealthSprint321'
+    dependsOn 'validateBrowserHealthSprint322'
+    dependsOn 'validateDashboardHealthSprint323'
+    dependsOn 'validateClaudeHealthSprint331'
+    dependsOn 'validateDeviceHealthSprint332'
+    dependsOn 'validateApiHealthSprint333'
+    dependsOn 'validatePerformanceHealthSprint334'
+    dependsOn 'qualityGateSprint24Gate'
+}
+
+// MAPAF v2.9 Sprint 3.4.1 - Executive Doctor Dashboard
+tasks.register('doctorExecutiveDashboardTest', Test) {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Executive Dashboard tests'
+
+    useTestNG() {
+        suites 'testng-mapaf-doctor-executive.xml'
+    }
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateDoctorExecutiveSprint341', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.4.1 Executive Doctor artifacts'
+
+    commandLine 'bash',
+            'scripts/doctor/validate-doctor-executive-sprint-3.4.1.sh'
+}
+
+tasks.register('doctorExecutiveDashboardGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Executive Dashboard validation'
+
+    dependsOn 'doctorExecutiveDashboardTest'
+    dependsOn 'validateDoctorExecutiveSprint341'
+    dependsOn 'doctorPerformanceGate'
+}
+
+// MAPAF v2.9 Sprint 3.4.4 - GA Packaging
+tasks.register('gaReleaseValidation', Exec) {
+    group = 'MAPAF Release'
+    description = 'Runs the complete MAPAF v2.9 GA release validation'
+    dependsOn 'doctorCliGate'
+    dependsOn 'releaseReadinessDemo'
+    dependsOn 'generateAllureEvidence'
+    commandLine 'bash', 'scripts/release/validate_v2_9_ga.sh', projectDir.absolutePath
+}
+
+tasks.register('gaReleasePackage', Exec) {
+    group = 'MAPAF Release'
+    description = 'Builds the MAPAF Enterprise v2.9.0 GA release package'
+    dependsOn 'gaReleaseValidation'
+    commandLine 'python3', 'scripts/release/build_v2_9_ga.py', '--root', projectDir.absolutePath, '--skip-validation'
+}
+
+// MAPAF v2.9 Sprint 3.4.2 - Diagnosis Center
+ tasks.register('doctorDiagnosisCenterTest', Test) {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Diagnosis Center tests'
+    useTestNG() {
+        suites 'testng-mapaf-doctor-diagnosis.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateDoctorDiagnosisSprint342', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.4.2 Diagnosis Center artifacts'
+    commandLine 'bash', 'scripts/doctor/validate-doctor-diagnosis-sprint-3.4.2.sh'
+}
+
+tasks.register('doctorDiagnosisCenterGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor Diagnosis Center validation'
+    dependsOn 'doctorDiagnosisCenterTest'
+    dependsOn 'validateDoctorDiagnosisSprint342'
+    dependsOn 'doctorExecutiveDashboardGate'
+}
+
+// MAPAF v2.9 Sprint 3.4.3 - Doctor CLI
+tasks.register('doctorCliTest', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor CLI and Executive Report tests'
+    dependsOn 'mapafDoctor'
+    commandLine 'bash', 'scripts/doctor/test-mapaf-doctor-cli-sprint-3.4.3.sh', projectDir.absolutePath
+}
+
+tasks.register('validateDoctorCliSprint343', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Validates Sprint 3.4.3 Doctor CLI artifacts'
+    commandLine 'bash', 'scripts/doctor/validate-doctor-cli-sprint-3.4.3.sh'
+}
+
+tasks.register('mapafDoctorExecutiveReport', Exec) {
+    group = 'MAPAF Doctor'
+    description = 'Publishes MAPAF Doctor executive JSON, Markdown, HTML, and PDF reports'
+    dependsOn 'mapafDoctor'
+    commandLine 'bash', '-c', './mapaf-doctor report --no-refresh --quiet'
+}
+
+tasks.register('doctorCliGate') {
+    group = 'MAPAF Doctor'
+    description = 'Runs MAPAF Doctor CLI and Executive Report validation'
+    dependsOn 'doctorCliTest'
+    dependsOn 'validateDoctorCliSprint343'
+    dependsOn 'doctorDiagnosisCenterGate'
+}
+
+// MAPAF v3.0 Sprint 4.1 - Platform Intelligence Foundation
+tasks.register('platformIntelligenceFoundationTest', Test) {
+    group = 'MAPAF Intelligence'
+    description = 'Runs Platform Intelligence history foundation tests'
+    useTestNG() {
+        suites 'testng-mapaf-platform-intelligence.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validatePlatformIntelligenceSprint41', Exec) {
+    group = 'MAPAF Intelligence'
+    description = 'Validates MAPAF v3.0 Sprint 4.1 artifacts'
+    commandLine 'bash', 'scripts/intelligence/validate-platform-intelligence-sprint-4.1.sh'
+}
+
+tasks.register('platformIntelligenceFoundationGate') {
+    group = 'MAPAF Intelligence'
+    description = 'Runs MAPAF Platform Intelligence Foundation validation'
+    dependsOn 'platformIntelligenceFoundationTest'
+    dependsOn 'validatePlatformIntelligenceSprint41'
+    dependsOn 'doctorCliGate'
+}
+
+// MAPAF v3.0 Sprint 4.2 - Trend Intelligence
+tasks.register('trendIntelligenceTest', Test) {
+    group = 'MAPAF Intelligence'
+    description = 'Runs MAPAF Trend Intelligence tests'
+    useTestNG() { suites 'testng-mapaf-trend-intelligence.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateTrendIntelligenceSprint42', Exec) {
+    group = 'MAPAF Intelligence'
+    description = 'Validates MAPAF v3.0 Sprint 4.2 artifacts'
+    commandLine 'bash', 'scripts/intelligence/validate-trend-intelligence-sprint-4.2.sh'
+}
+
+tasks.register('trendIntelligenceGate') {
+    group = 'MAPAF Intelligence'
+    description = 'Runs MAPAF Trend Intelligence validation'
+    dependsOn 'trendIntelligenceTest'
+    dependsOn 'validateTrendIntelligenceSprint42'
+    dependsOn 'platformIntelligenceFoundationGate'
+}
+
+// MAPAF v3.0 Patch 3.0.004 - Risk Forecast Engine
+tasks.register('riskForecastIntelligenceTest', Test) {
+    group = 'MAPAF Intelligence'
+    description = 'Runs MAPAF Risk Forecast Engine tests'
+    useTestNG() { suites 'testng-mapaf-risk-forecast.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateRiskForecastPatch3004', Exec) {
+    group = 'MAPAF Intelligence'
+    description = 'Validates MAPAF Patch 3.0.004 Risk Forecast Engine artifacts'
+    commandLine 'bash', 'scripts/intelligence/validate-risk-forecast-patch-3.0.004.sh'
+}
+
+tasks.register('forecastIntelligenceGate') {
+    group = 'MAPAF Intelligence'
+    description = 'Runs MAPAF Predictive Intelligence Risk Forecast validation'
+    dependsOn 'riskForecastIntelligenceTest'
+    dependsOn 'validateRiskForecastPatch3004'
+    dependsOn 'trendIntelligenceGate'
+}
+
+// MAPAF v3.2 Sprint 5.1 - Agent, Tool, and Skill Foundation
+tasks.register('agentFoundationTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF agent, tool, and skill foundation tests'
+    useTestNG() {
+        suites 'testng-mapaf-agent-foundation.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateAgentFoundationSprint51', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.2 Sprint 5.1 agent foundation artifacts'
+    commandLine 'bash', 'scripts/agent/validate-agent-foundation-sprint-5.1.sh'
+}
+
+tasks.register('agentFoundationGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Agent, Tool, and Skill Foundation validation'
+    dependsOn 'agentFoundationTest'
+    dependsOn 'validateAgentFoundationSprint51'
+    dependsOn 'forecastIntelligenceGate'
+}
+
+// MAPAF v3.2 Sprint 5.2 - Work Management Integration
+tasks.register('workManagementIntegrationTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs Jira and Azure Boards work-management integration tests'
+    useTestNG() { suites 'testng-mapaf-work-management.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateWorkManagementSprint52', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.2 Sprint 5.2 work-management artifacts'
+    commandLine 'bash', 'scripts/agent/validate-work-management-sprint-5.2.sh'
+}
+
+tasks.register('workManagementIntegrationGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Work Management Integration validation'
+    dependsOn 'workManagementIntegrationTest'
+    dependsOn 'validateWorkManagementSprint52'
+    dependsOn 'agentFoundationGate'
+}
+
+// MAPAF v3.2 Sprint 5.3 - Source Control and CI/CD Integration
+tasks.register('sourceControlIntegrationTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF source control, impact analysis, and pipeline integration tests'
+    useTestNG() {
+        suites 'testng-mapaf-source-control.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateSourceControlSprint53', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.2 Sprint 5.3 source control and CI/CD artifacts'
+    commandLine 'bash', 'scripts/agent/validate-source-control-sprint-5.3.sh'
+}
+
+tasks.register('sourceControlIntegrationGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Source Control and CI/CD Integration validation'
+    dependsOn 'sourceControlIntegrationTest'
+    dependsOn 'validateSourceControlSprint53'
+    dependsOn 'workManagementIntegrationGate'
+}
+
+// MAPAF v3.2 Sprint 5.4 - Knowledge Integration
+tasks.register('knowledgeIntegrationTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF knowledge integration and governance tests'
+    useTestNG() {
+        suites 'testng-mapaf-knowledge-integration.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateKnowledgeIntegrationSprint54', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.2 Sprint 5.4 knowledge integration artifacts'
+    commandLine 'bash', 'scripts/agent/validate-knowledge-integration-sprint-5.4.sh'
+}
+
+tasks.register('knowledgeIntegrationGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Knowledge Integration validation'
+    dependsOn 'knowledgeIntegrationTest'
+    dependsOn 'validateKnowledgeIntegrationSprint54'
+    dependsOn 'sourceControlIntegrationGate'
+}
+
+// MAPAF v3.2 Sprint 5.5 - Multi-Agent Orchestration
+tasks.register('multiAgentOrchestrationTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs governed multi-agent orchestration tests'
+    useTestNG() {
+        suites 'testng-mapaf-multi-agent-orchestration.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateMultiAgentOrchestrationSprint55', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.2 Sprint 5.5 multi-agent orchestration artifacts'
+    commandLine 'bash', 'scripts/agent/validate-multi-agent-orchestration-sprint-5.5.sh'
+}
+
+tasks.register('multiAgentOrchestrationGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Multi-Agent Orchestration validation'
+    dependsOn 'multiAgentOrchestrationTest'
+    dependsOn 'validateMultiAgentOrchestrationSprint55'
+    dependsOn 'knowledgeIntegrationGate'
+}
+
+// MAPAF v3.2 Sprint 5.6 - Agent Runtime and Tool Ecosystem
+tasks.register('agentRuntimeToolEcosystemTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs provider resolution, capability runtime, and MCP contract tests'
+    useTestNG() { suites 'testng-mapaf-agent-runtime.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateAgentRuntimeSprint56', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.2 Sprint 5.6 agent runtime artifacts'
+    commandLine 'bash', 'scripts/agent/validate-agent-runtime-sprint-5.6.sh'
+}
+
+tasks.register('agentRuntimeToolEcosystemGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Agent Runtime and Tool Ecosystem validation'
+    dependsOn 'agentRuntimeToolEcosystemTest'
+    dependsOn 'validateAgentRuntimeSprint56'
+    dependsOn 'multiAgentOrchestrationGate'
+}
+
+// MAPAF v3.3 Platform Phase 2.1 - Skill Studio Foundation
+tasks.register('skillStudioFoundationTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs versioned skill package, validation, evaluation, and publication tests'
+    useTestNG() {
+        suites 'testng-mapaf-skill-studio.xml'
+    }
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.register('validateSkillStudioPhase21', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.3 Platform Phase 2.1 Skill Studio artifacts'
+    commandLine 'bash', 'scripts/agent/validate-skill-studio-phase-2.1.sh'
+}
+
+tasks.register('skillStudioFoundationGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Skill Studio Foundation validation'
+    dependsOn 'skillStudioFoundationTest'
+    dependsOn 'validateSkillStudioPhase21'
+    dependsOn 'agentRuntimeToolEcosystemGate'
+}
+
+// MAPAF v3.3 Platform Phase 2.2 - Live Enterprise Connector Framework
+tasks.register('liveEnterpriseConnectorFrameworkTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs live, replay, hybrid, health, governance, and connector audit tests'
+    useTestNG() { suites 'testng-mapaf-live-connectors.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateLiveEnterpriseConnectorsPhase22', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.3 Platform Phase 2.2 connector artifacts'
+    commandLine 'bash', 'scripts/agent/validate-live-connectors-phase-2.2.sh'
+}
+
+tasks.register('liveEnterpriseConnectorFrameworkGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF Live Enterprise Connector Framework validation'
+    dependsOn 'liveEnterpriseConnectorFrameworkTest'
+    dependsOn 'validateLiveEnterpriseConnectorsPhase22'
+    dependsOn 'skillStudioFoundationGate'
+}
+
+// MAPAF v3.3 Platform Phase 2.3 - LLM Provider Platform
+tasks.register('llmProviderPlatformTest', Test) {
+    group = 'MAPAF Agents'
+    description = 'Runs LLM provider resolution, replay, fallback, governance, prompt and audit tests'
+    useTestNG() { suites 'testng-mapaf-llm-provider.xml' }
+    testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full' }
+}
+
+tasks.register('validateLlmProviderPhase23', Exec) {
+    group = 'MAPAF Agents'
+    description = 'Validates MAPAF v3.3 Platform Phase 2.3 LLM Provider Platform artifacts'
+    commandLine 'bash', 'scripts/agent/validate-llm-provider-phase-2.3.sh'
+}
+
+tasks.register('llmProviderPlatformGate') {
+    group = 'MAPAF Agents'
+    description = 'Runs MAPAF LLM Provider Platform validation'
+    dependsOn 'llmProviderPlatformTest'
+    dependsOn 'validateLlmProviderPhase23'
+    dependsOn 'liveEnterpriseConnectorFrameworkGate'
+}
+
+// BEGIN MAPAF UPDR AUTOMATION AND REPORTING
+
+def updrBaseUrl = providers.gradleProperty('updrBaseUrl').orElse('http://localhost:8090')
+
+tasks.register('updrDemoStart', Exec) { group='MAPAF UPDR Demo'; description='Starts the deterministic UPDR integrated demo'; commandLine 'bash','scripts/updr/start-updr-demo.sh',projectDir.absolutePath }
+tasks.register('updrDemoStop', Exec) { group='MAPAF UPDR Demo'; description='Stops the UPDR integrated demo'; commandLine 'bash','scripts/updr/stop-updr-demo.sh',projectDir.absolutePath }
+tasks.register('updrDemoReset', Exec) { group='MAPAF UPDR Demo'; description='Resets UPDR demo state'; commandLine 'bash','scripts/updr/reset-updr-demo.sh' }
+tasks.register('updrApiDemo', Test) { group='MAPAF UPDR Demo'; description='Runs enterprise UPDR API lifecycle tests'; useTestNG(){suites 'src/test/resources/testng-updr-api-demo.xml'}; systemProperty 'updr.baseUrl',updrBaseUrl.get(); outputs.upToDateWhen{false} }
+tasks.register('updrWebDemo', Test) { group='MAPAF UPDR Demo'; description='Runs Playwright Admin, mobile Inspector and QC journey'; useTestNG(){suites 'src/test/resources/testng-updr-web-demo.xml'}; systemProperty 'updr.baseUrl',updrBaseUrl.get(); systemProperty 'headless',System.getProperty('headless','true'); outputs.upToDateWhen{false} }
+tasks.register('updrMobileDemo', Test) { group='MAPAF UPDR Demo'; description='Runs the focused UPDR Inspector mobile-emulated demonstration'; useTestNG(){suites 'src/test/resources/testng-updr-mobile-demo.xml'}; systemProperty 'updr.baseUrl',updrBaseUrl.get(); systemProperty 'headless',System.getProperty('headless','true'); outputs.upToDateWhen{false} }
+tasks.register('updrPerformanceDemo', Exec) { group='MAPAF UPDR Demo'; description='Runs integrated k6 workloads for order, autosave, AI and validation'; doFirst{file('performance/updr/reports').mkdirs()}; environment 'UPDR_BASE_URL',updrBaseUrl.get(); commandLine 'k6','run','--summary-export=performance/updr/reports/integrated-summary.json','performance/updr/k6/updr-integrated-quality.js' }
+tasks.register('updrReport', Exec) { group='MAPAF UPDR Demo'; description='Generates the UPDR unified quality dashboard'; commandLine 'node','scripts/updr/generate-updr-integrated-report.js',projectDir.absolutePath }
+tasks.register('validateUpdrAutomationReporting', Exec) { group='verification'; description='Validates UPDR integrated quality artifacts'; commandLine 'bash','scripts/updr/validate-updr-integrated-quality.sh' }
+tasks.register('updrIntegratedQualityGate') { group='verification'; description='Runs API, mobile, Playwright and reporting validation'; dependsOn 'updrDemoStart','updrApiDemo','updrMobileDemo','updrWebDemo','updrReport','validateUpdrAutomationReporting' }
+tasks.register('updrDemoGate') { group='verification'; description='Compatibility alias for the integrated quality gate'; dependsOn 'updrIntegratedQualityGate' }
+
+// END MAPAF UPDR AUTOMATION AND REPORTING
+
+// BEGIN MAPAF UPDR LIVE API TRANSACTION MONITOR
+
+tasks.register('updrApiMonitor', Exec) {
+    group = 'MAPAF UPDR Demo'
+    description = 'Opens the live UPDR API Transaction Monitor'
+    environment 'UPDR_BASE_URL', providers.gradleProperty('updrBaseUrl').orElse('http://localhost:8090').get()
+    commandLine 'bash', 'scripts/updr/open-api-monitor.sh'
+}
+
+tasks.register('updrApiLiveDemo', Exec) {
+    group = 'MAPAF UPDR Demo'
+    description = 'Runs the paced UPDR API business journey and streams each transaction to the monitor'
+    environment 'UPDR_BASE_URL', providers.gradleProperty('updrBaseUrl').orElse('http://localhost:8090').get()
+    environment 'UPDR_API_PACE_MS', providers.gradleProperty('apiDemoPaceMs').orElse('1800').get()
+    commandLine 'node', 'scripts/updr/run-live-api-demo.js'
+}
+
+tasks.register('updrApiPresentationDemo', Exec) {
+    group = 'MAPAF UPDR Demo'
+    description = 'Starts the service, opens the live monitor, and runs the paced API demonstration'
+    environment 'UPDR_BASE_URL', providers.gradleProperty('updrBaseUrl').orElse('http://localhost:8090').get()
+    environment 'UPDR_API_PACE_MS', providers.gradleProperty('apiDemoPaceMs').orElse('1800').get()
+    commandLine 'bash', 'scripts/updr/run-api-presentation-demo.sh', projectDir.absolutePath
+}
+
+tasks.register('validateUpdrLiveApiMonitor', Exec) {
+    group = 'verification'
+    description = 'Validates the UPDR Live API Transaction Monitor artifacts and contracts'
+    commandLine 'bash', 'scripts/updr/validate-live-api-monitor.sh'
+}
+
+// END MAPAF UPDR LIVE API TRANSACTION MONITOR
+
+// BEGIN MAPAF UPDR LIVE API REPLAY FALLBACK HOTFIX
+
+tasks.register('validateUpdrLiveApiReplayFallback', Exec) {
+    group = 'verification'
+    description = 'Validates the UPDR Live API governed replay fallback hotfix'
+    commandLine 'bash', 'scripts/updr/validate-live-api-replay-fallback.sh'
+}
+
+// END MAPAF UPDR LIVE API REPLAY FALLBACK HOTFIX
+
+
+// MAPAF v3.3 UPDR Demo Experience Patch
+
+tasks.register('openUpdrDemoExperience', Exec) {
+    group = 'MAPAF UPDR Demo'
+    description = 'Opens the MAPAF enterprise UPDR demo launcher'
+    commandLine 'bash', 'scripts/updr/open-demo-experience.sh'
+}
+
+tasks.register('validateUpdrDemoExperience', Exec) {
+    group = 'MAPAF UPDR Demo'
+    description = 'Validates the MAPAF UPDR demo experience assets'
+    commandLine 'bash', 'scripts/updr/validate-demo-experience.sh', projectDir.absolutePath
+}
+
+tasks.register('updrClientDemo') {
+    group = 'MAPAF UPDR Demo'
+    description = 'Starts the UPDR service and opens the enterprise demo experience'
+    dependsOn 'updrDemoStart'
+    finalizedBy 'openUpdrDemoExperience'
+}
+
+// BEGIN MAPAF V3.0 K6 PERFORMANCE PLATFORM FOUNDATION
+
+def mapafK6Property = { String name, String fallback ->
+    providers.gradleProperty(name).orElse(fallback).get()
+}
+
+def configureUpdrK6 = { Exec task, String profile ->
+    task.environment 'UPDR_BASE_URL', mapafK6Property('updrBaseUrl', 'http://localhost:8090')
+    task.environment 'MAPAF_EXECUTION_ID', mapafK6Property('executionId', "MAPAF-K6-${System.currentTimeMillis()}")
+    task.environment 'MAPAF_K6_VUS', mapafK6Property('k6Vus', profile == 'ten-thousand' ? '100' : '1')
+    task.environment 'MAPAF_K6_ITERATIONS', mapafK6Property('k6Iterations', profile == 'ten-thousand' ? '10000' : '5')
+    task.environment 'MAPAF_K6_DURATION', mapafK6Property('k6Duration', '60s')
+    task.environment 'MAPAF_K6_MAX_DURATION', mapafK6Property('k6MaxDuration', '10m')
+    task.environment 'MAPAF_K6_ORDER_VUS', mapafK6Property('k6OrderVus', '20')
+    task.environment 'MAPAF_K6_AUTOSAVE_VUS', mapafK6Property('k6AutosaveVus', '40')
+    task.environment 'MAPAF_K6_AI_VUS', mapafK6Property('k6AiVus', '10')
+    task.environment 'MAPAF_K6_SPIKE_RATE', mapafK6Property('k6SpikeRate', '50')
+    task.commandLine 'bash', 'performance/scripts/run-updr-platform-profile.sh', projectDir.absolutePath, profile
+}
+
+tasks.register('performanceDoctor', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Validates k6, UPDR connectivity, workloads, thresholds, and reporting prerequisites'
+    environment 'UPDR_BASE_URL', mapafK6Property('updrBaseUrl', 'http://localhost:8090')
+    commandLine 'bash', 'performance/scripts/performance-doctor.sh', projectDir.absolutePath
+}
+
+tasks.register('performancePlatformUnitTest', Exec) {
+    group = 'verification'
+    description = 'Runs MAPAF k6 platform configuration and workload contract unit tests'
+    commandLine 'node', 'performance/k6/platform/tests/platform-contract.test.js', projectDir.absolutePath
+}
+
+tasks.register('validateK6PerformancePlatform', Exec) {
+    group = 'verification'
+    description = 'Validates MAPAF v3.0 k6 Performance Platform artifacts and contracts'
+    dependsOn 'performancePlatformUnitTest'
+    commandLine 'bash', 'performance/scripts/validate-k6-platform.sh', projectDir.absolutePath
+}
+
+tasks.register('updrPerformanceSmoke', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the governed UPDR k6 smoke profile and generates normalized evidence'
+    configureUpdrK6(delegate, 'smoke')
+}
+
+tasks.register('updrPerformanceLoad', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the production-style UPDR k6 load profile and generates normalized evidence'
+    configureUpdrK6(delegate, 'load')
+}
+
+tasks.register('updrPerformanceSpike', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs the UPDR submission spike profile and generates normalized evidence'
+    configureUpdrK6(delegate, 'spike')
+}
+
+tasks.register('updrPerformanceTenThousand', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Executes an exact-volume UPDR workload with 10,000 requests by default'
+    configureUpdrK6(delegate, 'ten-thousand')
+}
+
+tasks.register('updrPerformanceReport') {
+    group = 'MAPAF Dashboard'
+    description = 'Generates the existing unified UPDR report after k6 platform evidence is available'
+    dependsOn 'updrReport'
+}
+
+tasks.register('updrPerformanceGate') {
+    group = 'verification'
+    description = 'Runs doctor, unit tests, smoke execution, reporting, and platform validation'
+    dependsOn 'performanceDoctor', 'validateK6PerformancePlatform', 'updrPerformanceSmoke', 'updrPerformanceReport'
+}
+
+// END MAPAF V3.0 K6 PERFORMANCE PLATFORM FOUNDATION
+
+// BEGIN MAPAF V3.0 ENTERPRISE PERFORMANCE OBSERVABILITY
+
+def configureObservedUpdrK6 = { Exec task, String profile ->
+    task.environment 'UPDR_BASE_URL', providers.gradleProperty('updrBaseUrl').orElse('http://localhost:8090').get()
+    task.environment 'MAPAF_EXECUTION_ID', providers.gradleProperty('executionId').orElse("MAPAF-OBS-${System.currentTimeMillis()}").get()
+    task.environment 'MAPAF_K6_VUS', providers.gradleProperty('k6Vus').orElse(profile == 'ten-thousand' ? '100' : '1').get()
+    task.environment 'MAPAF_K6_ITERATIONS', providers.gradleProperty('k6Iterations').orElse(profile == 'ten-thousand' ? '10000' : '5').get()
+    task.environment 'MAPAF_K6_DURATION', providers.gradleProperty('k6Duration').orElse('60s').get()
+    task.environment 'MAPAF_K6_MAX_DURATION', providers.gradleProperty('k6MaxDuration').orElse('10m').get()
+    task.environment 'MAPAF_K6_ORDER_VUS', providers.gradleProperty('k6OrderVus').orElse('20').get()
+    task.environment 'MAPAF_K6_AUTOSAVE_VUS', providers.gradleProperty('k6AutosaveVus').orElse('40').get()
+    task.environment 'MAPAF_K6_AI_VUS', providers.gradleProperty('k6AiVus').orElse('10').get()
+    task.environment 'MAPAF_K6_SPIKE_RATE', providers.gradleProperty('k6SpikeRate').orElse('50').get()
+    task.commandLine 'bash', 'performance/scripts/run-updr-observed-profile.sh', projectDir.absolutePath, profile
+}
+
+tasks.register('performanceObservabilityDoctor', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Validates Docker, Prometheus, Grafana, OpenTelemetry, k6 remote write, and dashboard contracts'
+    commandLine 'bash', 'performance/scripts/performance-observability-doctor.sh', projectDir.absolutePath
+}
+
+tasks.register('validatePerformanceObservability', Exec) {
+    group = 'verification'
+    description = 'Validates MAPAF enterprise performance observability artifacts and contracts'
+    commandLine 'bash', 'performance/scripts/validate-performance-observability.sh', projectDir.absolutePath
+}
+
+tasks.register('performanceObservabilityStart', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Starts Prometheus, Grafana, and OpenTelemetry Collector'
+    commandLine 'bash', 'performance/scripts/performance-observability-up.sh', projectDir.absolutePath
+}
+
+tasks.register('performanceObservabilityStatus', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Checks Prometheus, Grafana, and OpenTelemetry availability'
+    commandLine 'bash', 'performance/scripts/performance-observability-status.sh', projectDir.absolutePath
+}
+
+tasks.register('performanceObservabilityStop', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Stops the MAPAF performance observability stack'
+    commandLine 'bash', 'performance/scripts/performance-observability-down.sh', projectDir.absolutePath
+}
+
+tasks.register('updrPerformanceSmokeObserved', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs UPDR smoke testing and streams live metrics to Prometheus and Grafana'
+    configureObservedUpdrK6(delegate, 'smoke')
+}
+
+tasks.register('updrPerformanceLoadObserved', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs UPDR load testing and streams live metrics to Prometheus and Grafana'
+    configureObservedUpdrK6(delegate, 'load')
+}
+
+tasks.register('updrPerformanceSpikeObserved', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs UPDR spike testing and streams live metrics to Prometheus and Grafana'
+    configureObservedUpdrK6(delegate, 'spike')
+}
+
+tasks.register('updrPerformanceTenThousandObserved', Exec) {
+    group = 'MAPAF Performance'
+    description = 'Runs exact-volume UPDR testing and streams live metrics to Prometheus and Grafana'
+    configureObservedUpdrK6(delegate, 'ten-thousand')
+}
+
+tasks.register('performanceObservabilityGate') {
+    group = 'verification'
+    description = 'Runs observability doctor, contract validation, stack startup, observed smoke test, and status checks'
+    dependsOn 'performanceObservabilityDoctor', 'validatePerformanceObservability', 'performanceObservabilityStart', 'updrPerformanceSmokeObserved', 'performanceObservabilityStatus'
+}
+
+// END MAPAF V3.0 ENTERPRISE PERFORMANCE OBSERVABILITY
+// BEGIN MAPAF V4.0 PERFORMANCE INTELLIGENCE AGENT FOUNDATION
+
+tasks.register('performanceIntelligenceUnitTest', Exec) {
+    group = 'verification'
+    description = 'Runs deterministic Performance Intelligence agent unit tests'
+    commandLine 'node', 'performance/intelligence/tests/performance-intelligence.test.js', projectDir.absolutePath
+}
+
+tasks.register('validatePerformanceIntelligence', Exec) {
+    group = 'verification'
+    description = 'Validates MAPAF v4.0 Performance Intelligence Agent artifacts and contracts'
+    dependsOn 'performanceIntelligenceUnitTest'
+    commandLine 'bash', 'performance/scripts/validate-performance-intelligence.sh', projectDir.absolutePath
+}
+
+tasks.register('analyzeUpdrPerformance', Exec) {
+    group = 'MAPAF AI'
+    description = 'Analyzes UPDR k6 evidence and generates deterministic risk and release recommendations'
+    commandLine 'node', 'performance/intelligence/analyze-performance.js', projectDir.absolutePath
+}
+
+tasks.register('openPerformanceIntelligenceReport', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Opens the MAPAF Performance Intelligence HTML report'
+    dependsOn 'analyzeUpdrPerformance'
+    commandLine 'bash', '-lc', 'open performance/updr/reports/intelligence/index.html 2>/dev/null || xdg-open performance/updr/reports/intelligence/index.html 2>/dev/null || true'
+}
+
+tasks.register('performanceIntelligenceDemo') {
+    group = 'MAPAF AI'
+    description = 'Runs load, spike, exact-volume performance profiles and generates intelligence'
+    dependsOn 'updrPerformanceLoad', 'updrPerformanceSpike', 'updrPerformanceTenThousand'
+    finalizedBy 'analyzeUpdrPerformance'
+}
+
+tasks.register('performanceIntelligenceGate') {
+    group = 'verification'
+    description = 'Runs platform validation, performance intelligence tests, analysis, and release recommendation gate'
+    dependsOn 'validateK6PerformancePlatform', 'validatePerformanceIntelligence', 'analyzeUpdrPerformance'
+}
+
+// END MAPAF V4.0 PERFORMANCE INTELLIGENCE AGENT FOUNDATION
+
+// BEGIN MAPAF V4.0 PERFORMANCE TREND, BASELINE, AND CARDINALITY GOVERNANCE
+
+tasks.register('performanceTrendIntelligenceUnitTest', Exec) {
+    group = 'verification'
+    description = 'Runs deterministic performance trend, baseline, and cardinality governance tests'
+    commandLine 'node', 'performance/intelligence/tests/performance-trend-intelligence.test.js', projectDir.absolutePath
+}
+
+tasks.register('validatePerformanceTrendIntelligence', Exec) {
+    group = 'verification'
+    description = 'Validates MAPAF v4.0 Performance Trend Intelligence artifacts and contracts'
+    dependsOn 'performanceTrendIntelligenceUnitTest'
+    commandLine 'bash', 'performance/scripts/validate-performance-trend-intelligence.sh', projectDir.absolutePath
+}
+
+tasks.register('capturePerformanceHistory', Exec) {
+    group = 'MAPAF AI'
+    description = 'Captures the current Performance Intelligence report as an immutable history record'
+    dependsOn 'analyzeUpdrPerformance'
+    environment 'MAPAF_EXECUTION_ID', providers.gradleProperty('executionId').orElse('').get()
+    commandLine 'node', 'performance/intelligence/history/capture-performance-history.js', projectDir.absolutePath
+}
+
+tasks.register('compareUpdrPerformance', Exec) {
+    group = 'MAPAF AI'
+    description = 'Compares current UPDR performance evidence with the approved baseline'
+    dependsOn 'analyzeUpdrPerformance'
+    commandLine 'node', 'performance/intelligence/trends/compare-performance.js', projectDir.absolutePath
+}
+
+tasks.register('validatePerformanceMetricTags', Exec) {
+    group = 'verification'
+    description = 'Validates k6 source code against MAPAF metric cardinality governance policy'
+    commandLine 'node', 'performance/intelligence/governance/validate-metric-tags.js', projectDir.absolutePath
+}
+
+tasks.register('openPerformanceTrendReport', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Opens the MAPAF Performance Trend Intelligence HTML report'
+    dependsOn 'compareUpdrPerformance'
+    commandLine 'bash', '-lc', 'open performance/updr/reports/trends/index.html 2>/dev/null || xdg-open performance/updr/reports/trends/index.html 2>/dev/null || true'
+}
+
+tasks.register('performanceTrendGate') {
+    group = 'verification'
+    description = 'Runs platform, intelligence, trend, baseline, and cardinality governance validation'
+    dependsOn 'validateK6PerformancePlatform', 'validatePerformanceIntelligence', 'validatePerformanceTrendIntelligence', 'validatePerformanceMetricTags', 'compareUpdrPerformance'
+}
+
+// END MAPAF V4.0 PERFORMANCE TREND, BASELINE, AND CARDINALITY GOVERNANCE
+// BEGIN MAPAF V4.0 SPRINT 1 UNIFIED COMMAND CENTER
+tasks.register('unifiedCommandCenterUnitTest', Exec) {
+    group = 'verification'; commandLine 'node', 'dashboard/tests/command-center.test.js'
+}
+tasks.register('validateUnifiedCommandCenter', Exec) {
+    group = 'verification'; dependsOn 'unifiedCommandCenterUnitTest'; commandLine 'bash', 'scripts/dashboard/validate-unified-command-center.sh', projectDir.absolutePath
+}
+tasks.register('generateUnifiedCommandCenter', Exec) {
+    group = 'MAPAF Dashboard'; commandLine 'node', 'dashboard/command-center/generate-command-center.js', projectDir.absolutePath
+}
+tasks.register('serveUnifiedCommandCenter', Exec) {
+    group = 'MAPAF Dashboard'; dependsOn 'generateUnifiedCommandCenter'; commandLine 'bash', 'scripts/dashboard/serve-unified-command-center.sh', projectDir.absolutePath
+}
+tasks.register('openUnifiedCommandCenter', Exec) {
+    group = 'MAPAF Dashboard'
+    description = 'Serves and opens the MAPAF Unified Command Center'
+    dependsOn 'generateUnifiedCommandCenter'
+
+    workingDir projectDir
+
+    environment 'MAPAF_COMMAND_CENTER_PORT',
+            project.findProperty('commandCenterPort') ?: '8098'
+
+    commandLine 'bash',
+            'scripts/dashboard/open-unified-command-center.sh',
+            projectDir.absolutePath
+}
+
+tasks.register('unifiedCommandCenterDemo') {
+    group = 'MAPAF Demo'; dependsOn 'generateUnifiedCommandCenter', 'validateUnifiedCommandCenter'
+}
+tasks.register('unifiedCommandCenterGate') {
+    group = 'verification'; dependsOn 'validateUnifiedCommandCenter', 'generateUnifiedCommandCenter'
+}
+// END MAPAF V4.0 SPRINT 1 UNIFIED COMMAND CENTER
+
+// BEGIN MAPAF V4.0 SPRINT 2 COMMAND CENTER APPLICATION
+
+tasks.register('commandCenterSprint2UnitTest', Exec) {
+    group = 'verification'
+    commandLine 'node', 'dashboard/tests/command-center-sprint2.test.js'
+}
+
+tasks.register('discoverCommandCenterModules', Exec) {
+    group = 'MAPAF Dashboard'
+    commandLine 'node', 'dashboard/command-center/discovery/discover-modules.js', projectDir.absolutePath
+}
+
+tasks.register('commandCenterDoctor', Exec) {
+    group = 'verification'
+    commandLine 'bash', 'scripts/dashboard/command-center-doctor.sh', projectDir.absolutePath
+}
+
+tasks.register('serveCommandCenterApplication', Exec) {
+    group = 'MAPAF Dashboard'
+    dependsOn 'discoverCommandCenterModules'
+    environment 'MAPAF_COMMAND_CENTER_PORT', project.findProperty('commandCenterPort') ?: '8098'
+    commandLine 'bash', 'scripts/dashboard/serve-command-center-app.sh', projectDir.absolutePath
+}
+
+tasks.register('openCommandCenterApplication', Exec) {
+    group = 'MAPAF Dashboard'
+    dependsOn 'discoverCommandCenterModules'
+    environment 'MAPAF_COMMAND_CENTER_PORT', project.findProperty('commandCenterPort') ?: '8098'
+    commandLine 'bash', 'scripts/dashboard/open-command-center-app.sh', projectDir.absolutePath
+}
+
+tasks.register('unifiedCommandCenterSprint2Demo') {
+    group = 'MAPAF Demo'
+    dependsOn 'commandCenterDoctor', 'commandCenterSprint2UnitTest', 'openCommandCenterApplication'
+}
+
+tasks.register('unifiedCommandCenterSprint2Gate') {
+    group = 'verification'
+    dependsOn 'commandCenterDoctor', 'commandCenterSprint2UnitTest', 'discoverCommandCenterModules'
+}
+
+// END MAPAF V4.0 SPRINT 2 COMMAND CENTER APPLICATION
+
+// BEGIN MAPAF V4.0 SPRINT 2.1 COMMAND CENTER EMBEDDED EXPERIENCE
+if (tasks.findByName('commandCenterSprint21UnitTest') == null) {
+    tasks.register('commandCenterSprint21UnitTest', Exec) {
+        group = 'verification'
+        commandLine 'node', 'dashboard/tests/command-center-sprint21.test.js'
+    }
+}
+if (tasks.findByName('validateCommandCenterSprint21') == null) {
+    tasks.register('validateCommandCenterSprint21', Exec) {
+        group = 'verification'
+        dependsOn 'commandCenterSprint21UnitTest'
+        commandLine 'bash', 'scripts/dashboard/validate-command-center-sprint21.sh', projectDir.absolutePath
+    }
+}
+if (tasks.findByName('unifiedCommandCenterSprint21Gate') == null) {
+    tasks.register('unifiedCommandCenterSprint21Gate') {
+        group = 'verification'
+        dependsOn 'validateCommandCenterSprint21', 'commandCenterDoctor', 'discoverCommandCenterModules'
+    }
+}
+// END MAPAF V4.0 SPRINT 2.1 COMMAND CENTER EMBEDDED EXPERIENCE

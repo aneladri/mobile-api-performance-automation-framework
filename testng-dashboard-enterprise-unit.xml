@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd">
+<suite name="MAPAF Executive Dashboard Unit Tests" parallel="none">
+    <test name="Executive Dashboard Unit Tests">
+        <classes>
+            <class name="dashboard.enterprise.tests.ExecutiveDashboardAggregatorTest"/>
+            <class name="dashboard.enterprise.tests.EnterpriseSummaryAdapterTest"/>
+            <class name="dashboard.enterprise.tests.ExecutionDetailsHtmlWriterTest"/>
+        </classes>
+    </test>
+</suite>

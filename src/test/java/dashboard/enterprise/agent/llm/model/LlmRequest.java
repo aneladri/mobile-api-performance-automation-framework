@@ -1,0 +1,4 @@
+package dashboard.enterprise.agent.llm.model;
+import java.util.Map;
+public record LlmRequest(String schemaVersion,String requestId,String capabilityId,String preferredProviderId,String systemPrompt,String userPrompt,String outputSchema,Map<String,Object> parameters){
+ public LlmRequest{schemaVersion=safe(schemaVersion);requestId=req(requestId,"Request id");capabilityId=req(capabilityId,"Capability id");preferredProviderId=safe(preferredProviderId);systemPrompt=safe(systemPrompt);userPrompt=req(userPrompt,"User prompt");outputSchema=safe(outputSchema);parameters=parameters==null?Map.of():Map.copyOf(parameters);}private static String safe(String v){return v==null?"":v.trim();}private static String req(String v,String l){String n=safe(v);if(n.isEmpty())throw new IllegalArgumentException(l+" is required.");return n;}}

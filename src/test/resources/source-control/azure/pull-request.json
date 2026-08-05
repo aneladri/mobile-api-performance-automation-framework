@@ -1,0 +1,16 @@
+{
+  "provider": "azure",
+  "id": "143",
+  "title": "Improve RoomScan upload resilience",
+  "description": "Adds retry and timeout handling for image uploads.",
+  "sourceBranch": "refs/heads/feature/upload-retry",
+  "targetBranch": "refs/heads/main",
+  "status": "ACTIVE",
+  "mergeable": true,
+  "reviewers": ["qe.lead", "mobile.lead"],
+  "changedFiles": [
+    "mobile/ios/UploadCoordinator.swift",
+    "backend/api/UploadController.cs",
+    "pipelines/quality.yml"
+  ]
+}
