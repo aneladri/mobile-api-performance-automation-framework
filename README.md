@@ -1,6 +1,33 @@
-# MAPAF — Modern Automation Platform and Framework
+# MAPAF — High-Performance Quality Execution Platform
 
-MAPAF is a unified Quality Engineering framework for API, mobile, performance, AI-assisted analysis, locator discovery, reporting, and CI/CD enablement.
+MAPAF is a modern **Quality Execution Platform** for producing trustworthy, observable, provenance-rich quality evidence across API, mobile, performance, web, data, and related validation channels.
+
+MAPAF owns execution. ZENIQ owns quality intelligence. AI must not sit unnecessarily in MAPAF's execution hot path, and MAPAF remains independently useful when ZENIQ or any external AI provider is unavailable.
+
+## Start here
+
+- Read [`CONTEXT.md`](CONTEXT.md) for the current architecture, checkpoint, and active modernization work.
+- Read [`docs/START_HERE.md`](docs/START_HERE.md) for detailed framework onboarding.
+- Use the Gradle wrapper as the primary entry point for verification and execution.
+- Treat `reports/`, `logs/`, generated output, runtime state, backups, and local diagnostic artifacts as disposable unless a release process explicitly packages them.
+
+## Product boundary
+
+```text
+MAPAF Runtime :8098
+   Execution Plane
+        |
+        | evidence / quality events
+        v
+ZENIQ Intelligence :8099
+  Intelligence Plane
+        |
+        v
+    ZENIQ Studio
+   Experience Plane
+```
+
+MAPAF should optimize execution throughput, evidence quality, observability, and reproducibility. ZENIQ may interpret MAPAF evidence asynchronously without making MAPAF dependent on intelligence latency.
 
 ## Supported capabilities
 

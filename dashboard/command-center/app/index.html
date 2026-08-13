@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>MAPAF Command Center</title>
+  <link rel="stylesheet" href="/dashboard/command-center/app/assets/tokens.css">
   <link rel="stylesheet" href="/dashboard/command-center/app/assets/app.css">
 </head>
 <body>
@@ -12,8 +13,11 @@
     <div class="brand"><b>M</b><span>MAPAF<br><small>Command Center</small></span></div>
     <nav id="main-nav">
       <a href="#home" data-view="home">Overview</a>
+      <a href="#runtime" data-view="runtime">Runtime</a>
       <a href="#modules" data-view="modules">Modules</a>
       <a href="#journey" data-view="journey">Journey</a>
+      <a href="#api-evidence" data-view="api-evidence">API Evidence</a>
+      <a href="#performance-evidence" data-view="performance-evidence">Performance Evidence</a>
       <a href="#evidence" data-view="evidence">Evidence</a>
       <a href="#release" data-view="release">Release</a>
     </nav>
@@ -48,6 +52,17 @@
 
       <section id="execution-context" class="context-strip"></section>
 
+      <section id="runtime">
+        <div class="section-title"><div><p class="eyebrow">Execution integrity</p><h2>Runtime diagnostics</h2></div><p>Live evidence-fabric health and blocking-overhead measurements.</p></div>
+        <div id="runtime-status" class="runtime-status">Loading runtime diagnostics…</div>
+        <div id="runtime-kpis" class="runtime-kpis"></div>
+        <div class="runtime-panels">
+          <article class="diagnostic-panel"><div class="panel-head"><div><p class="eyebrow">Quality Event Fabric</p><h3>Event delivery</h3></div><span id="fabric-health" class="badge">ASSESSING</span></div><div id="fabric-metrics" class="diagnostic-list"></div></article>
+          <article class="diagnostic-panel"><div class="panel-head"><div><p class="eyebrow">Performance SLO</p><h3>Execution overhead</h3></div><span id="slo-health" class="badge">MEASURING</span></div><div id="slo-metrics" class="diagnostic-list"></div></article>
+        </div>
+        <div class="diagnostic-panel execution-table-panel"><div class="panel-head"><div><p class="eyebrow">Recent executions</p><h3>Per-execution event overhead</h3></div></div><div class="table-wrap"><table class="diagnostics-table"><thead><tr><th>Execution</th><th>Source</th><th>Events</th><th>Duration</th><th>Publish overhead</th><th>SLO</th></tr></thead><tbody id="execution-diagnostics"><tr><td colspan="6">No completed execution diagnostics yet.</td></tr></tbody></table></div></div>
+      </section>
+
       <section id="modules">
         <div class="section-title"><div><p class="eyebrow">Dynamic discovery</p><h2>Platform modules</h2></div><p>Internal reports stay inside the Command Center. Live tools open safely when embedding is restricted.</p></div>
         <div id="module-grid" class="grid"></div>
@@ -56,6 +71,53 @@
       <section id="journey">
         <div class="section-title"><div><p class="eyebrow">UPDR lifecycle</p><h2>Business journey</h2></div></div>
         <div class="journey" id="journey-steps"></div>
+      </section>
+
+
+      <section id="api-evidence">
+        <div class="section-title"><div><p class="eyebrow">API Evidence 2.0</p><h2>API Evidence Explorer</h2></div><p>Sanitized request/response evidence with validation, trace context, provenance and integrity.</p></div>
+        <div id="api-evidence-status" class="runtime-status">Loading API evidence…</div>
+        <div class="api-evidence-layout">
+          <article class="diagnostic-panel api-evidence-list-panel">
+            <div class="panel-head"><div><p class="eyebrow">Evidence index</p><h3>Recent API executions</h3></div><span id="api-evidence-count" class="badge">0</span></div>
+            <div class="table-wrap"><table class="diagnostics-table"><thead><tr><th>Captured</th><th>Execution</th><th>Status</th><th>Transactions</th><th>Integrity</th></tr></thead><tbody id="api-evidence-list"><tr><td colspan="5">No API Evidence 2.0 artifacts captured yet.</td></tr></tbody></table></div>
+          </article>
+          <article class="diagnostic-panel api-evidence-detail-panel">
+            <div class="panel-head"><div><p class="eyebrow">Selected evidence</p><h3 id="api-evidence-title">Select an execution</h3></div><span id="api-evidence-contract" class="badge">—</span></div>
+            <div id="api-evidence-summary" class="api-evidence-summary"></div>
+            <div class="api-evidence-tabs">
+              <button class="secondary api-evidence-tab active" data-api-tab="request">Request</button>
+              <button class="secondary api-evidence-tab" data-api-tab="response">Response</button>
+              <button class="secondary api-evidence-tab" data-api-tab="validation">Validation</button>
+              <button class="secondary api-evidence-tab" data-api-tab="trace">Trace</button>
+              <button class="secondary api-evidence-tab" data-api-tab="provenance">Provenance</button>
+            </div>
+            <pre id="api-evidence-detail" class="evidence-code">Select API evidence to inspect its sanitized contract.</pre>
+          </article>
+        </div>
+      </section>
+
+      <section id="performance-evidence">
+        <div class="section-title"><div><p class="eyebrow">Performance Evidence 2.0</p><h2>Performance Evidence Explorer</h2></div><p>Aggregated workload evidence, deterministic baseline comparison, anomaly signals, provenance and integrity.</p></div>
+        <div id="performance-evidence-status" class="runtime-status">Loading performance evidence…</div>
+        <div class="api-evidence-layout">
+          <article class="diagnostic-panel api-evidence-list-panel">
+            <div class="panel-head"><div><p class="eyebrow">Evidence index</p><h3>Recent performance executions</h3></div><span id="performance-evidence-count" class="badge">0</span></div>
+            <div class="table-wrap"><table class="diagnostics-table"><thead><tr><th>Captured</th><th>Execution</th><th>Status</th><th>P95</th><th>Baseline</th><th>Integrity</th></tr></thead><tbody id="performance-evidence-list"><tr><td colspan="6">No Performance Evidence 2.0 artifacts captured yet.</td></tr></tbody></table></div>
+          </article>
+          <article class="diagnostic-panel api-evidence-detail-panel">
+            <div class="panel-head"><div><p class="eyebrow">Selected evidence</p><h3 id="performance-evidence-title">Select an execution</h3></div><span id="performance-evidence-contract" class="badge">—</span></div>
+            <div id="performance-evidence-summary" class="api-evidence-summary"></div>
+            <div class="api-evidence-tabs">
+              <button class="secondary performance-evidence-tab active" data-performance-tab="metrics">Metrics</button>
+              <button class="secondary performance-evidence-tab" data-performance-tab="baseline">Baseline</button>
+              <button class="secondary performance-evidence-tab" data-performance-tab="anomalies">Anomalies</button>
+              <button class="secondary performance-evidence-tab" data-performance-tab="thresholds">Thresholds</button>
+              <button class="secondary performance-evidence-tab" data-performance-tab="provenance">Provenance</button>
+            </div>
+            <pre id="performance-evidence-detail" class="evidence-code">Select performance evidence to inspect its aggregated contract.</pre>
+          </article>
+        </div>
       </section>
 
       <section id="evidence">

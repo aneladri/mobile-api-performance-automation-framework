@@ -2929,3 +2929,63 @@ if (tasks.findByName('unifiedCommandCenterSprint21Gate') == null) {
     }
 }
 // END MAPAF V4.0 SPRINT 2.1 COMMAND CENTER EMBEDDED EXPERIENCE
+
+// BEGIN MAPAF ZENIQ API EXECUTION CONTROL CONTRACT
+tasks.register('apiExecutionControlContractTest', Exec) {
+    group = 'verification'
+    description = 'Validates the ZENIQ-compatible MAPAF API execution control contract'
+    commandLine 'node', 'dashboard/command-center/server/api-execution-control.test.js'
+}
+// END MAPAF ZENIQ API EXECUTION CONTROL CONTRACT
+
+// BEGIN MAPAF ZENIQ PERFORMANCE EXECUTION CONTROL CONTRACT
+tasks.register('performanceExecutionControlContractTest', Exec) {
+    group = 'verification'
+    description = 'Validates the ZENIQ-compatible MAPAF performance execution control contract'
+    commandLine 'node', 'dashboard/command-center/server/performance-execution-control.test.js'
+}
+// END MAPAF ZENIQ PERFORMANCE EXECUTION CONTROL CONTRACT
+
+// BEGIN MAPAF M1 QUALITY EVENT FABRIC CONTRACT
+tasks.register('qualityEventFabricContractTest', Exec) {
+    group = 'verification'
+    description = 'Validates the lightweight in-process MAPAF Quality Event Fabric contract'
+    commandLine 'node', 'dashboard/command-center/server/quality-event-fabric.test.js'
+}
+// END MAPAF M1 QUALITY EVENT FABRIC CONTRACT
+
+// BEGIN MAPAF M2.2 EVENT FABRIC EXECUTION OVERHEAD GATE
+tasks.register('eventFabricExecutionOverheadBenchmark', Exec) {
+    group = 'verification'
+    description = 'Compares representative MAPAF execution-control paths with the Quality Event Fabric disabled/enabled and enforces the blocking-overhead SLO'
+    commandLine 'node', 'dashboard/command-center/server/execution-overhead-benchmark.js'
+}
+// END MAPAF M2.2 EVENT FABRIC EXECUTION OVERHEAD GATE
+
+// BEGIN MAPAF M2.4 API EVIDENCE 2.0 CONTRACT
+tasks.register('apiEvidence20ContractTest', Exec) {
+    group = 'verification'
+    description = 'Validates MAPAF API Evidence 2.0 redaction, provenance, integrity, persistence, and Quality Event publication'
+    commandLine 'node', 'dashboard/command-center/server/api-evidence.test.js'
+}
+
+tasks.register('mapafApiEvidence20Gate') {
+    group = 'verification'
+    description = 'Runs the MAPAF API Evidence 2.0 verification gate'
+    dependsOn 'apiEvidence20ContractTest', 'apiExecutionControlContractTest', 'qualityEventFabricContractTest', 'eventFabricExecutionOverheadBenchmark'
+}
+// END MAPAF M2.4 API EVIDENCE 2.0 CONTRACT
+
+// BEGIN MAPAF M2.5 PERFORMANCE EVIDENCE 2.0 CONTRACT
+tasks.register('performanceEvidence20ContractTest', Exec) {
+    group = 'verification'
+    description = 'Validates MAPAF Performance Evidence 2.0 aggregation, deterministic baseline comparison, anomaly signals, provenance, integrity, and persistence'
+    commandLine 'node', 'dashboard/command-center/server/performance-evidence.test.js'
+}
+
+tasks.register('mapafPerformanceEvidence20Gate') {
+    group = 'verification'
+    description = 'Runs the MAPAF Performance Evidence 2.0 verification gate'
+    dependsOn 'performanceEvidence20ContractTest', 'performanceExecutionControlContractTest', 'qualityEventFabricContractTest', 'eventFabricExecutionOverheadBenchmark'
+}
+// END MAPAF M2.5 PERFORMANCE EVIDENCE 2.0 CONTRACT

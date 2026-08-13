@@ -1,0 +1,43 @@
+:root {
+  --mapaf-color-bg-canvas: #07111f;
+  --mapaf-color-bg-surface: #101d2e;
+  --mapaf-color-bg-elevated: #14243a;
+  --mapaf-color-text-primary: #edf4ff;
+  --mapaf-color-text-secondary: #9eb0c7;
+  --mapaf-color-border-subtle: #263a54;
+  --mapaf-color-accent: #66d9ef;
+  --mapaf-color-action: #2764ff;
+  --mapaf-color-success: #35d07f;
+  --mapaf-color-warning: #ffbf47;
+  --mapaf-color-danger: #ff6577;
+
+  /* Shared MAPAF/ZENIQ quality experience semantics. */
+  --quality-bg-canvas: var(--mapaf-color-bg-canvas);
+  --quality-bg-surface: var(--mapaf-color-bg-surface);
+  --quality-bg-elevated: var(--mapaf-color-bg-elevated);
+  --quality-text-primary: var(--mapaf-color-text-primary);
+  --quality-text-secondary: var(--mapaf-color-text-secondary);
+  --quality-border-subtle: var(--mapaf-color-border-subtle);
+  --quality-accent: var(--mapaf-color-accent);
+
+  --quality-status-healthy: var(--mapaf-color-success);
+  --quality-status-degraded: var(--mapaf-color-warning);
+  --quality-status-failed: var(--mapaf-color-danger);
+  --quality-status-info: var(--mapaf-color-accent);
+
+  --quality-resolution-resolved: var(--mapaf-color-success);
+  --quality-resolution-partial: var(--mapaf-color-warning);
+  --quality-resolution-unresolved: var(--mapaf-color-danger);
+
+  --quality-evidence-fresh: var(--mapaf-color-success);
+  --quality-evidence-stale: var(--mapaf-color-warning);
+  --quality-evidence-expired: var(--mapaf-color-danger);
+
+  --quality-proof-proven: var(--mapaf-color-success);
+  --quality-proof-partial: var(--mapaf-color-warning);
+  --quality-proof-unproven: var(--mapaf-color-danger);
+
+  --quality-action-recommended: var(--mapaf-color-action);
+  --quality-action-stop: var(--mapaf-color-success);
+  --quality-action-blocked: var(--mapaf-color-danger);
+}
