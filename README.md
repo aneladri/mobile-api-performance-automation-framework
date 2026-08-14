@@ -1,5 +1,11 @@
 # MAPAF — High-Performance Quality Execution Platform
 
+**Creator:** Aneesh Neladri  
+**Author:** Aneesh Neladri  
+**Project Owner:** Aneesh Neladri  
+**Architecture Authority:** Aneesh Neladri  
+
+
 MAPAF is a modern **Quality Execution Platform** for producing trustworthy, observable, provenance-rich quality evidence across API, mobile, performance, web, data, and related validation channels.
 
 MAPAF owns execution. ZENIQ owns quality intelligence. AI must not sit unnecessarily in MAPAF's execution hot path, and MAPAF remains independently useful when ZENIQ or any external AI provider is unavailable.

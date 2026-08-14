@@ -1,5 +1,11 @@
 # MAPAF Enterprise Architecture Blueprint v1.0
 
+**Author:** Aneesh Neladri  
+**Creator:** Aneesh Neladri  
+**Architecture Authority:** Aneesh Neladri  
+**Document Owner:** Aneesh Neladri  
+
+
 ## 1. Purpose
 This blueprint is the governing architecture for MAPAF. It defines product boundaries, platform capabilities, domain ownership, dependency direction, extension contracts, non-functional requirements, and release governance.
 

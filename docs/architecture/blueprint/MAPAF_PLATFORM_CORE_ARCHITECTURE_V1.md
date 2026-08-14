@@ -1,5 +1,11 @@
 # MAPAF Platform Core Architecture v1.0
 
+**Author:** Aneesh Neladri  
+**Creator:** Aneesh Neladri  
+**Architecture Authority:** Aneesh Neladri  
+**Document Owner:** Aneesh Neladri  
+
+
 **Architecture Sprint:** 0.2  
 **Status:** Accepted baseline  
 **Purpose:** Define the stable operating core through which future MAPAF capabilities execute, publish telemetry, and integrate with reporting, evidence, AI and enterprise connectors.
